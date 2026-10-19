@@ -1,0 +1,26 @@
+[
+  {
+    "query": "I have a runny nose and sore throat",
+    "expected_condition": "common_cold"
+  },
+  {
+    "query": "I have fever, chills and body aches",
+    "expected_condition": "influenza"
+  },
+  {
+    "query": "I have vomiting and diarrhoea",
+    "expected_condition": "gastroenteritis"
+  },
+  {
+    "query": "I have a throbbing headache and nausea",
+    "expected_condition": "migraine"
+  },
+  {
+    "query": "My nose is itchy and my eyes are watery",
+    "expected_condition": "allergic_rhinitis"
+  },
+  {
+    "query": "I have painful and frequent urination",
+    "expected_condition": "urinary_tract_infection"
+  }
+]
