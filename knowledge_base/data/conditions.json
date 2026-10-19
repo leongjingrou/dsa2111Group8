@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "conditions": [
     {
       "id": "common_cold",
@@ -11,7 +11,7 @@
         "cough",
         "nasal congestion"
       ],
-      "description": "Development-only retrieval entry.",
+      "description": "A viral infection of the upper respiratory tract. Common symptoms include runny or blocked nose, sneezing, sore throat and cough.",
       "red_flags": [],
       "source_ids": ["healthhub_common_cold"],
       "last_reviewed": null,
@@ -27,7 +27,7 @@
         "fatigue",
         "chills"
       ],
-      "description": "Development-only retrieval entry.",
+      "description": "A contagious viral respiratory illness that can cause sudden fever, cough, sore throat, muscle aches, chills and fatigue.",
       "red_flags": [],
       "source_ids": ["influenza_source"],
       "last_reviewed": null,
@@ -43,7 +43,7 @@
         "abdominal cramps",
         "stomach pain"
       ],
-      "description": "Development-only retrieval entry.",
+      "description": "Inflammation of the stomach or intestines that may be caused by infections or other factors. Common symptoms include diarrhoea, vomiting, abdominal pain and fever.",
       "red_flags": [],
       "source_ids": ["gastroenteritis_source"],
       "last_reviewed": null,
@@ -58,7 +58,7 @@
         "light sensitivity",
         "throbbing headache"
       ],
-      "description": "Development-only retrieval entry.",
+      "description": "A type of headache that may involve throbbing pain, nausea, vomiting and sensitivity to light or sound.",
       "red_flags": [],
       "source_ids": ["migraine_source"],
       "last_reviewed": null,
@@ -75,7 +75,7 @@
         "nose is itchy",
         "eyes are watery"
       ],
-      "description": "Development-only retrieval entry.",
+      "description": "An allergic reaction to airborne particles that can cause sneezing, an itchy or blocked nose, clear nasal discharge and itchy or watery eyes.",
       "red_flags": [],
       "source_ids": ["allergic_rhinitis_source"],
       "last_reviewed": null,
@@ -90,7 +90,7 @@
         "burning urination",
         "urinary urgency"
       ],
-      "description": "Development-only retrieval entry.",
+      "description": "An infection involving the urinary tract, including the bladder or kidneys. Symptoms may include painful or frequent urination, urinary urgency and lower abdominal discomfort.",
       "red_flags": [],
       "source_ids": ["uti_source"],
       "last_reviewed": null,

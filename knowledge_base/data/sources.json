@@ -12,41 +12,41 @@
     {
       "id": "influenza_source",
       "title": "Influenza",
-      "publisher": null,
-      "url": null,
-      "accessed_date": null,
+      "publisher": "HealthHub Singapore",
+      "url": "https://www.healthhub.sg/health-conditions/topics_influenza",
+      "accessed_date": "2026-10-19",
       "review_status": "pending"
     },
     {
       "id": "gastroenteritis_source",
-      "title": "Gastroenteritis",
-      "publisher": null,
-      "url": null,
-      "accessed_date": null,
+      "title": "Gastroenteritis (Food Poisoning)",
+      "publisher": "SingHealth",
+      "url": "https://www.singhealth.com.sg/symptoms-treatments/gastroenteritis-food-poisoning",
+      "accessed_date": "2026-10-19",
       "review_status": "pending"
     },
     {
       "id": "migraine_source",
       "title": "Migraine",
-      "publisher": null,
-      "url": null,
-      "accessed_date": null,
+      "publisher": "HealthHub Singapore",
+      "url": "https://www.healthhub.sg/health-conditions/migraine",
+      "accessed_date": "2026-10-19",
       "review_status": "pending"
     },
     {
       "id": "allergic_rhinitis_source",
       "title": "Allergic Rhinitis",
-      "publisher": null,
-      "url": null,
-      "accessed_date": null,
+      "publisher": "HealthHub Singapore",
+      "url": "https://www.healthhub.sg/health-conditions/allergic-rhinitis",
+      "accessed_date": "2026-10-19",
       "review_status": "pending"
     },
     {
       "id": "uti_source",
       "title": "Urinary Tract Infection",
-      "publisher": null,
-      "url": null,
-      "accessed_date": null,
+      "publisher": "SingHealth",
+      "url": "https://www.singhealth.com.sg/symptoms-treatments/urinary-tract-infections",
+      "accessed_date": "2026-10-19",
       "review_status": "pending"
     }
   ]
