@@ -1,4 +1,4 @@
-from tfidf_retrieval import search_conditions_tfidf
+from knowledge_base.tfidf_retrieval import search_conditions_tfidf
 
 
 def test_tfidf_returns_results():

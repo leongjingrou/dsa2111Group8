@@ -2,11 +2,11 @@ import json
 import sys
 from pathlib import Path
 
-KB_DIR = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(KB_DIR))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT))
 
-from retrieval import search_conditions
-from tfidf_retrieval import search_conditions_tfidf
+from knowledge_base.retrieval import search_conditions
+from knowledge_base.tfidf_retrieval import search_conditions_tfidf
 
 
 def evaluate():

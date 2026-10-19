@@ -3,7 +3,7 @@ import json
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from retrieval import load_json
+from knowledge_base.retrieval import load_json
 
 
 def search_conditions_tfidf(query, top_k=3):

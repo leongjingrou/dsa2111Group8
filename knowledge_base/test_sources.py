@@ -1,5 +1,5 @@
 
-from retrieval import load_json
+from knowledge_base.retrieval import load_json
 
 
 def test_all_source_ids_exist():

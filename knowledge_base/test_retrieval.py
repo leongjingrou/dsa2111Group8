@@ -1,4 +1,4 @@
-from retrieval import search_conditions
+from knowledge_base.retrieval import search_conditions
 
 
 def test_matching_symptoms():
