@@ -6,8 +6,12 @@ def test_matching_symptoms():
         "I have a runny nose and sore throat"
     )
 
-    assert len(results) == 1
-    assert results[0]["condition_id"] == "common_cold"
+    condition_ids = {
+        result["condition_id"]
+        for result in results
+    }
+
+    assert "common_cold" in condition_ids
 
 
 def test_no_matching_symptoms():
@@ -21,11 +25,15 @@ def test_no_matching_symptoms():
 def test_source_retrieval():
     results = search_conditions("runny nose")
 
-    assert len(results) == 1
+    common_cold = next(
+        result
+        for result in results
+        if result["condition_id"] == "common_cold"
+    )
 
     source_ids = [
         source["id"]
-        for source in results[0]["sources"]
+        for source in common_cold["sources"]
     ]
 
     assert "healthhub_common_cold" in source_ids

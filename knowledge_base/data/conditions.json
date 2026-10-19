@@ -11,9 +11,86 @@
         "cough",
         "nasal congestion"
       ],
-      "description": "Example entry for testing medical knowledge retrieval.",
+      "description": "Development-only retrieval entry.",
       "red_flags": [],
       "source_ids": ["healthhub_common_cold"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "influenza",
+      "name": "Influenza",
+      "keywords": [
+        "fever",
+        "cough",
+        "body aches",
+        "fatigue",
+        "chills"
+      ],
+      "description": "Development-only retrieval entry.",
+      "red_flags": [],
+      "source_ids": [],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "gastroenteritis",
+      "name": "Gastroenteritis",
+      "keywords": [
+        "diarrhoea",
+        "diarrhea",
+        "vomiting",
+        "abdominal cramps",
+        "stomach pain"
+      ],
+      "description": "Development-only retrieval entry.",
+      "red_flags": [],
+      "source_ids": [],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "migraine",
+      "name": "Migraine",
+      "keywords": [
+        "headache",
+        "nausea",
+        "light sensitivity",
+        "throbbing headache"
+      ],
+      "description": "Development-only retrieval entry.",
+      "red_flags": [],
+      "source_ids": [],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "allergic_rhinitis",
+      "name": "Allergic Rhinitis",
+      "keywords": [
+        "sneezing",
+        "itchy nose",
+        "runny nose",
+        "watery eyes"
+      ],
+      "description": "Development-only retrieval entry.",
+      "red_flags": [],
+      "source_ids": [],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "urinary_tract_infection",
+      "name": "Urinary Tract Infection",
+      "keywords": [
+        "painful urination",
+        "frequent urination",
+        "burning urination",
+        "urinary urgency"
+      ],
+      "description": "Development-only retrieval entry.",
+      "red_flags": [],
+      "source_ids": [],
       "last_reviewed": null,
       "review_status": "pending"
     }
