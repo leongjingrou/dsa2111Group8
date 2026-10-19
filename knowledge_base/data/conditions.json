@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "conditions": [
     {
       "id": "common_cold",
@@ -71,7 +71,9 @@
         "sneezing",
         "itchy nose",
         "runny nose",
-        "watery eyes"
+        "watery eyes",
+        "nose is itchy",
+        "eyes are watery"
       ],
       "description": "Development-only retrieval entry.",
       "red_flags": [],

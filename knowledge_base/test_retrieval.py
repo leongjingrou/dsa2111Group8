@@ -42,4 +42,4 @@ def test_source_retrieval():
 def test_kb_version():
     results = search_conditions("sore throat")
 
-    assert results[0]["kb_version"] == "1.0.0"
+    assert results[0]["kb_version"] == "1.1.0"
