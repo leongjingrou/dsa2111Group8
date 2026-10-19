@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "conditions": [
+    {
+      "id": "common_cold",
+      "name": "Common Cold",
+      "keywords": [
+        "runny nose",
+        "sneezing",
+        "sore throat",
+        "cough",
+        "nasal congestion"
+      ],
+      "description": "Example entry for testing medical knowledge retrieval.",
+      "red_flags": [],
+      "source_ids": ["healthhub_common_cold"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    }
+  ]
+}
