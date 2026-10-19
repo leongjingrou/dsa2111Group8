@@ -1,11 +1,52 @@
+
 {
   "sources": [
     {
       "id": "healthhub_common_cold",
-      "title": "Common cold",
+      "title": "Common Cold",
       "publisher": "HealthHub Singapore",
       "url": "https://www.healthhub.sg/health-conditions/common-cold",
       "accessed_date": "2026-10-19",
+      "review_status": "pending"
+    },
+    {
+      "id": "influenza_source",
+      "title": "Influenza",
+      "publisher": null,
+      "url": null,
+      "accessed_date": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "gastroenteritis_source",
+      "title": "Gastroenteritis",
+      "publisher": null,
+      "url": null,
+      "accessed_date": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "migraine_source",
+      "title": "Migraine",
+      "publisher": null,
+      "url": null,
+      "accessed_date": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "allergic_rhinitis_source",
+      "title": "Allergic Rhinitis",
+      "publisher": null,
+      "url": null,
+      "accessed_date": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "uti_source",
+      "title": "Urinary Tract Infection",
+      "publisher": null,
+      "url": null,
+      "accessed_date": null,
       "review_status": "pending"
     }
   ]
