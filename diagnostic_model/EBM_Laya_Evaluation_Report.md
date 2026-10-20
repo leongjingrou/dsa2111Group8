@@ -74,14 +74,14 @@ Log loss evaluates the complete probability distribution. It penalises confident
 The project uses the unscaled multiclass Brier score:
 
 ```math
-\operatorname{Brier}
+B
 = \frac{1}{N}
   \sum_{i=1}^{N}
   \sum_{c=1}^{C}
-  \left(p_{i,c}-y_{i,c}\right)^2
+  (p_{i,c}-y_{i,c})^2
 ```
 
-The two sums cover all evaluated cases and diagnosis classes. For each case-class pair, the predicted probability is compared with a target of 1 for the true diagnosis and 0 for every other diagnosis. A perfect score is 0; this multiclass form ranges from 0 to 2. Lower values indicate that probability mass is placed closer to the correct outcomes ([scikit-learn, 2026d](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html)).
+In the equation, B is the multiclass Brier score. The two sums cover all evaluated cases and diagnosis classes. For each case-class pair, the predicted probability is compared with a target of 1 for the true diagnosis and 0 for every other diagnosis. A perfect score is 0; this multiclass form ranges from 0 to 2. Lower values indicate that probability mass is placed closer to the correct outcomes ([scikit-learn, 2026d](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html)).
 
 The Brier score reflects both calibration and discrimination. It should not be described as a pure calibration statistic. A separate reliability diagram or calibration-error measure is required to identify systematic overconfidence or underconfidence.
 
