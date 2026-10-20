@@ -8,15 +8,15 @@ Laya nevertheless showed substantial task adaptation: full fine-tuning raised it
 
 All results were obtained from a small, deliberately separable synthetic dataset. They demonstrate that the software and evaluation architecture work, but they do not establish clinical safety, effectiveness, generalisability, or superiority of EBM over logistic regression.
 
-## 1. Relationship to the project proposal
+## 1. Alignment with our project design
 
-The group proposal describes an artificial intelligence (AI)-assisted telemedicine system that organises patient information, estimates compatible conditions, identifies cases requiring escalation, and retains clinicians as the final decision-makers (DSA2111 Group 8, 2026). It makes three design choices that are directly relevant to this evaluation:
+Our artificial intelligence (AI)-assisted telemedicine system organises patient information, estimates compatible conditions, identifies cases requiring escalation, and retains clinicians as the final decision-makers. Three choices in our system design are directly relevant to this evaluation:
 
 1. **Diagnostic estimation is separated from safety and escalation.** The diagnostic model estimates which in-scope condition is compatible with the available information. A separate rule-based safety layer handles red flags, insufficient information, out-of-scope cases, and urgent escalation. Diagnostic confidence must therefore never be treated as a substitute for safety screening.
-2. **The diagnostic component should be interpretable.** The proposal identifies a Generalized Additive Model or EBM as a suitable approach because feature-level contributions can be reviewed. This aligns with the additive structure of EBMs, in which learned feature functions contribute to the final prediction ([InterpretML, 2023](https://interpret.ml/docs/ebm.html)). Clinical research on generalized additive models also indicates that interpretability depends on the complexity of the learned risk functions rather than on the model label alone ([Hegselmann et al., 2020](https://proceedings.mlr.press/v126/hegselmann20a.html)).
+2. **The diagnostic component should be interpretable.** We chose a Generalized Additive Model or EBM because its feature-level contributions can be reviewed. This aligns with the additive structure of EBMs, in which learned feature functions contribute to the final prediction ([InterpretML, 2023](https://interpret.ml/docs/ebm.html)). Clinical research on generalized additive models also indicates that interpretability depends on the complexity of the learned risk functions rather than on the model label alone ([Hegselmann et al., 2020](https://proceedings.mlr.press/v126/hegselmann20a.html)).
 3. **A structured decision record should precede patient-facing explanation.** The language layer should communicate a recorded assessment rather than invent unsupported clinical reasoning. The EBM contributes feature-level scores, while Laya contributes a typed choice, probability distribution, confidence value, and JSON Lines (JSONL) decision record. These are complementary audit records, although a Laya probability log is not equivalent to an explanation of clinical reasoning.
 
-The Part 3 diagnostic-model requirements are therefore: a trained and tuned EBM, feature-contribution plots, calibration analysis, and comparison against a simple baseline such as logistic regression. The implementation satisfies these prototype deliverables. It produces a tuned EBM artifact, global feature-importance and calibration plots, and a matched logistic-regression comparison. Laya extends the evaluation beyond the required deliverables without changing the proposal's safety boundaries.
+For Part 3, we need a trained and tuned EBM, feature-contribution plots, calibration analysis, and comparison against a simple baseline such as logistic regression. The implementation satisfies these prototype deliverables. It produces a tuned EBM artifact, global feature-importance and calibration plots, and a matched logistic-regression comparison. Laya extends the evaluation beyond the required deliverables without changing our safety boundaries.
 
 ## 2. Models and evaluation protocol
 
@@ -39,7 +39,7 @@ The audit found no direct target-column leakage: `condition_id`, `vignette_id`, 
 
 The low-level EBM disables interaction terms to retain a simple additive architecture. Its learning rate and bin count were selected through three-fold grid search on the training data using macro F1. The selected configuration used a learning rate of 0.03 and 16 bins. A standardized logistic-regression pipeline served as the simple baseline.
 
-This structure is consistent with the proposal's preference for reviewable feature contributions. EBM explanations can show how individual features affect a score, while the logistic model provides a useful check on whether the synthetic task is already linearly separable.
+This structure follows our preference for reviewable feature contributions. EBM explanations can show how individual features affect a score, while the logistic model provides a useful check on whether the synthetic task is already linearly separable.
 
 ### 2.3 Laya alternative
 
@@ -73,11 +73,15 @@ Log loss evaluates the complete probability distribution. It penalises confident
 
 The project uses the unscaled multiclass Brier score:
 
-$$
-\text{Brier}=\frac{1}{N}\sum_{i=1}^{N}\sum_{c=1}^{C}(p_{ic}-y_{ic})^2.
-$$
+```math
+\operatorname{Brier}
+= \frac{1}{N}
+  \sum_{i=1}^{N}
+  \sum_{c=1}^{C}
+  \left(p_{i,c}-y_{i,c}\right)^2
+```
 
-Here, $p_{ic}$ is the predicted probability for class $c$, and $y_{ic}$ is 1 for the true class and 0 otherwise. A perfect score is 0; this multiclass form ranges from 0 to 2. Lower values indicate that probability mass is placed closer to the correct outcomes ([scikit-learn, 2026d](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html)).
+The two sums cover all evaluated cases and diagnosis classes. For each case-class pair, the predicted probability is compared with a target of 1 for the true diagnosis and 0 for every other diagnosis. A perfect score is 0; this multiclass form ranges from 0 to 2. Lower values indicate that probability mass is placed closer to the correct outcomes ([scikit-learn, 2026d](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html)).
 
 The Brier score reflects both calibration and discrimination. It should not be described as a pure calibration statistic. A separate reliability diagram or calibration-error measure is required to identify systematic overconfidence or underconfidence.
 
@@ -174,7 +178,7 @@ Laya required 16.18 ms per row compared with 0.0353 ms for the EBM, yielding the
 
 ### EBM as the primary diagnostic estimator
 
-The EBM is the better fit for the current Part 3 deliverable. It provides high prototype accuracy, strong probability scores, very low inference latency, and direct feature-contribution plots. This matches the proposal's intention to expose how symptoms such as fever, breathing difficulty, duration, and progression affect the preliminary diagnostic estimate.
+The EBM is the better fit for our current Part 3 deliverable. It provides high prototype accuracy, strong probability scores, very low inference latency, and direct feature-contribution plots. This supports our intention to expose how symptoms such as fever, breathing difficulty, duration, and progression affect the preliminary diagnostic estimate.
 
 The feature contributions remain model explanations rather than clinical proof. They show how the model used its encoded variables; they do not demonstrate causality or guarantee that the learned relationship is medically appropriate. Clinician review and external validation remain necessary.
 
@@ -188,7 +192,7 @@ These capabilities do not yet outweigh the measured performance gap. Laya should
 2. a secondary text-native decision whose disagreement with the EBM triggers review; or
 3. a bridge between the language-based intake layer and the structured diagnostic model.
 
-Laya should not control safety escalation. Red flags, insufficient information, contraindications, pregnancy or age limits, and out-of-scope conditions must remain within the independent safety layer described by the proposal. This separation is important because symptom-checker diagnostic and triage performance can differ, and failures can be clinically consequential ([Semigran et al., 2015](https://doi.org/10.1136/bmj.h3480)).
+Laya should not control safety escalation. Red flags, insufficient information, contraindications, pregnancy or age limits, and out-of-scope conditions must remain within our independent safety layer. This separation is important because symptom-checker diagnostic and triage performance can differ, and failures can be clinically consequential ([Semigran et al., 2015](https://doi.org/10.1136/bmj.h3480)).
 
 ## 6. Limitations
 
@@ -215,7 +219,7 @@ These limitations are material under the Transparent Reporting of a multivariabl
 
 ### Evaluation expansion
 
-1. Build the proposal's clinician-reviewed set of 100-200 handwritten vignettes, covering all in-scope diagnoses and dangerous mimics.
+1. Build our clinician-reviewed set of 100-200 handwritten vignettes, covering all in-scope diagnoses and dangerous mimics.
 2. Reserve a genuinely external test set and add cases representing new diagnoses, ambiguous presentations, contradictory histories, and out-of-scope conditions.
 3. Report per-class sensitivity, specificity, precision, recall, macro F1, confusion matrices, log loss, Brier score, calibration plots, and confidence intervals.
 4. Evaluate the safety layer separately using escalation sensitivity, missed-urgent-case rate, false escalation rate, and time to escalation.
@@ -228,7 +232,7 @@ These limitations are material under the Transparent Reporting of a multivariabl
 
 ## 8. Final assessment
 
-The prototype results support the EBM as the main diagnostic component envisioned in the proposal because it is low-complexity, inspectable, fast, and at least matches the baseline's hard classifications. The EBM has a well-supported log-loss advantage on this fixed holdout, while its Brier-score advantage remains uncertain. The current data do not demonstrate that its nonlinear structure improves diagnostic accuracy over logistic regression.
+The prototype results support the EBM as the main diagnostic component in our architecture because it is low-complexity, inspectable, fast, and at least matches the baseline's hard classifications. The EBM has a well-supported log-loss advantage on this fixed holdout, while its Brier-score advantage remains uncertain. The current data do not demonstrate that its nonlinear structure improves diagnostic accuracy over logistic regression.
 
 Laya demonstrates that a text-native System 1 decision model can be adapted to the same diagnostic labels. Full fine-tuning produced a large improvement over its zero-shot behaviour, but its remaining accuracy, probability-quality, and latency disadvantages prevent it from being recommended as a complete replacement. Its most defensible role is as an alternative experimental model or complementary decision-tracking layer within an EBM-led, safety-separated architecture.
 
@@ -237,8 +241,6 @@ Laya demonstrates that a text-native System 1 decision model can be adapted to t
 Collins, G. S., Moons, K. G. M., Dhiman, P., et al. (2024). TRIPOD+AI statement: Updated guidance for reporting clinical prediction models that use regression or machine learning methods. *BMJ, 385*, e078378. https://doi.org/10.1136/bmj-2023-078378
 
 Convai Innovations. (2026). *Laya model card*. Hugging Face. https://huggingface.co/convaiinnovations/laya
-
-DSA2111 Group 8. (2026). *AI-Assisted Telemedicine Routing and Escalation in Singapore* [Unpublished group project proposal].
 
 Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. *Proceedings of Machine Learning Research, 70*, 1321-1330. https://proceedings.mlr.press/v70/guo17a.html
 
