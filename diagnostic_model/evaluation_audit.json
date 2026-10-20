@@ -1,0 +1,490 @@
+{
+  "audit": {
+    "rows": 180,
+    "holdout_rows": 45,
+    "stratified_support": {
+      "allergic_rhinitis": 7,
+      "common_cold": 8,
+      "gastroenteritis": 8,
+      "influenza": 7,
+      "migraine": 8,
+      "urinary_tract_infection": 7
+    },
+    "label_columns_removed": [
+      "condition_id",
+      "vignette_id",
+      "vignette_text"
+    ],
+    "same_holdout_for_all_models": true,
+    "bootstrap_repeats": 2000,
+    "bootstrap_scheme": "Resample with replacement within each diagnosis while preserving observed class support",
+    "accuracy_interval": "Two-sided exact Clopper-Pearson 95% confidence interval",
+    "laya_probability_source": "Saved four-decimal decision probabilities, row-normalized before common audit metrics"
+  },
+  "models": {
+    "logistic": {
+      "metrics": {
+        "accuracy": 0.9777777777777777,
+        "balanced_accuracy": 0.9761904761904762,
+        "f1_macro": 0.9773755656108598,
+        "f1_weighted": 0.9775766716943187,
+        "log_loss": 0.1051299957144446,
+        "brier": 0.039161112854553926,
+        "ece_10_bins": 0.07560725412928601
+      },
+      "per_class": {
+        "allergic_rhinitis": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 7.0
+        },
+        "common_cold": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1-score": 0.9411764705882353,
+          "support": 8.0
+        },
+        "gastroenteritis": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 8.0
+        },
+        "influenza": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 7.0
+        },
+        "migraine": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 8.0
+        },
+        "urinary_tract_infection": {
+          "precision": 1.0,
+          "recall": 0.8571428571428571,
+          "f1-score": 0.9230769230769231,
+          "support": 7.0
+        },
+        "accuracy": 0.9777777777777777,
+        "macro avg": {
+          "precision": 0.9814814814814815,
+          "recall": 0.9761904761904762,
+          "f1-score": 0.9773755656108598,
+          "support": 45.0
+        },
+        "weighted avg": {
+          "precision": 0.980246913580247,
+          "recall": 0.9777777777777777,
+          "f1-score": 0.9775766716943187,
+          "support": 45.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          8,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          8,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          7,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          8,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          6
+        ]
+      ]
+    },
+    "ebm": {
+      "metrics": {
+        "accuracy": 0.9777777777777777,
+        "balanced_accuracy": 0.9761904761904762,
+        "f1_macro": 0.9773755656108598,
+        "f1_weighted": 0.9775766716943187,
+        "log_loss": 0.059639592913477944,
+        "brier": 0.02949246902723803,
+        "ece_10_bins": 0.013448729536333937
+      },
+      "per_class": {
+        "allergic_rhinitis": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 7.0
+        },
+        "common_cold": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 8.0
+        },
+        "gastroenteritis": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 8.0
+        },
+        "influenza": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 7.0
+        },
+        "migraine": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1-score": 0.9411764705882353,
+          "support": 8.0
+        },
+        "urinary_tract_infection": {
+          "precision": 1.0,
+          "recall": 0.8571428571428571,
+          "f1-score": 0.9230769230769231,
+          "support": 7.0
+        },
+        "accuracy": 0.9777777777777777,
+        "macro avg": {
+          "precision": 0.9814814814814815,
+          "recall": 0.9761904761904762,
+          "f1-score": 0.9773755656108598,
+          "support": 45.0
+        },
+        "weighted avg": {
+          "precision": 0.980246913580247,
+          "recall": 0.9777777777777777,
+          "f1-score": 0.9775766716943187,
+          "support": 45.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          8,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          8,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          7,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          8,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          1,
+          6
+        ]
+      ]
+    },
+    "laya": {
+      "metrics": {
+        "accuracy": 0.8666666666666667,
+        "balanced_accuracy": 0.8690476190476191,
+        "f1_macro": 0.8660660418013358,
+        "f1_weighted": 0.8660687351863822,
+        "log_loss": 0.4057491581749894,
+        "brier": 0.20565617785526785,
+        "ece_10_bins": 0.05582224629094377
+      },
+      "per_class": {
+        "allergic_rhinitis": {
+          "precision": 0.7777777777777778,
+          "recall": 1.0,
+          "f1-score": 0.875,
+          "support": 7.0
+        },
+        "common_cold": {
+          "precision": 0.8571428571428571,
+          "recall": 0.75,
+          "f1-score": 0.8,
+          "support": 8.0
+        },
+        "gastroenteritis": {
+          "precision": 0.8888888888888888,
+          "recall": 1.0,
+          "f1-score": 0.9411764705882353,
+          "support": 8.0
+        },
+        "influenza": {
+          "precision": 0.75,
+          "recall": 0.8571428571428571,
+          "f1-score": 0.8,
+          "support": 7.0
+        },
+        "migraine": {
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1-score": 0.8571428571428571,
+          "support": 8.0
+        },
+        "urinary_tract_infection": {
+          "precision": 1.0,
+          "recall": 0.8571428571428571,
+          "f1-score": 0.9230769230769231,
+          "support": 7.0
+        },
+        "accuracy": 0.8666666666666667,
+        "macro avg": {
+          "precision": 0.878968253968254,
+          "recall": 0.8690476190476191,
+          "f1-score": 0.8660660418013358,
+          "support": 45.0
+        },
+        "weighted avg": {
+          "precision": 0.8813932980599647,
+          "recall": 0.8666666666666667,
+          "f1-score": 0.8660687351863822,
+          "support": 45.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          6,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          8,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          6,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          1,
+          6,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          0,
+          6
+        ]
+      ]
+    }
+  },
+  "bootstrap": {
+    "model_95_percentile_ci": {
+      "logistic": {
+        "accuracy": [
+          0.9333333333333333,
+          1.0
+        ],
+        "balanced_accuracy": [
+          0.9285714285714285,
+          1.0
+        ],
+        "f1_macro": [
+          0.9282296650717704,
+          1.0
+        ],
+        "log_loss": [
+          0.04868214596790553,
+          0.17523103951973207
+        ],
+        "brier": [
+          0.008055589543072318,
+          0.07626097902569692
+        ]
+      },
+      "ebm": {
+        "accuracy": [
+          0.9333333333333333,
+          1.0
+        ],
+        "balanced_accuracy": [
+          0.9285714285714285,
+          1.0
+        ],
+        "f1_macro": [
+          0.9282296650717704,
+          1.0
+        ],
+        "log_loss": [
+          0.009210414037946216,
+          0.12890383188304613
+        ],
+        "brier": [
+          0.0007270354517451029,
+          0.06916827912381564
+        ]
+      },
+      "laya": {
+        "accuracy": [
+          0.7777777777777778,
+          0.9555555555555556
+        ],
+        "balanced_accuracy": [
+          0.7767857142857143,
+          0.9583333333333334
+        ],
+        "f1_macro": [
+          0.7695092669270301,
+          0.9553571428571429
+        ],
+        "log_loss": [
+          0.16593110117360163,
+          0.6826827048047043
+        ],
+        "brier": [
+          0.07799676631899817,
+          0.35175325655650175
+        ]
+      }
+    },
+    "paired_difference_95_percentile_ci": {
+      "ebm_minus_logistic": {
+        "accuracy": [
+          0.0,
+          0.0
+        ],
+        "balanced_accuracy": [
+          0.0,
+          0.0
+        ],
+        "f1_macro": [
+          0.0,
+          0.0
+        ],
+        "log_loss": [
+          -0.074072430349146,
+          -0.021084912098146762
+        ],
+        "brier": [
+          -0.023654564257338508,
+          0.003083846956354765
+        ]
+      },
+      "ebm_minus_laya": {
+        "accuracy": [
+          0.0,
+          0.2222222222222222
+        ],
+        "balanced_accuracy": [
+          -0.0029761904761903546,
+          0.2142857142857143
+        ],
+        "f1_macro": [
+          -0.00014245014245017895,
+          0.2197210136712846
+        ],
+        "log_loss": [
+          -0.619543169275117,
+          -0.11200379854524817
+        ],
+        "brier": [
+          -0.31773973592397775,
+          -0.046918702842431194
+        ]
+      }
+    }
+  },
+  "paired_exact_tests": {
+    "ebm_vs_logistic": {
+      "ebm_only_correct": 0,
+      "logistic_only_correct": 0,
+      "mcnemar_exact_two_sided_p": 1.0
+    },
+    "ebm_vs_laya": {
+      "ebm_only_correct": 6,
+      "laya_only_correct": 1,
+      "mcnemar_exact_two_sided_p": 0.125
+    }
+  }
+}

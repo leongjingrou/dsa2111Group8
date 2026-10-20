@@ -2,11 +2,11 @@
 
 ## Executive conclusion
 
-The Explainable Boosting Machine (EBM) should remain the primary diagnostic model for the current prototype. On the matched 45-case synthetic holdout, it achieved 97.78% accuracy, a macro F1 score of 0.9774, a multiclass Brier score of 0.0295, and an amortized inference latency of 0.0353 ms per case. The fully fine-tuned Laya decision model achieved 86.67% accuracy, a macro F1 score of 0.8661, a Brier score of 0.2057, and 16.18 ms per case.
+The Explainable Boosting Machine (EBM) should remain the primary diagnostic model for the current prototype. On the matched 45-case synthetic holdout, it achieved 97.78% accuracy (44/45; exact 95% confidence interval 88.23%-99.94%), a macro F1 score of 0.9774, a multiclass Brier score of 0.0295, and an amortized inference latency of 0.0353 ms per case. Logistic regression produced the same correct/incorrect pattern and therefore the same accuracy and macro F1. The fully fine-tuned Laya decision model achieved 86.67% accuracy (39/45; exact 95% confidence interval 73.21%-94.95%), a macro F1 score of 0.8661, a Brier score of 0.2057, and 16.18 ms per case.
 
 Laya nevertheless showed substantial task adaptation: full fine-tuning raised its accuracy from 24.44% to 86.67% and reduced its log loss by approximately 74.4%. These results justify retaining Laya as an experimental, text-native alternative or secondary decision layer. They do not support replacing the EBM, because Laya remained less accurate, produced weaker probability estimates, and was approximately 458 times slower in the present batched benchmark.
 
-All results were obtained from a small synthetic dataset. They demonstrate that the software and evaluation architecture work, but they do not establish clinical safety, effectiveness, or generalisability.
+All results were obtained from a small, deliberately separable synthetic dataset. They demonstrate that the software and evaluation architecture work, but they do not establish clinical safety, effectiveness, generalisability, or superiority of EBM over logistic regression.
 
 ## 1. Relationship to the project proposal
 
@@ -31,7 +31,9 @@ The prototype dataset contains 180 synthetic vignettes, 29 structured features, 
 - migraine; and
 - urinary tract infection.
 
-A stratified 25% holdout produced 45 evaluation cases. The EBM and Laya comparison used the same held-out rows. The EBM consumed structured variables, whereas Laya consumed vignette text derived from those variables. The comparison is therefore matched by patient scenario but not by input representation.
+A stratified 25% holdout produced 45 evaluation cases. The class supports were 7 allergic-rhinitis, 8 common-cold, 8 gastroenteritis, 7 influenza, 8 migraine, and 7 urinary-tract-infection cases. The EBM, logistic regression, and Laya comparison used the same held-out rows. The EBM and logistic regression consumed structured variables, whereas Laya consumed vignette text derived from those variables. The comparison is therefore matched by patient scenario but not by input representation.
+
+The audit found no direct target-column leakage: `condition_id`, `vignette_id`, and `vignette_text` are removed from the structured feature matrix; model selection uses three-fold cross-validation within the training portion; and the test portion is used only for final scoring. The central validity limitation is the data generator. For each diagnosis, its listed keywords are activated with probability 0.72 and other keywords with probability 0.06. Training and test cases therefore share strong, diagnosis-specific synthetic rules. A linear model can solve this task well, and performance on this split should be regarded as a pipeline check rather than a realistic clinical benchmark.
 
 ### 2.2 EBM and logistic-regression baseline
 
@@ -59,6 +61,10 @@ Accuracy is the fraction of holdout cases for which the highest-probability clas
 
 F1 is the harmonic mean of precision and recall. Macro F1 calculates an F1 score separately for each diagnosis and takes their unweighted mean. Each condition therefore contributes equally, even if class frequencies differ ([scikit-learn, 2026b](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html)).
 
+### Balanced accuracy and per-diagnosis sensitivity
+
+Balanced accuracy is the unweighted mean of recall across diagnoses. In this six-class setting it exposes whether a high overall accuracy is being driven by easier or more frequent classes. Per-diagnosis recall, or sensitivity, is more actionable still: it reports the proportion of cases from each diagnosis that the model detects. Precision reports how often a model's predictions for that diagnosis are correct. These classwise results are essential because an average can conceal a weak diagnosis.
+
 ### Log loss
 
 Log loss evaluates the complete probability distribution. It penalises confident errors more severely than uncertain errors, so it distinguishes models that have the same accuracy but assign different probabilities. Zero is ideal and the upper range is unbounded. It is the negative log-likelihood, also known as cross-entropy loss ([scikit-learn, 2026c](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html)).
@@ -71,15 +77,23 @@ $$
 \text{Brier}=\frac{1}{N}\sum_{i=1}^{N}\sum_{c=1}^{C}(p_{ic}-y_{ic})^2.
 $$
 
-Here, \(p_{ic}\) is the predicted probability for class \(c\), and \(y_{ic}\) is 1 for the true class and 0 otherwise. A perfect score is 0; this multiclass form ranges from 0 to 2. Lower values indicate that probability mass is placed closer to the correct outcomes ([scikit-learn, 2026d](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html)).
+Here, $p_{ic}$ is the predicted probability for class $c$, and $y_{ic}$ is 1 for the true class and 0 otherwise. A perfect score is 0; this multiclass form ranges from 0 to 2. Lower values indicate that probability mass is placed closer to the correct outcomes ([scikit-learn, 2026d](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html)).
 
 The Brier score reflects both calibration and discrimination. It should not be described as a pure calibration statistic. A separate reliability diagram or calibration-error measure is required to identify systematic overconfidence or underconfidence.
 
 ### Expected calibration error
 
-Expected calibration error (ECE) groups predictions into confidence bins and measures the weighted gap between mean confidence and observed accuracy. The fully tuned Laya ECE of 0.0845 represents an estimated average confidence-accuracy gap of 8.45 percentage points under the chosen binning method. It does not mean that every probability is accurate within 8.45 percentage points.
+Expected calibration error (ECE) groups predictions into confidence bins and measures the weighted gap between mean confidence and observed accuracy. The original fully tuned Laya run reported an ECE of 0.0845, representing an estimated average confidence-accuracy gap of 8.45 percentage points under that run's binning method. It does not mean that every probability is accurate within 8.45 percentage points.
 
-ECE is sensitive to sample size, bin definitions, and whether probabilities are examined globally or by class. Conventional ECE can therefore produce unstable conclusions, particularly with only 45 evaluation cases ([Guo et al., 2017](https://proceedings.mlr.press/v70/guo17a.html); [Nixon et al., 2019](https://openaccess.thecvf.com/content_CVPRW_2019/papers/Uncertainty%20and%20Robustness%20in%20Deep%20Visual%20Learning/Nixon_Measuring_Calibration_in_Deep_Learning_CVPRW_2019_paper.pdf)). ECE was not recorded for the EBM, so the present experiment does not support a direct ECE comparison between the two architectures.
+ECE is sensitive to sample size, bin definitions, and whether probabilities are examined globally or by class. Conventional ECE can therefore produce unstable conclusions, particularly with only 45 evaluation cases ([Guo et al., 2017](https://proceedings.mlr.press/v70/guo17a.html); [Nixon et al., 2019](https://openaccess.thecvf.com/content_CVPRW_2019/papers/Uncertainty%20and%20Robustness%20in%20Deep%20Visual%20Learning/Nixon_Measuring_Calibration_in_Deep_Learning_CVPRW_2019_paper.pdf)).
+
+For the audit below, ECE was recomputed for logistic regression, EBM, and fully tuned Laya with one common 10-bin implementation. This improves comparability but does not remove the instability caused by the small sample.
+
+### Confidence intervals and paired comparisons
+
+Accuracy intervals use exact two-sided binomial 95% confidence intervals. Probability-score and model-difference intervals use 2,000 stratified bootstrap resamples, preserving the observed number of cases from each diagnosis. The bootstrap intervals describe uncertainty from this fixed holdout; they do not include variation from regenerating the synthetic dataset, retraining the models, or sampling patients from a real clinical population. Paired exact McNemar tests compare which model is correct on each of the same 45 cases.
+
+The machine-readable audit is stored in `diagnostic_model/evaluation_audit.json` for future reruns and report updates.
 
 ### Latency
 
@@ -93,21 +107,50 @@ This is a warm, batched, amortized inference measurement. It excludes model load
 
 ## 4. Results
 
-| Model | Accuracy | Macro F1 | Log loss | Brier score | ECE | Latency per row |
+### 4.1 Primary matched comparison
+
+| Model | Accuracy (exact 95% CI) | Balanced accuracy | Macro F1 | Log loss | Brier score | ECE, 10 bins | Latency per row |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Logistic regression | 0.9778 (0.8823-0.9994) | 0.9762 | 0.9774 | 0.1051 | 0.0392 | 0.0756 | Not measured |
+| EBM | 0.9778 (0.8823-0.9994) | 0.9762 | 0.9774 | 0.0596 | 0.0295 | 0.0134 | 0.0353 ms |
+| Laya full tuning | 0.8667 (0.7321-0.9495) | 0.8690 | 0.8661 | 0.4057 | 0.2057 | 0.0558 | 16.18 ms |
+
+ECE in this table was recomputed with the same 10-bin procedure for all three primary models. Latency was not captured for logistic regression, so no speed ranking between logistic regression and EBM is claimed.
+
+### 4.2 Laya tuning ablation
+
+| Laya setting | Accuracy | Macro F1 | Log loss | Brier score | Original-run ECE | Latency per row |
 |---|---:|---:|---:|---:|---:|---:|
-| Logistic regression | 0.9778 | 0.9774 | 0.1051 | 0.0392 | Not measured | Not measured |
-| EBM | 0.9778 | 0.9774 | 0.0596 | 0.0295 | Not measured | 0.0353 ms |
-| Laya zero-shot | 0.2444 | 0.1628 | 1.5823 | 0.7724 | 0.1751 | 15.84 ms |
-| Laya head-only tuning | 0.2444 | 0.1628 | 1.4507 | 0.7300 | 0.1589 | 15.94 ms |
-| Laya full tuning | 0.8667 | 0.8661 | 0.4057 | 0.2057 | 0.0845 | 16.18 ms |
+| Zero-shot | 0.2444 | 0.1628 | 1.5823 | 0.7724 | 0.1751 | 15.84 ms |
+| Head-only tuning | 0.2444 | 0.1628 | 1.4507 | 0.7300 | 0.1589 | 15.94 ms |
+| Full tuning | 0.8667 | 0.8661 | 0.4057 | 0.2057 | 0.0845 | 16.18 ms |
 
-### 4.1 EBM versus logistic regression
+The ablation ECE values are retained from the original training runs and should be compared within this table only; their binning implementation differs from the common 10-bin audit above.
 
-The EBM and logistic regression classified the same proportion of holdout cases correctly: approximately 44 of 45. The EBM nevertheless achieved a 43.3% lower log loss and a 24.7% lower Brier score. On this dataset, the evidence therefore supports improved probability quality rather than improved hard-label accuracy.
+### 4.3 Per-diagnosis performance on the 45-case holdout
+
+Each cell reports precision / recall / F1. Support is the number of true cases for that diagnosis.
+
+| Diagnosis | Support | Logistic regression | EBM | Fully tuned Laya |
+|---|---:|---:|---:|---:|
+| Allergic rhinitis | 7 | 1.000 / 1.000 / 1.000 | 1.000 / 1.000 / 1.000 | 0.778 / 1.000 / 0.875 |
+| Common cold | 8 | 0.889 / 1.000 / 0.941 | 1.000 / 1.000 / 1.000 | 0.857 / 0.750 / 0.800 |
+| Gastroenteritis | 8 | 1.000 / 1.000 / 1.000 | 1.000 / 1.000 / 1.000 | 0.889 / 1.000 / 0.941 |
+| Influenza | 7 | 1.000 / 1.000 / 1.000 | 1.000 / 1.000 / 1.000 | 0.750 / 0.857 / 0.800 |
+| Migraine | 8 | 1.000 / 1.000 / 1.000 | 0.889 / 1.000 / 0.941 | 1.000 / 0.750 / 0.857 |
+| Urinary tract infection | 7 | 1.000 / 0.857 / 0.923 | 1.000 / 0.857 / 0.923 | 1.000 / 0.857 / 0.923 |
+
+The classwise values are not tight estimates. For example, an observed recall of 7/7 has an exact 95% interval of 0.590-1.000; 8/8 has an interval of 0.631-1.000; 6/7 has an interval of 0.421-0.996; and 6/8 has an interval of 0.349-0.968. The apparently perfect class scores therefore remain compatible with materially weaker real performance.
+
+### 4.4 EBM versus logistic regression
+
+The EBM and logistic regression classified the same 44 cases correctly and the same urinary-tract-infection case incorrectly, although they assigned that error to different classes. Their accuracy difference is exactly zero on every paired bootstrap resample, and the exact McNemar p-value is 1.0. There is no hard-label evidence that EBM is better on this holdout.
+
+The EBM achieved a 43.3% lower log loss and a 24.7% lower Brier score. The paired stratified-bootstrap 95% interval for EBM minus logistic-regression log loss was -0.0741 to -0.0211, supporting lower log loss on this fixed holdout. The corresponding Brier difference interval was -0.0237 to 0.0031 and crossed zero, so the Brier advantage is not established with the same confidence. The 10-bin ECE was lower for EBM, but 45 cases are too few for a stable calibration ranking.
 
 The identical accuracy also indicates that the current synthetic task may be relatively easy or largely linearly separable. A larger and more varied evaluation is needed to determine whether the EBM's nonlinear feature functions produce a meaningful diagnostic advantage. Its present advantages are the probability scores and the ability to visualise feature-level contributions.
 
-### 4.2 Laya adaptation
+### 4.5 Laya adaptation
 
 Head-only tuning reduced log loss and Brier score but did not improve accuracy or macro F1. Full tuning was necessary to adapt the representation to the diagnostic task. Relative to zero-shot Laya, full tuning produced:
 
@@ -119,9 +162,11 @@ Head-only tuning reduced log loss and Brier score but did not improve accuracy o
 
 This result is consistent with the Laya model card's statement that domain fine-tuning can materially improve decision accuracy. The model card is vendor-provided evidence, however, and does not independently validate Laya for clinical diagnosis.
 
-### 4.3 EBM versus fully tuned Laya
+### 4.6 EBM versus fully tuned Laya
 
-The EBM exceeded fully tuned Laya by 11.11 percentage points in accuracy and by 0.1113 in macro F1. It also obtained substantially lower log loss and Brier score. In count terms, the EBM produced approximately five fewer errors on the 45-case holdout.
+The EBM exceeded fully tuned Laya by 11.11 percentage points in accuracy and by 0.1113 in macro F1. It made one error versus Laya's six. Because the errors were paired by case, EBM was uniquely correct on six cases and Laya was uniquely correct on one. The exact McNemar p-value was 0.125, and the paired-bootstrap 95% interval for the accuracy difference was 0.0000-0.2222. The direction favours EBM, but this holdout is too small to establish a conventional statistically significant hard-label advantage.
+
+The probability metrics are more clearly separated on this fixed holdout. Paired-bootstrap intervals for EBM minus Laya were -0.6195 to -0.1120 for log loss and -0.3177 to -0.0469 for Brier score, both favouring EBM. These intervals remain conditional on the synthetic generator and fixed trained models; they are not clinical-performance intervals.
 
 Laya required 16.18 ms per row compared with 0.0353 ms for the EBM, yielding the reported 458.36-fold latency ratio. Because this is a small batched benchmark and the architectures use different execution paths, the ratio should not be generalised beyond the present server and implementation.
 
@@ -147,13 +192,14 @@ Laya should not control safety escalation. Red flags, insufficient information, 
 
 ## 6. Limitations
 
-1. **Synthetic data:** The vignettes were generated for prototype development and may contain cleaner class boundaries than real patient descriptions.
-2. **Small holdout:** Forty-five cases are insufficient for precise overall estimates or reliable per-diagnosis and subgroup analysis. Confidence intervals were not included in the current artifacts.
+1. **Synthetic data:** The vignettes were generated from diagnosis-specific keyword probabilities, producing much cleaner class boundaries than real patient descriptions and strongly favouring models that recover those rules.
+2. **Small holdout:** Forty-five cases are insufficient for precise overall estimates or reliable per-diagnosis and subgroup analysis. The exact and bootstrap intervals reported here are correspondingly wide.
 3. **No external validation:** Training, calibration, and evaluation data originate from the same synthetic generation process.
 4. **Different representations:** The EBM uses structured features while Laya uses derived text. The experiment compares complete model pipelines rather than isolating architecture alone.
-5. **Partial calibration comparison:** Brier score is available for all models, but ECE was not recorded for the EBM or logistic baseline.
+5. **Unstable calibration comparison:** Brier score is available for all models and a common 10-bin ECE was added for the three primary models, but 45 cases are insufficient for a stable reliability curve or classwise calibration analysis.
 6. **Narrow latency benchmark:** The reported latency excludes most end-to-end application costs and does not include tail latency or concurrency.
 7. **No safety-layer evaluation:** The results measure diagnostic classification. They do not measure escalation sensitivity, false escalation rate, contraindication detection, or out-of-scope recognition.
+8. **Training variation omitted:** The reported intervals condition on one generated dataset and one set of fitted models. They do not quantify variability across regenerated datasets, alternative splits, or retraining runs.
 
 These limitations are material under the Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis plus AI (TRIPOD+AI) statement, which emphasises transparent reporting of intended use, data, evaluation procedures, findings, limitations, and relevant subgroups ([Collins et al., 2024](https://doi.org/10.1136/bmj-2023-078378)). This report follows those principles as guidance but does not claim formal TRIPOD+AI compliance.
 
@@ -182,7 +228,7 @@ These limitations are material under the Transparent Reporting of a multivariabl
 
 ## 8. Final assessment
 
-The prototype results support the EBM as the main diagnostic component envisioned in the proposal. It meets the immediate need for a low-complexity, inspectable model and performs at least as well as logistic regression on hard classifications while providing better probability scores. The current data do not yet demonstrate that its nonlinear structure improves diagnostic accuracy over the simple baseline.
+The prototype results support the EBM as the main diagnostic component envisioned in the proposal because it is low-complexity, inspectable, fast, and at least matches the baseline's hard classifications. The EBM has a well-supported log-loss advantage on this fixed holdout, while its Brier-score advantage remains uncertain. The current data do not demonstrate that its nonlinear structure improves diagnostic accuracy over logistic regression.
 
 Laya demonstrates that a text-native System 1 decision model can be adapted to the same diagnostic labels. Full fine-tuning produced a large improvement over its zero-shot behaviour, but its remaining accuracy, probability-quality, and latency disadvantages prevent it from being recommended as a complete replacement. Its most defensible role is as an alternative experimental model or complementary decision-tracking layer within an EBM-led, safety-separated architecture.
 
