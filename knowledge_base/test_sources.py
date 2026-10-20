@@ -40,3 +40,10 @@ def test_all_conditions_have_source_records():
 
     for condition in kb["conditions"]:
         assert len(condition["source_ids"]) >= 1
+
+
+def test_version_metadata_matches_conditions():
+    version = load_json("version.json")
+    conditions = load_json("conditions.json")
+
+    assert version["version"] == conditions["version"]
