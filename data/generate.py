@@ -405,9 +405,10 @@ def render_patient_text(row):
         negatives += f", and {len(absent) - 5} other checked symptoms"
     pregnancy = "pregnant" if row["pregnancy_status"] else "not pregnant"
     age_text = f"{row['age']}-year-old"
+    sex_text = "female" if row["sex"] == "F" else "male"
 
     narrative = (
-        f"A {age_text} patient reports {chief} for {row['duration_days']} days. "
+        f"A {age_text} {sex_text} patient reports {chief} for {row['duration_days']} days. "
         f"The symptom feels {row['severity']} and is {row['progression']}. "
         f"Their temperature is {row['temperature']:.1f} °C. "
         f"Other reported symptoms include {positives}. When asked, the patient "
