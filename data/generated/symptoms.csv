@@ -1,0 +1,73 @@
+symptom_id,name,category,is_red_flag,associated_diagnoses
+runny_nose,Runny nose,respiratory,False,Common Cold; Influenza; COVID-19; Allergic Rhinitis
+nasal_congestion,Nasal congestion,respiratory,False,Common Cold; Allergic Rhinitis; Sinusitis
+sneezing,Sneezing,respiratory,False,Common Cold; Allergic Rhinitis
+itchy_nose,Itchy nose,respiratory,False,Allergic Rhinitis
+sore_throat,Sore throat,respiratory,False,"Common Cold; Influenza; COVID-19; Tonsillitis; Hand, Foot and Mouth Disease"
+cough,Cough,respiratory,False,Common Cold; Influenza; COVID-19; Sinusitis
+thick_nasal_discharge,Thick yellow/green nasal discharge,respiratory,False,Sinusitis
+facial_pain_pressure,Facial pain or pressure,respiratory,False,Sinusitis
+loss_of_smell_taste,Loss of smell or taste,respiratory,False,COVID-19; Sinusitis
+difficulty_swallowing,Difficulty or pain swallowing,respiratory,False,Tonsillitis
+swollen_tonsils,"Red, swollen tonsils",respiratory,False,Tonsillitis
+swollen_neck_glands,Swollen neck glands,respiratory,False,Tonsillitis
+wheezing,Wheezing,respiratory,True,Common Cold; Allergic Rhinitis
+shortness_of_breath,Shortness of breath,respiratory,True,Common Cold; Influenza; COVID-19; Allergic Rhinitis; Tonsillitis; Chickenpox
+chest_pain,Chest pain,respiratory,True,Common Cold; Influenza; COVID-19; Allergic Rhinitis; Chickenpox
+difficulty_opening_mouth,Difficulty opening mouth / drooling,respiratory,True,Tonsillitis
+fever,Fever,systemic,False,"Common Cold; Influenza; COVID-19; Sinusitis; Tonsillitis; Gastroenteritis; Dengue Fever; Hand, Foot and Mouth Disease; Chickenpox; Urinary Tract Infection"
+chills,Chills,systemic,False,Influenza; COVID-19; Dengue Fever; Eczema; Urinary Tract Infection
+body_aches,Body aches,systemic,False,Common Cold; Influenza; COVID-19
+fatigue,Fatigue,systemic,False,"Common Cold; Influenza; COVID-19; Allergic Rhinitis; Sinusitis; Tonsillitis; Gastroenteritis; Dengue Fever; Hand, Foot and Mouth Disease; Chickenpox; Tension Headache"
+loss_of_appetite,Loss of appetite,systemic,False,"Influenza; Tonsillitis; Gastritis; Constipation; Dengue Fever; Hand, Foot and Mouth Disease; Chickenpox"
+joint_muscle_pain,Severe joint or muscle pain,systemic,False,Dengue Fever
+confusion_drowsiness,Confusion or unusual drowsiness,systemic,True,"Common Cold; Influenza; COVID-19; Sinusitis; Gastroenteritis; Dengue Fever; Hand, Foot and Mouth Disease; Chickenpox; Migraine; Tension Headache; Urinary Tract Infection"
+dehydration_signs,"Signs of dehydration (reduced urine, dry mouth)",systemic,True,"Common Cold; Influenza; COVID-19; Tonsillitis; Gastroenteritis; Dengue Fever; Hand, Foot and Mouth Disease"
+unintentional_weight_loss,Unintentional weight loss,systemic,True,Gastritis; Constipation
+upper_abdominal_pain,Upper abdominal / epigastric pain,gastrointestinal,False,Gastritis
+lower_abdominal_pain,Lower abdominal pain,gastrointestinal,False,Gastroenteritis; Constipation; Urinary Tract Infection
+bloating,Bloating,gastrointestinal,False,Gastritis; Constipation
+heartburn,Heartburn / indigestion,gastrointestinal,False,Gastritis
+nausea,Nausea,gastrointestinal,False,Gastritis; Gastroenteritis; Dengue Fever; Migraine
+vomiting,Vomiting,gastrointestinal,False,Gastritis; Gastroenteritis; Migraine; Urinary Tract Infection
+diarrhoea,Diarrhoea,gastrointestinal,False,Gastroenteritis
+infrequent_bowel_movements,Fewer than 3 bowel movements a week,gastrointestinal,False,Constipation
+hard_stools,Hard or lumpy stools,gastrointestinal,False,Constipation
+straining,Straining during bowel movements,gastrointestinal,False,Constipation
+persistent_vomiting,Persistent vomiting,gastrointestinal,True,"Influenza; Gastritis; Gastroenteritis; Constipation; Dengue Fever; Hand, Foot and Mouth Disease"
+vomiting_blood,Vomiting blood,gastrointestinal,True,Gastritis
+black_stools,"Black, tarry stools",gastrointestinal,True,Gastritis
+blood_in_stool,Blood in stool,gastrointestinal,True,Gastroenteritis; Constipation
+severe_abdominal_pain,Severe abdominal pain,gastrointestinal,True,Gastritis; Gastroenteritis; Constipation; Dengue Fever
+rash,Skin rash,skin,False,"Dengue Fever; Hand, Foot and Mouth Disease; Chickenpox; Eczema"
+itchy_blisters,Itchy fluid-filled blisters,skin,False,Chickenpox
+mouth_ulcers,Mouth ulcers,skin,False,"Hand, Foot and Mouth Disease"
+blisters_hands_feet,Spots/blisters on palms and soles,skin,False,"Hand, Foot and Mouth Disease"
+dry_itchy_skin,"Dry, itchy skin",skin,False,Eczema
+red_inflamed_patches,"Red, inflamed skin patches",skin,False,Eczema
+skin_infection_signs,"Weeping, crusting or pus on skin",skin,True,Chickenpox; Eczema
+bleeding_gums_nose,Bleeding gums or nose,skin,True,Dengue Fever
+red_eyes,Red eyes,eye,False,Conjunctivitis
+watery_eyes,Watery eyes,eye,False,Allergic Rhinitis; Conjunctivitis
+itchy_eyes,Itchy eyes,eye,False,Allergic Rhinitis; Conjunctivitis
+eye_discharge,Eye discharge,eye,False,Conjunctivitis
+pain_behind_eyes,Pain behind the eyes,eye,False,Dengue Fever
+eye_pain,Eye pain,eye,True,Conjunctivitis
+blurred_vision,Blurred vision,eye,True,Sinusitis; Conjunctivitis; Migraine; Tension Headache
+periorbital_swelling,Swelling around the eye,eye,True,Sinusitis; Conjunctivitis
+headache,Headache,neurological,False,Common Cold; Influenza; COVID-19; Sinusitis; Tonsillitis; Dengue Fever; Chickenpox; Migraine; Tension Headache
+throbbing_headache,"Throbbing, one-sided headache",neurological,False,Migraine
+band_like_headache,"Tight, band-like headache",neurological,False,Tension Headache
+light_sensitivity,Sensitivity to light,neurological,False,Conjunctivitis; Migraine; Tension Headache
+sound_sensitivity,Sensitivity to sound,neurological,False,Migraine
+visual_aura,Visual aura,neurological,False,Migraine
+neck_shoulder_tension,Neck or shoulder muscle tension,neurological,False,Tension Headache
+neck_stiffness,Neck stiffness,neurological,True,"Sinusitis; Hand, Foot and Mouth Disease; Chickenpox; Migraine; Tension Headache"
+sudden_severe_headache,"Sudden, worst-ever headache",neurological,True,Sinusitis; Migraine; Tension Headache
+weakness_numbness,Weakness or numbness,neurological,True,"Hand, Foot and Mouth Disease; Migraine; Tension Headache"
+painful_urination,Painful / burning urination,urinary,False,Urinary Tract Infection
+frequent_urination,Frequent urination,urinary,False,Urinary Tract Infection
+urinary_urgency,Urinary urgency,urinary,False,Urinary Tract Infection
+cloudy_urine,Cloudy or foul-smelling urine,urinary,False,Urinary Tract Infection
+blood_in_urine,Blood in urine,urinary,False,Urinary Tract Infection
+flank_pain,Flank / back pain,urinary,True,Urinary Tract Infection
