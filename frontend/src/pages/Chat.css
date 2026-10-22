@@ -16,6 +16,12 @@
   font-weight: 600;
 }
 
+.back {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+}
+
 .messages {
   flex: 1;
   overflow-y: auto;

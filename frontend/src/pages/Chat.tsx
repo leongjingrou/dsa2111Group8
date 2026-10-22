@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router'
 import { diagnose, transcribe } from '../api'
 import ChatBubble from '../components/ChatBubble'
 import ChatInput from '../components/ChatInput'
-import { BotIcon } from '../components/Icons'
+import { BackIcon, BotIcon } from '../components/Icons'
 import useRecorder from '../hooks/useRecorder'
 import type { DiagnosticStatus, Message } from '../types'
 import './Chat.css'
@@ -54,6 +54,9 @@ const Chat = () => {
   return (
     <main className="chat">
       <header>
+        <button className="back" onClick={() => navigate('/')} aria-label="Back to home">
+          <BackIcon size={20} />
+        </button>
         <BotIcon size={22} />
         <span>Telemedicine Assistant</span>
       </header>
