@@ -5,9 +5,10 @@ import './ChatInput.css'
 type ChatInputProps = {
   onSend: (text: string) => void
   onMic: () => void
+  disabled: boolean
 }
 
-const ChatInput = ({ onSend, onMic }: ChatInputProps) => {
+const ChatInput = ({ onSend, onMic, disabled }: ChatInputProps) => {
   const [text, setText] = useState('')
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -24,11 +25,14 @@ const ChatInput = ({ onSend, onMic }: ChatInputProps) => {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Describe your symptoms..."
+        disabled={disabled}
       />
-      <button type="button" className="mic" onClick={onMic} aria-label="Speak">
+      <button type="button" className="mic" onClick={onMic} aria-label="Speak" disabled={disabled}>
         <MicIcon size={20} />
       </button>
-      <button type="submit">Send</button>
+      <button type="submit" disabled={disabled || !text.trim()}>
+        Send
+      </button>
     </form>
   )
 }

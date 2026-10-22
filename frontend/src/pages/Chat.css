@@ -24,3 +24,8 @@
   gap: 12px;
   padding: 16px;
 }
+
+.end-diagnosis {
+  align-self: center;
+  margin-bottom: 8px;
+}

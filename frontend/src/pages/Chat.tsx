@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { diagnose } from '../api'
 import ChatBubble from '../components/ChatBubble'
 import ChatInput from '../components/ChatInput'
 import { BotIcon } from '../components/Icons'
-import type { Message } from '../types'
+import type { DiagnosticStatus, Message } from '../types'
 import './Chat.css'
 
 const greeting: Message = {
@@ -12,13 +14,29 @@ const greeting: Message = {
 
 const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([greeting])
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<DiagnosticStatus>('asking')
+  const navigate = useNavigate()
   const bottom = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [messages, loading])
 
-  const send = (text: string) => setMessages((prev) => [...prev, { role: 'user', text }])
+  const send = async (text: string) => {
+    const history: Message[] = [...messages, { role: 'user', text }]
+    setMessages(history)
+    setLoading(true)
+    try {
+      const result = await diagnose(history)
+      setMessages((prev) => [...prev, { role: 'bot', text: result.reply }])
+      setStatus(result.status)
+    } catch {
+      setMessages((prev) => [...prev, { role: 'bot', text: 'Sorry, something went wrong. Please try again.' }])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <main className="chat">
@@ -30,9 +48,15 @@ const Chat = () => {
         {messages.map((msg, i) => (
           <ChatBubble key={i} {...msg} />
         ))}
+        {loading && <ChatBubble role="bot" text="..." />}
         <div ref={bottom} />
       </section>
-      <ChatInput onSend={send} onMic={() => {}} />
+      {status !== 'asking' && (
+        <button className="end-diagnosis" onClick={() => navigate('/')}>
+          End consultation
+        </button>
+      )}
+      <ChatInput onSend={send} onMic={() => {}} disabled={loading} />
     </main>
   )
 }

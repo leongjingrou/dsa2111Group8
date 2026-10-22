@@ -19,6 +19,11 @@
   border-color: var(--teal);
 }
 
+.chat-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .chat-input .mic {
   display: grid;
   place-items: center;
