@@ -5,6 +5,7 @@ import ChatBubble from '../components/ChatBubble'
 import ChatInput from '../components/ChatInput'
 import { BackIcon, BotIcon } from '../components/Icons'
 import useRecorder from '../hooks/useRecorder'
+import useSpeech from '../hooks/useSpeech'
 import type { DiagnosticStatus, Message } from '../types'
 import './Chat.css'
 
@@ -18,6 +19,7 @@ const Chat = () => {
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState<DiagnosticStatus>('asking')
   const { recording, start, stop } = useRecorder()
+  const { speaking, speak, stop: silence, supported } = useSpeech()
   const navigate = useNavigate()
   const bottom = useRef<HTMLDivElement>(null)
 
@@ -28,7 +30,10 @@ const Chat = () => {
   const reply = (text: string) => setMessages((prev) => [...prev, { role: 'bot', text }])
 
   const toggleMic = async () => {
-    if (!recording) return start().catch(() => reply('Unable to access the microphone. Please check your permissions.'))
+    if (!recording) {
+      silence()
+      return start().catch(() => reply('Unable to access the microphone. Please check your permissions.'))
+    }
     setLoading(true)
     const text = (await stop().then(transcribe).catch(() => '')).trim()
     setLoading(false)
@@ -62,7 +67,12 @@ const Chat = () => {
       </header>
       <section className="messages">
         {messages.map((msg, i) => (
-          <ChatBubble key={i} {...msg} />
+          <ChatBubble
+            key={i}
+            {...msg}
+            speaking={speaking === i}
+            onSpeak={msg.role === 'bot' && supported ? () => (speaking === i ? silence() : speak(i, msg.text)) : undefined}
+          />
         ))}
         {loading && <ChatBubble role="bot" text="..." />}
         <div ref={bottom} />

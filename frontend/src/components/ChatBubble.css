@@ -26,3 +26,16 @@
   color: var(--on-teal);
   border-bottom-right-radius: 4px;
 }
+
+.speak {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  background: transparent;
+  color: var(--teal);
+}
+
+.speak:hover {
+  background: var(--grey);
+  color: var(--teal-dark);
+}
