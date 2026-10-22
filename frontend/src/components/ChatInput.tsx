@@ -1,14 +1,15 @@
 import { useState, type FormEvent } from 'react'
-import { MicIcon } from './Icons'
+import { MicIcon, StopIcon } from './Icons'
 import './ChatInput.css'
 
 type ChatInputProps = {
   onSend: (text: string) => void
-  onMic: () => void
+  onToggleMic: () => void
+  recording: boolean
   disabled: boolean
 }
 
-const ChatInput = ({ onSend, onMic, disabled }: ChatInputProps) => {
+const ChatInput = ({ onSend, onToggleMic, recording, disabled }: ChatInputProps) => {
   const [text, setText] = useState('')
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -24,13 +25,19 @@ const ChatInput = ({ onSend, onMic, disabled }: ChatInputProps) => {
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Describe your symptoms..."
-        disabled={disabled}
+        placeholder={recording ? 'Listening...' : 'Describe your symptoms...'}
+        disabled={disabled || recording}
       />
-      <button type="button" className="mic" onClick={onMic} aria-label="Speak" disabled={disabled}>
-        <MicIcon size={20} />
+      <button
+        type="button"
+        className={recording ? 'mic recording' : 'mic'}
+        onClick={onToggleMic}
+        aria-label={recording ? 'Stop recording' : 'Speak'}
+        disabled={disabled}
+      >
+        {recording ? <StopIcon size={20} /> : <MicIcon size={20} />}
       </button>
-      <button type="submit" disabled={disabled || !text.trim()}>
+      <button type="submit" disabled={disabled || recording || !text.trim()}>
         Send
       </button>
     </form>

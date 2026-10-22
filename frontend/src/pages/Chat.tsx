@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { diagnose } from '../api'
+import { diagnose, transcribe } from '../api'
 import ChatBubble from '../components/ChatBubble'
 import ChatInput from '../components/ChatInput'
 import { BotIcon } from '../components/Icons'
+import useRecorder from '../hooks/useRecorder'
 import type { DiagnosticStatus, Message } from '../types'
 import './Chat.css'
 
@@ -16,6 +17,7 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([greeting])
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState<DiagnosticStatus>('asking')
+  const { recording, start, stop } = useRecorder()
   const navigate = useNavigate()
   const bottom = useRef<HTMLDivElement>(null)
 
@@ -23,16 +25,27 @@ const Chat = () => {
     bottom.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  const reply = (text: string) => setMessages((prev) => [...prev, { role: 'bot', text }])
+
+  const toggleMic = async () => {
+    if (!recording) return start().catch(() => reply('Unable to access the microphone. Please check your permissions.'))
+    setLoading(true)
+    const text = (await stop().then(transcribe).catch(() => '')).trim()
+    setLoading(false)
+    if (text) send(text)
+    else reply("Sorry, I couldn't catch that. Please try again.")
+  }
+
   const send = async (text: string) => {
     const history: Message[] = [...messages, { role: 'user', text }]
     setMessages(history)
     setLoading(true)
     try {
       const result = await diagnose(history)
-      setMessages((prev) => [...prev, { role: 'bot', text: result.reply }])
+      reply(result.reply)
       setStatus(result.status)
     } catch {
-      setMessages((prev) => [...prev, { role: 'bot', text: 'Sorry, something went wrong. Please try again.' }])
+      reply('Sorry, something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -56,7 +69,7 @@ const Chat = () => {
           End consultation
         </button>
       )}
-      <ChatInput onSend={send} onMic={() => {}} disabled={loading} />
+      <ChatInput onSend={send} onToggleMic={toggleMic} recording={recording} disabled={loading} />
     </main>
   )
 }

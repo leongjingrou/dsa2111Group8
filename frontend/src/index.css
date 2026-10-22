@@ -5,6 +5,8 @@
   --grey: #e5e7eb;
   --text: #1f2937;
   --on-teal: #ffffff;
+  --red: #dc2626;
+  --red-dark: #b91c1c;
 
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
