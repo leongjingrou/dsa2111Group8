@@ -1,0 +1,15 @@
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    deploy:
+      replicas: 3
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
