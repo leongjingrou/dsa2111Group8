@@ -26,7 +26,7 @@ const useRecorder = () => {
       rec.onstop = () => {
         release()
         setRecording(false)
-        resolve(new Blob(chunks.current, { type: rec.mimeType }))
+        resolve(new Blob(chunks.current, { type: chunks.current[0]?.type }))
       }
       rec.stop()
     })
