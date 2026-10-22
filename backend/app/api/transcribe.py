@@ -4,7 +4,7 @@ from functools import cache
 from fastapi import APIRouter, Depends, UploadFile
 from groq import AsyncGroq
 
-from schemas import Transcription
+from app.schemas import Transcription
 
 router = APIRouter()
 

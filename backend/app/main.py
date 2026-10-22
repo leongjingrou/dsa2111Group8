@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from api import diagnose, transcribe
+from app.api import diagnose, transcribe
 
 load_dotenv()
 

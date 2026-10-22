@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from schemas import DiagnoseRequest, Diagnosis
+from app.schemas import DiagnoseRequest, Diagnosis
 
 router = APIRouter()
 
