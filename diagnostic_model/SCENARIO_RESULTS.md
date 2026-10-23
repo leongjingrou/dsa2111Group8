@@ -28,6 +28,36 @@ The persistent server outputs are in
 `/home/ubuntu/dsa2111-persistent/results/conversation-v0.3/`. They include 2,125
 intermediate confidence states across the 425 held-out consultations.
 
+## Conversational v0.3 fine-tune on a stratified half split
+
+A follow-up experiment used a deterministic 50/50 split stratified by condition
+and escalation: 850 consultations for training and 850 for testing. The Laya
+encoder remained frozen and its decision head was fine-tuned for ten epochs.
+The EBM was retrained on the identical training half for a matched comparison.
+
+| Model | Condition accuracy | Condition macro-F1 | Scope accuracy | Escalation accuracy | Median latency |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| EBM, 50% conversational dataset | 0.9506 | 0.9338 | 0.9518 | 0.9788 | not measured |
+| Laya v0.3 head, 50% conversational dataset | 0.7282 | 0.3905 | 0.8106 | 0.8235 | 61.6 ms/row |
+
+Laya's own decision-level evaluation improved from 0.4459 to 0.7765 accuracy;
+expected calibration error fell from 0.1754 to 0.0509. End-to-end escalation
+accuracy improved materially over the v0.2-to-v0.3 transfer check, although the
+different holdout size means the two runs are not a paired comparison.
+
+The final-turn scope decision is conservative: precision is 0.9484 but recall
+is 0.4900. The model therefore rarely labels unsupported cases as supported,
+but misses about half of the supported cases. Condition accuracy rises from
+0.4871 after the chief complaint to 0.7282 after the fifth patient answer, and
+escalation accuracy rises from 0.5565 to 0.8235. Unlike the unadapted transfer
+run, the best end-to-end results now occur after the complete consultation.
+
+Persistent outputs are under
+`/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-half/`, and the final
+model is under `/home/ubuntu/dsa2111-persistent/models/laya-head-v0.3-half/`.
+The redundant training checkpoint copy was removed after verification; the
+loadable final model and all result artifacts remain.
+
 Server evaluation used the fixed v0.2.0 synthetic scenario dataset, a matched
 condition-plus-escalation split, and 425 untouched holdout rows. Laya ran on an
 NVIDIA Tesla T4. These results measure interpolation within the rule-generated
