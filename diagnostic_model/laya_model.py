@@ -27,9 +27,15 @@ from diagnostic_model.scenario_data import (
     scenario_targets,
 )
 from knowledge_base.retrieval import load_json
+from data.generate import SYMPTOMS
 
 
 OUT_OF_SCOPE = "out_of_scope"
+EVIDENCE_MODES = ("conversation", "prioritized")
+SYMPTOM_DETAILS = {
+    symptom_id: {"name": name.lower(), "red_flag": is_red_flag}
+    for symptom_id, name, _, is_red_flag in SYMPTOMS
+}
 
 
 def questions():
@@ -132,12 +138,63 @@ def conversation_text(turns):
     return "\n".join(f"{turn['role'].title()}: {turn['content']}" for turn in turns)
 
 
-def consultation_state(row, turns=None):
+def prioritized_evidence(row, patient_answers=5):
+    """Render label-free structured findings in a stable priority order.
+
+    ``patient_answers`` prevents the confidence trace from seeing information
+    that has not yet appeared in the conversation.
+    """
+    symptoms = json.loads(row.get("symptoms", "{}"))
+    present = [symptom_id for symptom_id, value in symptoms.items() if bool(value)]
+    absent = [symptom_id for symptom_id, value in symptoms.items() if not bool(value)]
+    evidence = []
+
+    if patient_answers >= 1 and present:
+        symptom_id = present[0]
+        detail = SYMPTOM_DETAILS[symptom_id]
+        evidence.append((0 if detail["red_flag"] else 2, f"present: {detail['name']}"))
+    if patient_answers >= 2:
+        evidence.extend([
+            (1 if row["severity"] == "severe" else 3, f"severity: {row['severity']}"),
+            (1 if row["progression"] == "worsening" else 3, f"progression: {row['progression']}"),
+            (3, f"duration: {row['duration_days']} days"),
+        ])
+    if patient_answers >= 3:
+        for symptom_id in present[1:]:
+            detail = SYMPTOM_DETAILS[symptom_id]
+            evidence.append((0 if detail["red_flag"] else 2, f"present: {detail['name']}"))
+    if patient_answers >= 4:
+        for symptom_id in absent[:5]:
+            detail = SYMPTOM_DETAILS[symptom_id]
+            evidence.append((1 if detail["red_flag"] else 4, f"absent: {detail['name']}"))
+    if patient_answers >= 5:
+        temperature = float(row["temperature"])
+        evidence.extend([
+            (1 if temperature >= 38.5 else 3, f"temperature: {temperature:.1f} °C"),
+            (3, f"age: {row['age']}"),
+            (4, f"sex: {row['sex']}"),
+        ])
+        if row["sex"] == "F" and 18 <= int(row["age"]) <= 45:
+            evidence.append((1 if bool(row["pregnancy_status"]) else 4,
+                             f"pregnancy: {'yes' if bool(row['pregnancy_status']) else 'no'}"))
+
+    evidence.sort(key=lambda item: item[0])
+    return [f"P{priority + 1} | {finding}" for priority, finding in evidence]
+
+
+def consultation_state(row, turns=None, evidence_mode="conversation", patient_answers=None):
     turns = conversation_turns(row) if turns is None else turns
-    return {"conversation": conversation_text(turns)}
+    state = {"conversation": conversation_text(turns)}
+    if evidence_mode == "prioritized":
+        if patient_answers is None:
+            patient_answers = sum(turn["role"] == "patient" for turn in turns)
+        state["priority_evidence"] = prioritized_evidence(row, patient_answers)
+    elif evidence_mode != "conversation":
+        raise ValueError(f"Unknown evidence mode: {evidence_mode}")
+    return state
 
 
-def confidence_traces(rows, agent, batch_size=16):
+def confidence_traces(rows, agent, batch_size=16, evidence_mode="conversation"):
     """Predict after every patient answer to show how confidence develops."""
     states = []
     locations = []
@@ -146,7 +203,15 @@ def confidence_traces(rows, agent, batch_size=16):
         turns = conversation_turns(row)
         for turn_number, turn in enumerate(turns):
             if turn["role"] == "patient":
-                states.append(consultation_state(row, turns[:turn_number + 1]))
+                patient_answers = sum(
+                    item["role"] == "patient" for item in turns[:turn_number + 1]
+                )
+                states.append(consultation_state(
+                    row,
+                    turns[:turn_number + 1],
+                    evidence_mode=evidence_mode,
+                    patient_answers=patient_answers,
+                ))
                 locations.append((row_number, turn_number, turn["content"]))
     results = agent.predict_batch(states, questions(), batch_size=batch_size)
     traces = [[] for _ in row_records]
@@ -203,22 +268,66 @@ def conversation_trace_report(
                 answer["escalation"]["answer_confidence"] for answer in answers
             ])), 4),
         })
+    nodes = {}
+    edges = {}
+    for trace in traces:
+        previous = None
+        for step, checkpoint in enumerate(trace, 1):
+            answers = checkpoint["answers"]
+            condition = answers["condition"]["choice"]
+            escalation = answers["escalation"]["choice"]
+            node_id = f"{step}|{condition}|{escalation}"
+            node = nodes.setdefault(node_id, {
+                "id": node_id,
+                "patient_answer": step,
+                "condition": condition,
+                "escalation": escalation,
+                "count": 0,
+                "condition_confidence_total": 0.0,
+                "escalation_confidence_total": 0.0,
+            })
+            node["count"] += 1
+            node["condition_confidence_total"] += answers["condition"]["answer_confidence"]
+            node["escalation_confidence_total"] += answers["escalation"]["answer_confidence"]
+            if previous is not None:
+                edge_id = f"{previous}->{node_id}"
+                edge = edges.setdefault(edge_id, {
+                    "source": previous, "target": node_id, "count": 0,
+                })
+                edge["count"] += 1
+            previous = node_id
+    pathway_nodes = []
+    for node in nodes.values():
+        count = node.pop("count")
+        condition_total = node.pop("condition_confidence_total")
+        escalation_total = node.pop("escalation_confidence_total")
+        pathway_nodes.append({
+            **node,
+            "count": count,
+            "mean_condition_confidence": round(condition_total / count, 4),
+            "mean_escalation_confidence": round(escalation_total / count, 4),
+        })
     return {
         "enabled": True,
         "states": sum(len(trace) for trace in traces),
         "by_patient_answer": checkpoints,
+        "pathway_map": {
+            "nodes": sorted(pathway_nodes, key=lambda node: node["id"]),
+            "edges": sorted(edges.values(), key=lambda edge: (edge["source"], edge["target"])),
+        },
     }
 
 
 def evaluate_laya(
     data, output_dir, agent, batch_size=16, runs=5, name="laya",
     model_name=None, trace_conversation=False, test_size=0.25,
+    evidence_mode="conversation",
 ):
     rows = held_out_rows(data, test_size=test_size)
     condition_labels = sorted(knowledge_base_condition_ids() + [OUT_OF_SCOPE])
     escalation_labels = ["routine", "urgent"]
     row_records = rows.to_dict("records")
-    states = [consultation_state(row) for row in row_records]
+    states = [consultation_state(row, evidence_mode=evidence_mode) for row in row_records]
     agent.predict_batch(states[:1], questions(), batch_size=1)
     timings = []
     for _ in range(runs):
@@ -234,13 +343,17 @@ def evaluate_laya(
     escalation_predictions = [answer["escalation"]["choice"] == "urgent" for answer in answers]
     condition_truth = expected_condition(rows)
     escalation_truth = scenario_targets(rows)["escalation"].to_numpy()
-    traces = confidence_traces(rows, agent, batch_size) if trace_conversation else None
+    traces = (
+        confidence_traces(rows, agent, batch_size, evidence_mode=evidence_mode)
+        if trace_conversation else None
+    )
 
     report = {
         "rows": len(rows),
         "model": model_name or "convaiinnovations/laya:typed-decisions",
         "batch_size": batch_size,
         "test_size": test_size,
+        "evidence_mode": evidence_mode,
         "latency_ms_total_median": round(elapsed_ms, 2),
         "latency_ms_per_row": round(elapsed_ms / len(rows), 3),
         "condition": multiclass_score(
@@ -280,6 +393,8 @@ def evaluate_laya(
                 "answers": answer,
                 "dataset_version": row["dataset_version"],
             }
+            if evidence_mode == "prioritized":
+                record["priority_evidence"] = prioritized_evidence(row)
             if traces is not None:
                 record["confidence_trace"] = traces[row_number]
             log.write(json.dumps(record) + "\n")
@@ -346,6 +461,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="convaiinnovations/laya")
     parser.add_argument("--subfolder", default="typed-decisions")
     parser.add_argument("--test-size", type=float, default=0.25)
+    parser.add_argument("--evidence-mode", choices=EVIDENCE_MODES, default="conversation")
     parser.add_argument(
         "--trace-conversation",
         action="store_true",
@@ -373,6 +489,7 @@ if __name__ == "__main__":
         model_name=args.model,
         trace_conversation=args.trace_conversation,
         test_size=args.test_size,
+        evidence_mode=args.evidence_mode,
     )
     comparison = compare_ebm(
         data, args.output_dir, report, args.output_dir, test_size=args.test_size

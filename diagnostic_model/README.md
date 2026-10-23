@@ -43,7 +43,24 @@ python -m diagnostic_model.training data/generated/synthetic_scenarios.csv \
 python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv
 python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv \
   --trace-conversation
+python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv \
+  --evidence-mode prioritized --trace-conversation
 ```
+
+`--evidence-mode prioritized` is an alternate, label-free path that supplies
+Laya with a structured evidence list alongside the original conversation. It
+uses the same observed fields available to EBM and orders them from P1 to P5:
+present red flags first; then severe/worsening/high-temperature or pregnancy
+risk; other present symptoms; general context; and ordinary negative findings.
+During turn-level evaluation it includes only evidence already revealed by that
+patient answer, preventing future-turn leakage.
+
+With `--trace-conversation`, the metrics report contains a `pathway_map` of
+decision nodes and transitions. Each node records patient-answer number,
+condition choice, escalation choice, case count and mean confidences; each edge
+records how many cases moved between consecutive decisions. This supports
+Sankey, alluvial or directed-flow visual analysis without exposing labels to
+the model state.
 
 For a matched 50/50 experiment, pass `--test-size 0.5` to EBM training,
 Laya evaluation, and Laya fine-tuning. The split remains stratified by condition

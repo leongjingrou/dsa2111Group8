@@ -4,6 +4,7 @@ from pathlib import Path
 
 from diagnostic_model.laya_model import (
     OUT_OF_SCOPE,
+    EVIDENCE_MODES,
     compare_ebm,
     consultation_state,
     evaluate_laya,
@@ -17,7 +18,7 @@ from diagnostic_model.scenario_data import (
 )
 
 
-def write_rows(data, folder, test_size=0.25):
+def write_rows(data, folder, test_size=0.25, evidence_mode="conversation"):
     train_index, test_index = scenario_split(data, test_size=test_size)
     folder.mkdir(parents=True, exist_ok=True)
     paths = []
@@ -29,7 +30,7 @@ def write_rows(data, folder, test_size=0.25):
             for (_, row), urgent in zip(rows.iterrows(), escalation):
                 condition = row["condition_id"] if row["scope_status"] == "in_scope" else OUT_OF_SCOPE
                 item = {
-                    "state": consultation_state(row),
+                    "state": consultation_state(row, evidence_mode=evidence_mode),
                     "questions": questions(),
                     "expected": {
                         "condition": condition,
@@ -57,6 +58,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--train-encoder", action="store_true")
     parser.add_argument("--trace-conversation", action="store_true")
+    parser.add_argument("--evidence-mode", choices=EVIDENCE_MODES, default="conversation")
     parser.add_argument(
         "--generate-scenarios",
         action="store_true",
@@ -71,7 +73,12 @@ if __name__ == "__main__":
         if args.generate_scenarios
         else load_scenarios(args.data)
     )
-    train_path, test_path = write_rows(data, args.output_dir, test_size=args.test_size)
+    train_path, test_path = write_rows(
+        data,
+        args.output_dir,
+        test_size=args.test_size,
+        evidence_mode=args.evidence_mode,
+    )
     base = Path(
         snapshot_download("convaiinnovations/laya", allow_patterns=["typed-decisions/*"])
     ) / "typed-decisions"
@@ -103,6 +110,7 @@ if __name__ == "__main__":
         model_name=str(args.model_dir),
         trace_conversation=args.trace_conversation,
         test_size=args.test_size,
+        evidence_mode=args.evidence_mode,
     )
     comparison = compare_ebm(
         data,
