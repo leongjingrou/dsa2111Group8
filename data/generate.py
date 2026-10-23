@@ -418,11 +418,19 @@ def render_patient_text(row):
     return narrative
 
 
-def main():
-    rng = random.Random(SEED)
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+def generate(output_dir=OUTPUT_DIR):
+    """Generate the deterministic scenario and symptom CSV files.
 
-    with (OUTPUT_DIR / "symptoms.csv").open("w", newline="", encoding="utf-8") as f:
+    ``output_dir`` is injectable so tests and downstream pipelines can invoke
+    the data-branch generator without mutating the checked-in dataset.
+    """
+    output_dir = Path(output_dir)
+    rng = random.Random(SEED)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    symptoms_path = output_dir / "symptoms.csv"
+    scenarios_path = output_dir / "synthetic_scenarios.csv"
+    with symptoms_path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["symptom_id", "name", "category", "is_red_flag", "associated_diagnoses"])
         for sid, name, cat, red in SYMPTOMS:
@@ -443,12 +451,17 @@ def main():
         r["vignette_text"] = render_patient_text(r)
 
     fields = ["scenario_id"] + [k for k in rows[0] if k != "scenario_id"]
-    with (OUTPUT_DIR / "synthetic_scenarios.csv").open("w", newline="", encoding="utf-8") as f:
+    with scenarios_path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         w.writerows(rows)
 
-    print(f"Wrote {len(SYMPTOMS)} symptoms and {len(rows)} synthetic scenarios to {OUTPUT_DIR}")
+    print(f"Wrote {len(SYMPTOMS)} symptoms and {len(rows)} synthetic scenarios to {output_dir}")
+    return symptoms_path, scenarios_path
+
+
+def main():
+    generate()
 
 
 if __name__ == "__main__":

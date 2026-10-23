@@ -9,6 +9,11 @@ Run it from the repository root:
 python data/generate.py
 ```
 
+The generator is also callable as `data.generate.generate(output_dir)`. The
+scenario-model commands expose this through `--generate-scenarios`, so model
+training can regenerate and validate its input rather than relying implicitly on
+the checked-in CSV.
+
 Generated files are written to `data/generated/`:
 
 - `synthetic_scenarios.csv` is the complete pool of 1,700 structured scenarios across 17 fictional diagnosis labels, before any train/validation/test split. Six labels match the current knowledge-base scope; the rest are marked `out_of_scope`. Each diagnosis has 50 rows with `escalation=false` and 50 with `escalation=true`.

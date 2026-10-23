@@ -23,7 +23,13 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from diagnostic_model.scenario_data import scenario_features, scenario_split, scenario_targets
+from diagnostic_model.scenario_data import (
+    load_scenarios,
+    regenerate_scenarios,
+    scenario_features,
+    scenario_split,
+    scenario_targets,
+)
 
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt
@@ -239,8 +245,20 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, default=Path("diagnostic_model/artifacts"))
     parser.add_argument("--no-tune", action="store_true")
     parser.add_argument("--scenario-schema", action="store_true")
+    parser.add_argument(
+        "--generate-scenarios",
+        action="store_true",
+        help="Regenerate the scenario CSV with data/generate.py before training.",
+    )
     args = parser.parse_args()
-    data = pd.read_csv(args.data)
+    if args.generate_scenarios and not args.scenario_schema:
+        parser.error("--generate-scenarios requires --scenario-schema")
+    if args.generate_scenarios:
+        data = regenerate_scenarios(args.data)
+    elif args.scenario_schema:
+        data = load_scenarios(args.data)
+    else:
+        data = pd.read_csv(args.data)
     result = (
         train_scenario_models(data, args.output_dir, not args.no_tune)
         if args.scenario_schema

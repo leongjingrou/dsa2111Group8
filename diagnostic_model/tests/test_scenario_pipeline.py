@@ -2,7 +2,13 @@ import json
 
 import pandas as pd
 
-from diagnostic_model.scenario_data import scenario_features, scenario_split, scenario_targets
+from data.generate import DATASET_VERSION, DISEASES, N_PER_CLASS, SYMPTOMS, generate
+from diagnostic_model.scenario_data import (
+    regenerate_scenarios,
+    scenario_features,
+    scenario_split,
+    scenario_targets,
+)
 from diagnostic_model.training import train_scenario_models
 
 
@@ -51,3 +57,20 @@ def test_scenario_targets_have_expected_balance():
     targets = scenario_targets(pd.read_csv("data/generated/synthetic_scenarios.csv"))
     assert int(targets["scope"].sum()) == 600
     assert int(targets["escalation"].sum()) == 850
+
+
+def test_data_generator_is_deterministic_and_pipeline_compatible(tmp_path):
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    first_symptoms, first_scenarios = generate(first)
+    second_symptoms, second_scenarios = generate(second)
+
+    assert first_symptoms.read_bytes() == second_symptoms.read_bytes()
+    assert first_scenarios.read_bytes() == second_scenarios.read_bytes()
+
+    data = regenerate_scenarios(first / "synthetic_scenarios.csv")
+    assert len(data) == len(DISEASES) * 2 * N_PER_CLASS
+    assert data["dataset_version"].astype(str).unique().tolist() == [DATASET_VERSION]
+    assert data["scenario_id"].is_unique
+    assert len(pd.read_csv(first_symptoms)) == len(SYMPTOMS)
+    assert set(data["scope_status"]) == {"in_scope", "out_of_scope"}

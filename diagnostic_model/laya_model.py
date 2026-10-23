@@ -20,6 +20,8 @@ from sklearn.metrics import (
 
 from diagnostic_model.scenario_data import (
     knowledge_base_condition_ids,
+    load_scenarios,
+    regenerate_scenarios,
     scenario_features,
     scenario_split,
     scenario_targets,
@@ -223,8 +225,17 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--model", default="convaiinnovations/laya")
     parser.add_argument("--subfolder", default="typed-decisions")
+    parser.add_argument(
+        "--generate-scenarios",
+        action="store_true",
+        help="Regenerate the scenario CSV with data/generate.py before evaluation.",
+    )
     args = parser.parse_args()
-    data = pd.read_csv(args.data)
+    data = (
+        regenerate_scenarios(args.data)
+        if args.generate_scenarios
+        else load_scenarios(args.data)
+    )
     model = laya.load(args.model, subfolder=args.subfolder)
     report = evaluate_laya(data, args.output_dir, model, args.batch_size)
     comparison = compare_ebm(data, args.output_dir, report, args.output_dir)

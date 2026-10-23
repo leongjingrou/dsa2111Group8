@@ -2,10 +2,13 @@ import argparse
 import json
 from pathlib import Path
 
-import pandas as pd
-
 from diagnostic_model.laya_model import OUT_OF_SCOPE, compare_ebm, evaluate_laya, questions
-from diagnostic_model.scenario_data import scenario_split, scenario_targets
+from diagnostic_model.scenario_data import (
+    load_scenarios,
+    regenerate_scenarios,
+    scenario_split,
+    scenario_targets,
+)
 
 
 def write_rows(data, folder):
@@ -43,9 +46,18 @@ if __name__ == "__main__":
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--train-encoder", action="store_true")
+    parser.add_argument(
+        "--generate-scenarios",
+        action="store_true",
+        help="Regenerate the scenario CSV with data/generate.py before fine-tuning.",
+    )
     args = parser.parse_args()
 
-    data = pd.read_csv(args.data)
+    data = (
+        regenerate_scenarios(args.data)
+        if args.generate_scenarios
+        else load_scenarios(args.data)
+    )
     train_path, test_path = write_rows(data, args.output_dir)
     base = Path(
         snapshot_download("convaiinnovations/laya", allow_patterns=["typed-decisions/*"])

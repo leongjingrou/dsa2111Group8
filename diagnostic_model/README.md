@@ -39,9 +39,17 @@ dataset metadata, height and weight are excluded from the default feature set.
 
 ```bash
 python -m diagnostic_model.training data/generated/synthetic_scenarios.csv \
-  --scenario-schema --no-tune
+  --scenario-schema --generate-scenarios --no-tune
 python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv
 ```
+
+`--generate-scenarios` explicitly invokes the deterministic `generate()`
+function in `data/generate.py` before validation and training. That generator is
+the scenario-schema evolution of the repository's `data` branch generator: it
+retains the fixed seed, symptom vocabulary and disease-profile logic, while
+adding scope labels, knowledge-base condition IDs, dataset versioning and
+vignette text needed by the matched EBM/Laya pipeline. The same flag is available
+on the Laya evaluation and fine-tuning entry points when they are run directly.
 
 The EBM command writes separate diagnosis, scope and escalation artifacts. Laya
 uses the identical holdout rows and returns a supported condition or

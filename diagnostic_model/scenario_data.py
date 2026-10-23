@@ -9,6 +9,7 @@ from knowledge_base.retrieval import load_json
 
 
 SEED = 2111
+DEFAULT_SCENARIO_PATH = Path("data/generated/synthetic_scenarios.csv")
 IDENTIFIER_COLUMNS = {"scenario_id", "vignette_id"}
 LABEL_COLUMNS = {"diagnosis", "condition_id", "escalation", "scope_status"}
 METADATA_COLUMNS = {"synthetic", "dataset_version", "vignette_text", "symptoms"}
@@ -96,8 +97,21 @@ def scenario_split(data, test_size=0.25, seed=SEED):
     return np.sort(train_index), np.sort(test_index)
 
 
-def load_scenarios(path=Path("data/generated/synthetic_scenarios.csv")):
+def load_scenarios(path=DEFAULT_SCENARIO_PATH):
     data = pd.read_csv(path)
     # Validate eagerly so failures happen before model fitting.
     scenario_features(data)
     return data
+
+
+def regenerate_scenarios(path=DEFAULT_SCENARIO_PATH):
+    """Run the data-branch-derived generator, then validate and load its output."""
+    from data.generate import generate
+
+    path = Path(path)
+    if path.name != DEFAULT_SCENARIO_PATH.name:
+        raise ValueError(
+            f"Generated scenario path must end with {DEFAULT_SCENARIO_PATH.name!r}: {path}"
+        )
+    _, generated_path = generate(path.parent)
+    return load_scenarios(generated_path)
