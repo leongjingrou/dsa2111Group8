@@ -220,8 +220,9 @@ def train_scenario_models(data, output_dir, tune=False):
         "classes": list(diagnosis_model.classes_),
     }
 
+    dataset_versions = sorted(data["dataset_version"].astype(str).unique())
     report = {
-        "dataset_version": sorted(data["dataset_version"].astype(str).unique()),
+        "dataset_version": dataset_versions,
         "rows": len(data),
         "train_rows": len(train_index),
         "test_rows": len(test_index),
@@ -232,7 +233,8 @@ def train_scenario_models(data, output_dir, tune=False):
         "tasks": tasks,
         "warning": (
             "All results use rule-generated synthetic data. Random holdout performance measures "
-            "interpolation within generator version 0.2.0, not clinical validity."
+            f"interpolation within generator version {', '.join(dataset_versions)}, "
+            "not clinical validity."
         ),
     }
     (output_dir / "scenario_metrics.json").write_text(json.dumps(report, indent=2))
