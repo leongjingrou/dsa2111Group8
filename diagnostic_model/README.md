@@ -50,3 +50,6 @@ uses the identical holdout rows and returns a supported condition or
 The fixed-seed scenarios are rule-generated and balanced by construction. Their
 holdout metrics measure interpolation within generator version 0.2.0 only; they
 are not clinical performance or deployable probability calibration.
+
+The matched server results and the accepted/rejected Laya design comparison are
+recorded in [SCENARIO_RESULTS.md](SCENARIO_RESULTS.md).
