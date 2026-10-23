@@ -1,5 +1,33 @@
 # Scenario model results
 
+## Conversational v0.3 transfer check
+
+Generator v0.3 renders each structured scenario as five alternating
+doctor/patient exchanges and Laya records a prediction after every patient
+answer. The existing selected v0.2 head was evaluated without retraining on the
+same 425-row holdout, so these numbers measure transfer to the new conversation
+format rather than a newly adapted model.
+
+| Model | Condition accuracy | Condition macro-F1 | Scope accuracy | Escalation accuracy | Median latency |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| EBM (structured v0.3 fields) | 0.9600 | 0.9468 | 0.9600 | 0.9835 | not measured |
+| Laya v0.2 head on v0.3 conversations | 0.6824 | 0.3777 | 0.8188 | 0.7271 | 61.6 ms/row |
+
+The turn-level trace shows that more dialogue does not monotonically improve
+the old text model. Condition accuracy is 0.6329 after the chief complaint,
+drops to 0.5224 after duration/severity/progression, peaks at 0.7012 after the
+negative risk screen, and ends at 0.6824 after demographics and temperature.
+Escalation accuracy starts at 0.5647, peaks at 0.7859 after associated symptoms,
+and ends at 0.7271. This is evidence of a prompt/data-format distribution shift:
+the v0.2 head should not be treated as calibrated for chained consultations.
+A v0.3-specific fine-tune and an independently reviewed validation set are the
+next model-development steps. Escalation remains a near-term triage-risk proxy,
+not a clinical or long-term prognosis.
+
+The persistent server outputs are in
+`/home/ubuntu/dsa2111-persistent/results/conversation-v0.3/`. They include 2,125
+intermediate confidence states across the 425 held-out consultations.
+
 Server evaluation used the fixed v0.2.0 synthetic scenario dataset, a matched
 condition-plus-escalation split, and 425 untouched holdout rows. Laya ran on an
 NVIDIA Tesla T4. These results measure interpolation within the rule-generated
