@@ -67,6 +67,8 @@ def test_data_generator_is_deterministic_and_pipeline_compatible(tmp_path):
 
     assert first_symptoms.read_bytes() == second_symptoms.read_bytes()
     assert first_scenarios.read_bytes() == second_scenarios.read_bytes()
+    assert b"\r\n" not in first_symptoms.read_bytes()
+    assert b"\r\n" not in first_scenarios.read_bytes()
 
     data = regenerate_scenarios(first / "synthetic_scenarios.csv")
     assert len(data) == len(DISEASES) * 2 * N_PER_CLASS

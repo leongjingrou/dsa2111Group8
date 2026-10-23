@@ -431,7 +431,7 @@ def generate(output_dir=OUTPUT_DIR):
     symptoms_path = output_dir / "symptoms.csv"
     scenarios_path = output_dir / "synthetic_scenarios.csv"
     with symptoms_path.open("w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(["symptom_id", "name", "category", "is_red_flag", "associated_diagnoses"])
         for sid, name, cat, red in SYMPTOMS:
             assoc = [d for d, p in DISEASES.items()
@@ -452,7 +452,7 @@ def generate(output_dir=OUTPUT_DIR):
 
     fields = ["scenario_id"] + [k for k in rows[0] if k != "scenario_id"]
     with scenarios_path.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
+        w = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
 
