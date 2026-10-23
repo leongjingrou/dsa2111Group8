@@ -9,10 +9,21 @@ import pandas as pd
 from interpret.glassbox import ExplainableBoostingClassifier
 from sklearn.calibration import calibration_curve
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, log_loss
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    confusion_matrix,
+    f1_score,
+    log_loss,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+
+from diagnostic_model.scenario_data import scenario_features, scenario_split, scenario_targets
 
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt
@@ -45,6 +56,22 @@ def get_scores(model, x, y):
         "f1_macro": round(f1_score(y, prediction, average="macro"), 4),
         "log_loss": round(log_loss(y, probability, labels=model.classes_), 4),
         "brier": round(np.mean(np.sum((probability - truth) ** 2, axis=1)), 4),
+    }
+
+
+def get_binary_scores(model, x, y):
+    prediction = model.predict(x).astype(int)
+    probability = model.predict_proba(x)[:, list(model.classes_).index(1)]
+    tn, fp, fn, tp = confusion_matrix(y, prediction, labels=[0, 1]).ravel()
+    return {
+        "accuracy": round(accuracy_score(y, prediction), 4),
+        "f1": round(f1_score(y, prediction, zero_division=0), 4),
+        "precision": round(precision_score(y, prediction, zero_division=0), 4),
+        "recall": round(recall_score(y, prediction, zero_division=0), 4),
+        "roc_auc": round(roc_auc_score(y, probability), 4),
+        "average_precision": round(average_precision_score(y, probability), 4),
+        "brier": round(float(np.mean((probability - np.asarray(y)) ** 2)), 4),
+        "confusion": {"tn": int(tn), "fp": int(fp), "fn": int(fn), "tp": int(tp)},
     }
 
 
@@ -112,11 +139,111 @@ def train_and_evaluate(data, output_dir, tune=True):
     return report
 
 
+def _fit_ebm(train_x, train_y, tune=False, scoring="f1_macro"):
+    if tune:
+        search = GridSearchCV(
+            new_ebm(),
+            {"learning_rate": [0.03, 0.05], "max_bins": [16, 32]},
+            scoring=scoring,
+            cv=3,
+        ).fit(train_x, train_y)
+        return search.best_estimator_, search.best_params_
+    model = new_ebm().fit(train_x, train_y)
+    return model, {"learning_rate": model.learning_rate, "max_bins": model.max_bins}
+
+
+def train_scenario_models(data, output_dir, tune=False):
+    """Train diagnosis, scope, and escalation EBMs on the v0.2 scenario schema."""
+    x, symptom_ids = scenario_features(data)
+    targets = scenario_targets(data)
+    train_index, test_index = scenario_split(data)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    tasks = {}
+    for task in ("scope", "escalation"):
+        model, best = _fit_ebm(
+            x.loc[train_index], targets[task].loc[train_index], tune=tune, scoring="f1"
+        )
+        joblib.dump(
+            {
+                "model": model,
+                "features": list(x.columns),
+                "symptom_ids": symptom_ids,
+                "task": task,
+                "dataset_version": sorted(data["dataset_version"].astype(str).unique()),
+            },
+            output_dir / f"{task}_model.joblib",
+        )
+        tasks[task] = {
+            "metrics": get_binary_scores(model, x.loc[test_index], targets[task].loc[test_index]),
+            "best_parameters": best,
+        }
+
+    in_scope = targets["scope"].eq(1)
+    diagnosis_train = np.intersect1d(train_index, data.index[in_scope])
+    diagnosis_test = np.intersect1d(test_index, data.index[in_scope])
+    diagnosis_model, diagnosis_best = _fit_ebm(
+        x.loc[diagnosis_train],
+        targets["diagnosis"].loc[diagnosis_train],
+        tune=tune,
+        scoring="f1_macro",
+    )
+    joblib.dump(
+        {
+            "model": diagnosis_model,
+            "features": list(x.columns),
+            "symptom_ids": symptom_ids,
+            "task": "diagnosis",
+            "dataset_version": sorted(data["dataset_version"].astype(str).unique()),
+        },
+        output_dir / "diagnosis_model.joblib",
+    )
+    save_plots(
+        diagnosis_model,
+        x.loc[diagnosis_test],
+        targets["diagnosis"].loc[diagnosis_test],
+        output_dir,
+    )
+    tasks["diagnosis"] = {
+        "metrics": get_scores(
+            diagnosis_model,
+            x.loc[diagnosis_test],
+            targets["diagnosis"].loc[diagnosis_test],
+        ),
+        "best_parameters": diagnosis_best,
+        "classes": list(diagnosis_model.classes_),
+    }
+
+    report = {
+        "dataset_version": sorted(data["dataset_version"].astype(str).unique()),
+        "rows": len(data),
+        "train_rows": len(train_index),
+        "test_rows": len(test_index),
+        "in_scope_rows": int(targets["scope"].sum()),
+        "out_of_scope_rows": int((1 - targets["scope"]).sum()),
+        "features": x.shape[1],
+        "split": "matched condition_id + escalation stratification",
+        "tasks": tasks,
+        "warning": (
+            "All results use rule-generated synthetic data. Random holdout performance measures "
+            "interpolation within generator version 0.2.0, not clinical validity."
+        ),
+    }
+    (output_dir / "scenario_metrics.json").write_text(json.dumps(report, indent=2))
+    return report
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("data", type=Path)
     parser.add_argument("--output-dir", type=Path, default=Path("diagnostic_model/artifacts"))
     parser.add_argument("--no-tune", action="store_true")
+    parser.add_argument("--scenario-schema", action="store_true")
     args = parser.parse_args()
-    result = train_and_evaluate(pd.read_csv(args.data), args.output_dir, not args.no_tune)
+    data = pd.read_csv(args.data)
+    result = (
+        train_scenario_models(data, args.output_dir, not args.no_tune)
+        if args.scenario_schema
+        else train_and_evaluate(data, args.output_dir, not args.no_tune)
+    )
     print(json.dumps(result, indent=2))

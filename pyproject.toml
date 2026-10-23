@@ -17,6 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8.3,<9"]
+laya = ["laya==0.4.12"]
 
 [tool.pytest.ini_options]
 testpaths = ["knowledge_base", "diagnostic_model/tests"]

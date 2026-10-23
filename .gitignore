@@ -1,9 +1,11 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+.pytest_tmp*/
 .venv/
 .deps/
 .tmp/
 .env
 diagnostic_model/artifacts/
+diagnostic_model/artifacts_*/
 diagnostic_model/demo_data.csv
