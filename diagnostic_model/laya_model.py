@@ -237,6 +237,12 @@ if __name__ == "__main__":
         else load_scenarios(args.data)
     )
     model = laya.load(args.model, subfolder=args.subfolder)
-    report = evaluate_laya(data, args.output_dir, model, args.batch_size)
+    report = evaluate_laya(
+        data,
+        args.output_dir,
+        model,
+        args.batch_size,
+        model_name=args.model,
+    )
     comparison = compare_ebm(data, args.output_dir, report, args.output_dir)
     print(json.dumps(comparison, indent=2))
