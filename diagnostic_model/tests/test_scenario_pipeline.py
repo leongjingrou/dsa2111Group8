@@ -76,3 +76,9 @@ def test_data_generator_is_deterministic_and_pipeline_compatible(tmp_path):
     assert data["scenario_id"].is_unique
     assert len(pd.read_csv(first_symptoms)) == len(SYMPTOMS)
     assert set(data["scope_status"]) == {"in_scope", "out_of_scope"}
+    assert {"conversation", "conversation_text"}.issubset(data.columns)
+    for _, row in data.head(20).iterrows():
+        turns = json.loads(row["conversation"])
+        assert len(turns) == 10
+        assert [turn["role"] for turn in turns] == ["doctor", "patient"] * 5
+        assert row["diagnosis"].lower() not in row["conversation_text"].lower()

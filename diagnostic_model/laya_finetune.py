@@ -2,7 +2,13 @@ import argparse
 import json
 from pathlib import Path
 
-from diagnostic_model.laya_model import OUT_OF_SCOPE, compare_ebm, evaluate_laya, questions
+from diagnostic_model.laya_model import (
+    OUT_OF_SCOPE,
+    compare_ebm,
+    consultation_state,
+    evaluate_laya,
+    questions,
+)
 from diagnostic_model.scenario_data import (
     load_scenarios,
     regenerate_scenarios,
@@ -23,7 +29,7 @@ def write_rows(data, folder):
             for (_, row), urgent in zip(rows.iterrows(), escalation):
                 condition = row["condition_id"] if row["scope_status"] == "in_scope" else OUT_OF_SCOPE
                 item = {
-                    "state": {"vignette": row["vignette_text"]},
+                    "state": consultation_state(row),
                     "questions": questions(),
                     "expected": {
                         "condition": condition,

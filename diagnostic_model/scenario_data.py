@@ -12,7 +12,10 @@ SEED = 2111
 DEFAULT_SCENARIO_PATH = Path("data/generated/synthetic_scenarios.csv")
 IDENTIFIER_COLUMNS = {"scenario_id", "vignette_id"}
 LABEL_COLUMNS = {"diagnosis", "condition_id", "escalation", "scope_status"}
-METADATA_COLUMNS = {"synthetic", "dataset_version", "vignette_text", "symptoms"}
+METADATA_COLUMNS = {
+    "synthetic", "dataset_version", "vignette_text", "conversation",
+    "conversation_text", "symptoms",
+}
 
 
 def knowledge_base_condition_ids():

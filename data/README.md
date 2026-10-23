@@ -21,9 +21,11 @@ Generated files are written to `data/generated/`:
 
 The scenario CSV keeps structured values such as age, sex, duration, severity, progression,
 the assessed symptom answers, diagnosis, escalation label, scope status,
-synthetic marker, and dataset version. It also adds `vignette_text`, a readable
-summary rendered from the same row. A separate dialogue is not included until
-the project implements conversational question and answer behavior.
+synthetic marker, and dataset version. Version 0.3 also adds `conversation`, a
+JSON sequence of five alternating doctor/patient exchanges, plus a readable
+`conversation_text` rendering. The dialogue reveals the structured evidence in
+stages without including the diagnosis or escalation label. `vignette_text` is
+retained for compatibility with earlier experiments.
 
 The random seed is fixed at `42` and each diagnosis/escalation combination has
 50 rows. Generation probabilities and escalation labels are invented for

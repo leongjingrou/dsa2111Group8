@@ -36,19 +36,25 @@ def questions():
     conditions = load_json("conditions.json")["conditions"]
     condition_criteria = {item["id"]: item["description"] for item in conditions}
     condition_criteria[OUT_OF_SCOPE] = (
-        "The vignette is not adequately represented by the supported condition list."
+        "The consultation is not adequately represented by the supported condition list."
     )
     return {
         "condition": {
             "type": "choice",
             "instructions": (
-                "Choose the best supported condition, or out_of_scope when none is adequate."
+                "Act as a telemedicine doctor reviewing the chained doctor-patient "
+                "conversation. Choose the best supported condition, or out_of_scope "
+                "when none is adequate."
             ),
             "criteria": condition_criteria,
         },
         "escalation": {
             "type": "choice",
-            "instructions": "Does this presentation require urgent escalation?",
+            "instructions": (
+                "Based on the conversation so far, classify the patient's near-term "
+                "risk as routine or requiring urgent escalation. This is a triage-risk "
+                "proxy, not a long-term prognosis."
+            ),
             "criteria": {
                 "routine": "No urgent escalation signal is present.",
                 "urgent": "Escalation is required because of risk factors or red flags.",
@@ -108,11 +114,60 @@ def _answer_matrix(answers, name, labels):
     )
 
 
-def evaluate_laya(data, output_dir, agent, batch_size=16, runs=5, name="laya", model_name=None):
+def conversation_turns(row):
+    """Read the generated dialogue, with a legacy-vignette fallback."""
+    raw = row.get("conversation")
+    missing = raw is None or (isinstance(raw, float) and pd.isna(raw))
+    if not missing:
+        turns = json.loads(raw) if isinstance(raw, str) else raw
+        if isinstance(turns, list) and turns:
+            return turns
+    return [
+        {"role": "doctor", "content": "Please describe what brings you in today."},
+        {"role": "patient", "content": str(row.get("vignette_text", ""))},
+    ]
+
+
+def conversation_text(turns):
+    return "\n".join(f"{turn['role'].title()}: {turn['content']}" for turn in turns)
+
+
+def consultation_state(row, turns=None):
+    turns = conversation_turns(row) if turns is None else turns
+    return {"conversation": conversation_text(turns)}
+
+
+def confidence_traces(rows, agent, batch_size=16):
+    """Predict after every patient answer to show how confidence develops."""
+    states = []
+    locations = []
+    row_records = rows.to_dict("records")
+    for row_number, row in enumerate(row_records):
+        turns = conversation_turns(row)
+        for turn_number, turn in enumerate(turns):
+            if turn["role"] == "patient":
+                states.append(consultation_state(row, turns[:turn_number + 1]))
+                locations.append((row_number, turn_number, turn["content"]))
+    results = agent.predict_batch(states, questions(), batch_size=batch_size)
+    traces = [[] for _ in row_records]
+    for (row_number, turn_number, response), result in zip(locations, results):
+        traces[row_number].append({
+            "patient_turn": turn_number + 1,
+            "latest_response": response,
+            "answers": result["answers"],
+        })
+    return traces
+
+
+def evaluate_laya(
+    data, output_dir, agent, batch_size=16, runs=5, name="laya",
+    model_name=None, trace_conversation=False,
+):
     rows = held_out_rows(data)
     condition_labels = sorted(knowledge_base_condition_ids() + [OUT_OF_SCOPE])
     escalation_labels = ["routine", "urgent"]
-    states = [{"vignette": text} for text in rows["vignette_text"]]
+    row_records = rows.to_dict("records")
+    states = [consultation_state(row) for row in row_records]
     agent.predict_batch(states[:1], questions(), batch_size=1)
     timings = []
     for _ in range(runs):
@@ -128,6 +183,7 @@ def evaluate_laya(data, output_dir, agent, batch_size=16, runs=5, name="laya", m
     escalation_predictions = [answer["escalation"]["choice"] == "urgent" for answer in answers]
     condition_truth = expected_condition(rows)
     escalation_truth = scenario_targets(rows)["escalation"].to_numpy()
+    traces = confidence_traces(rows, agent, batch_size) if trace_conversation else None
 
     report = {
         "rows": len(rows),
@@ -148,15 +204,20 @@ def evaluate_laya(data, output_dir, agent, batch_size=16, runs=5, name="laya", m
             escalation_predictions,
             escalation_probabilities[:, escalation_labels.index("urgent")],
         ),
+        "conversation_trace": {
+            "enabled": trace_conversation,
+            "states": sum(len(trace) for trace in traces) if traces is not None else 0,
+        },
         "warning": "Synthetic generator holdout; not clinical validation.",
     }
 
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / f"{name}_metrics.json").write_text(json.dumps(report, indent=2))
     with (output_dir / f"{name}_decisions.jsonl").open("w") as log:
-        for row, answer in zip(rows.to_dict("records"), answers):
+        for row_number, (row, answer) in enumerate(zip(row_records, answers)):
             record = {
                 "scenario_id": row["scenario_id"],
+                "conversation": conversation_turns(row),
                 "truth": {
                     "condition": row["condition_id"] if row["scope_status"] == "in_scope" else OUT_OF_SCOPE,
                     "escalation": "urgent" if bool(row["escalation"]) else "routine",
@@ -164,6 +225,8 @@ def evaluate_laya(data, output_dir, agent, batch_size=16, runs=5, name="laya", m
                 "answers": answer,
                 "dataset_version": row["dataset_version"],
             }
+            if traces is not None:
+                record["confidence_trace"] = traces[row_number]
             log.write(json.dumps(record) + "\n")
     return report
 
@@ -226,6 +289,11 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="convaiinnovations/laya")
     parser.add_argument("--subfolder", default="typed-decisions")
     parser.add_argument(
+        "--trace-conversation",
+        action="store_true",
+        help="Record diagnosis and escalation confidence after each patient response.",
+    )
+    parser.add_argument(
         "--generate-scenarios",
         action="store_true",
         help="Regenerate the scenario CSV with data/generate.py before evaluation.",
@@ -243,6 +311,7 @@ if __name__ == "__main__":
         model,
         args.batch_size,
         model_name=args.model,
+        trace_conversation=args.trace_conversation,
     )
     comparison = compare_ebm(data, args.output_dir, report, args.output_dir)
     print(json.dumps(comparison, indent=2))

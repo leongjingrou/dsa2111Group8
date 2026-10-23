@@ -25,7 +25,7 @@ separate component.
 
 ## Scenario dataset and matched EBM/Laya evaluation
 
-The v0.2 scenario dataset is handled as three separate decisions:
+The v0.3 scenario dataset is handled as three separate decisions:
 
 1. whether the case is within the six-condition knowledge-base scope;
 2. which supported condition best matches an in-scope case; and
@@ -41,6 +41,8 @@ dataset metadata, height and weight are excluded from the default feature set.
 python -m diagnostic_model.training data/generated/synthetic_scenarios.csv \
   --scenario-schema --generate-scenarios --no-tune
 python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv
+python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv \
+  --trace-conversation
 ```
 
 `--generate-scenarios` explicitly invokes the deterministic `generate()`
@@ -52,11 +54,15 @@ vignette text needed by the matched EBM/Laya pipeline. The same flag is availabl
 on the Laya evaluation and fine-tuning entry points when they are run directly.
 
 The EBM command writes separate diagnosis, scope and escalation artifacts. Laya
-uses the identical holdout rows and returns a supported condition or
-`out_of_scope` together with a `routine` or `urgent` decision.
+uses the identical holdout rows, consumes the chained doctor-patient transcript,
+and returns a supported condition or `out_of_scope` together with a `routine` or
+`urgent` decision. `--trace-conversation` also records those probabilities after
+every patient response, making it possible to analyse how confidence changes as
+the consultation gathers evidence. Escalation is only a synthetic near-term risk
+proxy; it is not a clinical prognosis or longitudinal outcome estimate.
 
 The fixed-seed scenarios are rule-generated and balanced by construction. Their
-holdout metrics measure interpolation within generator version 0.2.0 only; they
+holdout metrics measure interpolation within generator version 0.3.0 only; they
 are not clinical performance or deployable probability calibration.
 
 The matched server results and the accepted/rejected Laya design comparison are

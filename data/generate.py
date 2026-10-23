@@ -21,7 +21,7 @@ SEED = 42
 N_PER_CLASS = 50  # per diagnosis, per escalation value
 DATA_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = DATA_DIR / "generated"
-DATASET_VERSION = "0.2.0"
+DATASET_VERSION = "0.3.0"
 
 # This mapping identifies the six conditions currently represented in the
 # project knowledge base. Other generated diagnoses are out-of-scope examples.
@@ -418,6 +418,97 @@ def render_patient_text(row):
     return narrative
 
 
+def _spoken_list(items, fallback):
+    """Turn a list of generated findings into short, natural speech."""
+    if not items:
+        return fallback
+    if len(items) == 1:
+        return items[0]
+    return f"{', '.join(items[:-1])}, and {items[-1]}"
+
+
+def render_conversation(row):
+    """Render a grounded, multi-turn fictional doctor-patient consultation.
+
+    The dialogue reveals the same structured evidence in stages. It never
+    includes the diagnosis, scope, or escalation labels that models predict.
+    """
+    symptoms = json.loads(row["symptoms"])
+    names = {sid: name.lower() for sid, name, _, _ in SYMPTOMS}
+    present = [names[sid] for sid, value in symptoms.items() if value]
+    absent = [names[sid] for sid, value in symptoms.items() if not value]
+    chief = present[0] if present else "a health concern"
+    associated = _spoken_list(present[1:], "")
+    screened = absent[:5]
+    screen_text = _spoken_list(screened, "any other specific warning symptoms")
+    denied = _spoken_list(screened, "none of those")
+    sex_text = "female" if row["sex"] == "F" else "male"
+
+    turns = [
+        {
+            "role": "doctor",
+            "content": "Hello, I am your telemedicine assistant. How are you feeling today?",
+        },
+        {"role": "patient", "content": f"I have {chief}."},
+        {
+            "role": "doctor",
+            "content": "How long has this been going on, how severe is it, and is it changing?",
+        },
+        {
+            "role": "patient",
+            "content": (
+                f"It has been {row['duration_days']} days. It feels {row['severity']} "
+                f"and is {row['progression']}."
+            ),
+        },
+        {"role": "doctor", "content": "What other symptoms have you noticed?"},
+        {
+            "role": "patient",
+            "content": (
+                f"I also have {associated}."
+                if associated
+                else "I have not noticed any other symptoms."
+            ),
+        },
+        {
+            "role": "doctor",
+            "content": f"To check for warning signs, have you had {screen_text}?",
+        },
+        {"role": "patient", "content": f"No, I have not had {denied}."},
+    ]
+    if row["sex"] == "F" and 18 <= row["age"] <= 45:
+        turns.extend([
+            {
+                "role": "doctor",
+                "content": "Lastly, what is your age and temperature, and are you pregnant?",
+            },
+            {
+                "role": "patient",
+                "content": (
+                    f"I am {row['age']}, {sex_text}, and my temperature is "
+                    f"{row['temperature']:.1f} °C. I am "
+                    f"{'pregnant' if row['pregnancy_status'] else 'not pregnant'}."
+                ),
+            },
+        ])
+    else:
+        turns.extend([
+            {"role": "doctor", "content": "Lastly, what is your age and temperature?"},
+            {
+                "role": "patient",
+                "content": (
+                    f"I am {row['age']}, {sex_text}, and my temperature is "
+                    f"{row['temperature']:.1f} °C."
+                ),
+            },
+        ])
+    return turns
+
+
+def render_conversation_text(turns):
+    return "\n".join(f"{turn['role'].title()}: {turn['content']}" for turn in turns)
+
+
 def generate(output_dir=OUTPUT_DIR):
     """Generate the deterministic scenario and symptom CSV files.
 
@@ -449,6 +540,9 @@ def generate(output_dir=OUTPUT_DIR):
     for i, r in enumerate(rows, 1):
         r["scenario_id"] = f"SYN-{i:05d}"
         r["vignette_text"] = render_patient_text(r)
+        conversation = render_conversation(r)
+        r["conversation"] = json.dumps(conversation, ensure_ascii=False)
+        r["conversation_text"] = render_conversation_text(conversation)
 
     fields = ["scenario_id"] + [k for k in rows[0] if k != "scenario_id"]
     with scenarios_path.open("w", newline="", encoding="utf-8") as f:

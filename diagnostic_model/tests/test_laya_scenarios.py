@@ -42,7 +42,13 @@ def test_laya_rows_and_evaluation_use_shared_holdout(tmp_path):
     assert {item["expected"]["escalation"] for item in train} == {"routine", "urgent"}
     assert "out_of_scope" in {item["expected"]["condition"] for item in train}
 
-    report = evaluate_laya(data, tmp_path, FakeAgent(), batch_size=8, runs=1)
+    report = evaluate_laya(
+        data, tmp_path, FakeAgent(), batch_size=8, runs=1, trace_conversation=True
+    )
     assert report["rows"] == len(held_out_rows(data))
     assert {"condition", "scope", "escalation"}.issubset(report)
+    assert report["conversation_trace"]["states"] == report["rows"] * 5
     assert (tmp_path / "laya_decisions.jsonl").is_file()
+    decision = json.loads((tmp_path / "laya_decisions.jsonl").read_text().splitlines()[0])
+    assert len(decision["confidence_trace"]) == 5
+    assert set(decision["confidence_trace"][-1]["answers"]) == {"condition", "escalation"}
