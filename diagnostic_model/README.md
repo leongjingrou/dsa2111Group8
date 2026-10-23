@@ -62,6 +62,20 @@ records how many cases moved between consecutive decisions. This supports
 Sankey, alluvial or directed-flow visual analysis without exposing labels to
 the model state.
 
+For a smaller visualization-ready report with human-readable labels and
+uncertainty estimates:
+
+```bash
+python -m diagnostic_model.decision_analysis \
+  diagnostic_model/artifacts/laya_decisions.jsonl \
+  --output diagnostic_model/artifacts/decision_analysis.json
+```
+
+This exports separate condition and escalation transition graphs plus accuracy
+after every patient answer with Wilson 95% confidence intervals. The compact
+report is intended for readable flow diagrams; the original JSONL remains the
+complete audit log.
+
 For a matched 50/50 experiment, pass `--test-size 0.5` to EBM training,
 Laya evaluation, and Laya fine-tuning. The split remains stratified by condition
 and escalation, so every diagnosis/risk combination is represented on both
