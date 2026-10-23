@@ -76,6 +76,14 @@ after every patient answer with Wilson 95% confidence intervals. The compact
 report is intended for readable flow diagrams; the original JSONL remains the
 complete audit log.
 
+Export that report as human-readable PNGs (requires Pillow):
+
+```bash
+python -m diagnostic_model.export_decision_visuals \
+  diagnostic_model/artifacts/decision_analysis.json \
+  --output-dir diagnostic_model/visualizations --name conversation
+```
+
 For a matched 50/50 experiment, pass `--test-size 0.5` to EBM training,
 Laya evaluation, and Laya fine-tuning. The split remains stratified by condition
 and escalation, so every diagnosis/risk combination is represented on both
