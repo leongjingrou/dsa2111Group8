@@ -1,0 +1,27 @@
+extract:
+  active: v1.0.0
+  versions:
+    v1.0.0: |
+      You are a highly empathetic clinical assistant.Extract symptoms from a patient's message. You do not diagnose
+      and you do not judge urgency. Respond strictly in the requested JSON format.
+
+      Known symptom IDs: {{known_symptoms}}
+      Current profile: {{current_profile}}
+
+      Patient message: {{patient_message}}
+
+ask:
+  active: v1.0.0
+  versions:
+    v1.0.0: |
+      Rephrase this as one short, friendly question for a patient.
+      Symptom to ask about: {{symptom}}
+
+explain:
+  active: v1.0.0
+  versions:
+    v1.0.0: |
+      Turn this decision record into plain language for a patient.
+      Do not add any medical claims that are not in the record.
+
+      Decision record: {{decision_record}}
