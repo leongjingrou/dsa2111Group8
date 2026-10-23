@@ -158,11 +158,11 @@ def _fit_ebm(train_x, train_y, tune=False, scoring="f1_macro"):
     return model, {"learning_rate": model.learning_rate, "max_bins": model.max_bins}
 
 
-def train_scenario_models(data, output_dir, tune=False):
-    """Train diagnosis, scope, and escalation EBMs on the v0.2 scenario schema."""
+def train_scenario_models(data, output_dir, tune=False, test_size=0.25):
+    """Train diagnosis, scope, and escalation EBMs on the scenario schema."""
     x, symptom_ids = scenario_features(data)
     targets = scenario_targets(data)
-    train_index, test_index = scenario_split(data)
+    train_index, test_index = scenario_split(data, test_size=test_size)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     tasks = {}
@@ -226,6 +226,7 @@ def train_scenario_models(data, output_dir, tune=False):
         "rows": len(data),
         "train_rows": len(train_index),
         "test_rows": len(test_index),
+        "test_size": test_size,
         "in_scope_rows": int(targets["scope"].sum()),
         "out_of_scope_rows": int((1 - targets["scope"]).sum()),
         "features": x.shape[1],
@@ -248,11 +249,17 @@ if __name__ == "__main__":
     parser.add_argument("--no-tune", action="store_true")
     parser.add_argument("--scenario-schema", action="store_true")
     parser.add_argument(
+        "--test-size", type=float, default=0.25,
+        help="Fraction reserved for stratified scenario testing (default: 0.25).",
+    )
+    parser.add_argument(
         "--generate-scenarios",
         action="store_true",
         help="Regenerate the scenario CSV with data/generate.py before training.",
     )
     args = parser.parse_args()
+    if not 0 < args.test_size < 1:
+        parser.error("--test-size must be between 0 and 1")
     if args.generate_scenarios and not args.scenario_schema:
         parser.error("--generate-scenarios requires --scenario-schema")
     if args.generate_scenarios:
@@ -262,7 +269,7 @@ if __name__ == "__main__":
     else:
         data = pd.read_csv(args.data)
     result = (
-        train_scenario_models(data, args.output_dir, not args.no_tune)
+        train_scenario_models(data, args.output_dir, not args.no_tune, args.test_size)
         if args.scenario_schema
         else train_and_evaluate(data, args.output_dir, not args.no_tune)
     )

@@ -17,8 +17,8 @@ from diagnostic_model.scenario_data import (
 )
 
 
-def write_rows(data, folder):
-    train_index, test_index = scenario_split(data)
+def write_rows(data, folder, test_size=0.25):
+    train_index, test_index = scenario_split(data, test_size=test_size)
     folder.mkdir(parents=True, exist_ok=True)
     paths = []
     for name, index in (("train", train_index), ("test", test_index)):
@@ -51,20 +51,27 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, default=Path("diagnostic_model/artifacts"))
     parser.add_argument("--model-dir", type=Path, required=True)
     parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument(
+        "--test-size", type=float, default=0.25,
+        help="Fraction reserved for stratified testing; use 0.5 for a 50/50 experiment.",
+    )
     parser.add_argument("--train-encoder", action="store_true")
+    parser.add_argument("--trace-conversation", action="store_true")
     parser.add_argument(
         "--generate-scenarios",
         action="store_true",
         help="Regenerate the scenario CSV with data/generate.py before fine-tuning.",
     )
     args = parser.parse_args()
+    if not 0 < args.test_size < 1:
+        parser.error("--test-size must be between 0 and 1")
 
     data = (
         regenerate_scenarios(args.data)
         if args.generate_scenarios
         else load_scenarios(args.data)
     )
-    train_path, test_path = write_rows(data, args.output_dir)
+    train_path, test_path = write_rows(data, args.output_dir, test_size=args.test_size)
     base = Path(
         snapshot_download("convaiinnovations/laya", allow_patterns=["typed-decisions/*"])
     ) / "typed-decisions"
@@ -88,8 +95,21 @@ if __name__ == "__main__":
     (args.output_dir / f"{name}_finetune.json").write_text(json.dumps(summary, indent=2))
 
     model = laya.load(str(args.model_dir), device="cuda")
-    report = evaluate_laya(data, args.output_dir, model, name=name, model_name=str(args.model_dir))
+    report = evaluate_laya(
+        data,
+        args.output_dir,
+        model,
+        name=name,
+        model_name=str(args.model_dir),
+        trace_conversation=args.trace_conversation,
+        test_size=args.test_size,
+    )
     comparison = compare_ebm(
-        data, args.output_dir, report, args.output_dir, name=f"{name}_comparison"
+        data,
+        args.output_dir,
+        report,
+        args.output_dir,
+        name=f"{name}_comparison",
+        test_size=args.test_size,
     )
     print(json.dumps(comparison, indent=2))

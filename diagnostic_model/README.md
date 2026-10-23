@@ -45,6 +45,11 @@ python -m diagnostic_model.laya_model data/generated/synthetic_scenarios.csv \
   --trace-conversation
 ```
 
+For a matched 50/50 experiment, pass `--test-size 0.5` to EBM training,
+Laya evaluation, and Laya fine-tuning. The split remains stratified by condition
+and escalation, so every diagnosis/risk combination is represented on both
+sides.
+
 `--generate-scenarios` explicitly invokes the deterministic `generate()`
 function in `data/generate.py` before validation and training. That generator is
 the scenario-schema evolution of the repository's `data` branch generator: it

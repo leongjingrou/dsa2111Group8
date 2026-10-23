@@ -34,7 +34,7 @@ def test_laya_questions_include_abstention_and_escalation():
 
 def test_laya_rows_and_evaluation_use_shared_holdout(tmp_path):
     data = sample_scenarios()
-    train_path, test_path = write_rows(data, tmp_path)
+    train_path, test_path = write_rows(data, tmp_path, test_size=0.5)
     train = [json.loads(line) for line in train_path.read_text().splitlines()]
     test = [json.loads(line) for line in test_path.read_text().splitlines()]
 
@@ -43,9 +43,16 @@ def test_laya_rows_and_evaluation_use_shared_holdout(tmp_path):
     assert "out_of_scope" in {item["expected"]["condition"] for item in train}
 
     report = evaluate_laya(
-        data, tmp_path, FakeAgent(), batch_size=8, runs=1, trace_conversation=True
+        data,
+        tmp_path,
+        FakeAgent(),
+        batch_size=8,
+        runs=1,
+        trace_conversation=True,
+        test_size=0.5,
     )
-    assert report["rows"] == len(held_out_rows(data))
+    assert report["rows"] == len(held_out_rows(data, test_size=0.5))
+    assert report["test_size"] == 0.5
     assert {"condition", "scope", "escalation"}.issubset(report)
     assert report["conversation_trace"]["states"] == report["rows"] * 5
     assert len(report["conversation_trace"]["by_patient_answer"]) == 5

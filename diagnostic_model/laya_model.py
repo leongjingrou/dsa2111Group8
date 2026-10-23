@@ -63,8 +63,8 @@ def questions():
     }
 
 
-def held_out_rows(data):
-    _, test_index = scenario_split(data)
+def held_out_rows(data, test_size=0.25):
+    _, test_index = scenario_split(data, test_size=test_size)
     return data.loc[test_index].copy().reset_index(drop=True)
 
 
@@ -212,9 +212,9 @@ def conversation_trace_report(
 
 def evaluate_laya(
     data, output_dir, agent, batch_size=16, runs=5, name="laya",
-    model_name=None, trace_conversation=False,
+    model_name=None, trace_conversation=False, test_size=0.25,
 ):
-    rows = held_out_rows(data)
+    rows = held_out_rows(data, test_size=test_size)
     condition_labels = sorted(knowledge_base_condition_ids() + [OUT_OF_SCOPE])
     escalation_labels = ["routine", "urgent"]
     row_records = rows.to_dict("records")
@@ -240,6 +240,7 @@ def evaluate_laya(
         "rows": len(rows),
         "model": model_name or "convaiinnovations/laya:typed-decisions",
         "batch_size": batch_size,
+        "test_size": test_size,
         "latency_ms_total_median": round(elapsed_ms, 2),
         "latency_ms_per_row": round(elapsed_ms / len(rows), 3),
         "condition": multiclass_score(
@@ -285,8 +286,8 @@ def evaluate_laya(
     return report
 
 
-def evaluate_ebm_on_laya_holdout(data, artifacts_dir):
-    rows = held_out_rows(data)
+def evaluate_ebm_on_laya_holdout(data, artifacts_dir, test_size=0.25):
+    rows = held_out_rows(data, test_size=test_size)
     targets = scenario_targets(rows)
     bundles = {
         task: joblib.load(artifacts_dir / f"{task}_model.joblib")
@@ -322,11 +323,13 @@ def evaluate_ebm_on_laya_holdout(data, artifacts_dir):
     }
 
 
-def compare_ebm(data, artifacts_dir, laya_report, output_dir, name="model_comparison"):
+def compare_ebm(
+    data, artifacts_dir, laya_report, output_dir, name="model_comparison", test_size=0.25,
+):
     comparison = {
-        "matched_holdout_rows": len(held_out_rows(data)),
+        "matched_holdout_rows": len(held_out_rows(data, test_size=test_size)),
         "laya": laya_report,
-        "ebm": evaluate_ebm_on_laya_holdout(data, artifacts_dir),
+        "ebm": evaluate_ebm_on_laya_holdout(data, artifacts_dir, test_size=test_size),
         "warning": "Matched synthetic holdout; not clinical validation.",
     }
     (output_dir / f"{name}.json").write_text(json.dumps(comparison, indent=2))
@@ -342,6 +345,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--model", default="convaiinnovations/laya")
     parser.add_argument("--subfolder", default="typed-decisions")
+    parser.add_argument("--test-size", type=float, default=0.25)
     parser.add_argument(
         "--trace-conversation",
         action="store_true",
@@ -353,6 +357,8 @@ if __name__ == "__main__":
         help="Regenerate the scenario CSV with data/generate.py before evaluation.",
     )
     args = parser.parse_args()
+    if not 0 < args.test_size < 1:
+        parser.error("--test-size must be between 0 and 1")
     data = (
         regenerate_scenarios(args.data)
         if args.generate_scenarios
@@ -366,6 +372,9 @@ if __name__ == "__main__":
         args.batch_size,
         model_name=args.model,
         trace_conversation=args.trace_conversation,
+        test_size=args.test_size,
     )
-    comparison = compare_ebm(data, args.output_dir, report, args.output_dir)
+    comparison = compare_ebm(
+        data, args.output_dir, report, args.output_dir, test_size=args.test_size
+    )
     print(json.dumps(comparison, indent=2))

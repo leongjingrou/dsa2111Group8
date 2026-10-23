@@ -42,6 +42,10 @@ def test_scenario_split_is_matched_and_disjoint():
     assert len(train) + len(test) == len(data)
     assert set(data.loc[train, "condition_id"]) == set(data.loc[test, "condition_id"])
 
+    half_train, half_test = scenario_split(data, test_size=0.5)
+    assert len(half_train) == len(half_test)
+    assert set(half_train).isdisjoint(half_test)
+
 
 def test_scenario_models_write_three_artifacts(tmp_path):
     data = sample_scenarios()
