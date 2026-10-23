@@ -159,6 +159,57 @@ def confidence_traces(rows, agent, batch_size=16):
     return traces
 
 
+def conversation_trace_report(
+    traces, condition_truth, escalation_truth, condition_labels, escalation_labels,
+):
+    if traces is None:
+        return {"enabled": False, "states": 0, "by_patient_answer": []}
+
+    condition_truth = np.asarray(condition_truth)
+    escalation_truth = np.asarray(escalation_truth)
+    checkpoints = []
+    for step in range(max(map(len, traces), default=0)):
+        row_indices = [index for index, trace in enumerate(traces) if len(trace) > step]
+        answers = [traces[index][step]["answers"] for index in row_indices]
+        condition_probabilities = _answer_matrix(answers, "condition", condition_labels)
+        escalation_probabilities = _answer_matrix(answers, "escalation", escalation_labels)
+        condition_predictions = [answer["condition"]["choice"] for answer in answers]
+        escalation_predictions = [answer["escalation"]["choice"] == "urgent" for answer in answers]
+        step_condition_truth = condition_truth[row_indices]
+        step_escalation_truth = escalation_truth[row_indices]
+        checkpoints.append({
+            "patient_answer": step + 1,
+            "rows": len(row_indices),
+            "condition": multiclass_score(
+                step_condition_truth,
+                condition_predictions,
+                condition_probabilities,
+                condition_labels,
+            ),
+            "scope": binary_score(
+                step_condition_truth != OUT_OF_SCOPE,
+                np.asarray(condition_predictions) != OUT_OF_SCOPE,
+                1 - condition_probabilities[:, condition_labels.index(OUT_OF_SCOPE)],
+            ),
+            "escalation": binary_score(
+                step_escalation_truth,
+                escalation_predictions,
+                escalation_probabilities[:, escalation_labels.index("urgent")],
+            ),
+            "mean_condition_confidence": round(float(np.mean([
+                answer["condition"]["answer_confidence"] for answer in answers
+            ])), 4),
+            "mean_escalation_confidence": round(float(np.mean([
+                answer["escalation"]["answer_confidence"] for answer in answers
+            ])), 4),
+        })
+    return {
+        "enabled": True,
+        "states": sum(len(trace) for trace in traces),
+        "by_patient_answer": checkpoints,
+    }
+
+
 def evaluate_laya(
     data, output_dir, agent, batch_size=16, runs=5, name="laya",
     model_name=None, trace_conversation=False,
@@ -204,10 +255,13 @@ def evaluate_laya(
             escalation_predictions,
             escalation_probabilities[:, escalation_labels.index("urgent")],
         ),
-        "conversation_trace": {
-            "enabled": trace_conversation,
-            "states": sum(len(trace) for trace in traces) if traces is not None else 0,
-        },
+        "conversation_trace": conversation_trace_report(
+            traces,
+            condition_truth,
+            escalation_truth,
+            condition_labels,
+            escalation_labels,
+        ),
         "warning": "Synthetic generator holdout; not clinical validation.",
     }
 

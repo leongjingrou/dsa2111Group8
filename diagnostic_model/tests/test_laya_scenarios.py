@@ -48,6 +48,7 @@ def test_laya_rows_and_evaluation_use_shared_holdout(tmp_path):
     assert report["rows"] == len(held_out_rows(data))
     assert {"condition", "scope", "escalation"}.issubset(report)
     assert report["conversation_trace"]["states"] == report["rows"] * 5
+    assert len(report["conversation_trace"]["by_patient_answer"]) == 5
     assert (tmp_path / "laya_decisions.jsonl").is_file()
     decision = json.loads((tmp_path / "laya_decisions.jsonl").read_text().splitlines()[0])
     assert len(decision["confidence_trace"]) == 5
