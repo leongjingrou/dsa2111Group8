@@ -6,13 +6,22 @@ build-backend = "setuptools.build_meta"
 name = "dsa2111-group8-telemedicine"
 version = "0.1.0"
 description = "Prototype knowledge-base and explainable diagnostic model components"
-requires-python = ">=3.13,<3.14"
+requires-python = ">=3.13,<3.15"
 dependencies = [
   "interpret-core>=0.7.8,<0.8",
   "joblib>=1.4,<2",
   "matplotlib>=3.9,<4",
   "pandas>=2.2,<4",
   "scikit-learn>=1.6,<2",
+  "pydantic>=2.0",
+  "fastapi",
+  "uvicorn[standard]>=0.22.0",
+  "openai>=1.0.0",
+  "pydantic>=2.0.0",
+  "pydantic-settings>=2.0.0",
+  "pyyaml>=6.0",
+  "python-dotenv>=1.0.0",
+  "httpx>=0.24.0",
 ]
 
 [project.optional-dependencies]
@@ -21,3 +30,6 @@ test = ["pytest>=8.3,<9"]
 [tool.pytest.ini_options]
 testpaths = ["knowledge_base", "diagnostic_model/tests"]
 addopts = "-q -p no:cacheprovider"
+
+[tool.setuptools]
+packages = ["llm_service", "knowledge_base", "diagnostic_model"]
