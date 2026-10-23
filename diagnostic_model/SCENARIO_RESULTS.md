@@ -58,6 +58,32 @@ model is under `/home/ubuntu/dsa2111-persistent/models/laya-head-v0.3-half/`.
 The redundant training checkpoint copy was removed after verification; the
 loadable final model and all result artifacts remain.
 
+## Prioritized evidence injection A/B
+
+The v0.3 fine-tuned head was evaluated again on the identical 850-case holdout
+with a label-free `priority_evidence` field added to each conversation. Findings
+were ordered P1-P5 from present red flags through ordinary negative findings,
+and each intermediate trace contained only evidence revealed by that turn.
+
+| Laya input | Condition accuracy | Condition macro-F1 | Scope accuracy | Escalation accuracy | Median latency |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Conversation only | 0.7282 | 0.3905 | 0.8106 | 0.8235 | 61.6 ms/row |
+| Conversation + prioritized evidence | 0.5400 | 0.3356 | 0.7165 | 0.8447 | 94.3 ms/row |
+
+Priority injection improved escalation by 2.12 percentage points and increased
+urgent recall from 0.7388 to 0.8329. However, condition accuracy fell by 18.82
+points, scope accuracy fell by 9.41 points, and latency increased by about 53%.
+The existing head was not trained on the extra evidence representation, and a
+single risk-first summary biases both decisions even though diagnosis and
+triage need different evidence orderings.
+
+The result argues against enabling this combined path as the default. A better
+next experiment is question-specific evidence: differential-diagnosis findings
+for condition/scope, red flags for escalation, followed by fine-tuning on that
+same representation. The generated `pathway_map` records decision nodes and
+transitions for visual analysis. Persistent outputs are under
+`/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-half-prioritized/`.
+
 Server evaluation used the fixed v0.2.0 synthetic scenario dataset, a matched
 condition-plus-escalation split, and 425 untouched holdout rows. Laya ran on an
 NVIDIA Tesla T4. These results measure interpolation within the rule-generated
