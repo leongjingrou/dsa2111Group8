@@ -17,22 +17,27 @@ docker build -f deploy/Dockerfile.ebm -t "${IMAGE_NAME}" .
 "${KUBECTL_BIN}" apply -k deploy/k8s
 "${KUBECTL_BIN}" -n diagnosis-sim rollout status deployment/diagnosis-api --timeout=300s
 
-"${KUBECTL_BIN}" -n diagnosis-sim port-forward service/diagnosis-api 18080:80 >"${RESULTS_DIR}.port-forward.log" 2>&1 &
-forward_pid=$!
-trap 'kill "${forward_pid}" 2>/dev/null || true' EXIT
-
-for _ in $(seq 1 30); do
-  if curl --fail --silent http://127.0.0.1:18080/readyz >/dev/null; then
-    break
-  fi
-  sleep 1
-done
-
-"${PYTHON_BIN}" -m serving.load_test \
-  --base-url http://127.0.0.1:18080 \
+mkdir -p "${RESULTS_DIR}"
+"${KUBECTL_BIN}" -n diagnosis-sim delete pod load-driver --ignore-not-found
+"${KUBECTL_BIN}" -n diagnosis-sim run load-driver \
+  --image "${IMAGE_NAME}" \
+  --image-pull-policy IfNotPresent \
+  --restart Never \
+  --command -- \
+  python -m serving.load_test \
+  --base-url http://diagnosis-api \
   --concurrency "${CONCURRENCY:-1,4,16,32}" \
   --sessions "${SESSIONS:-60}" \
-  --output-dir "${RESULTS_DIR}"
+  --output-dir /tmp/results
+
+if ! "${KUBECTL_BIN}" -n diagnosis-sim wait \
+  --for=jsonpath='{.status.phase}'=Succeeded pod/load-driver --timeout=900s; then
+  "${KUBECTL_BIN}" -n diagnosis-sim logs load-driver || true
+  exit 1
+fi
+"${KUBECTL_BIN}" -n diagnosis-sim logs load-driver >"${RESULTS_DIR}/load-driver.log"
+"${KUBECTL_BIN}" cp \
+  diagnosis-sim/load-driver:/tmp/results/. "${RESULTS_DIR}"
 
 "${KUBECTL_BIN}" -n diagnosis-sim get pods -o wide >"${RESULTS_DIR}/pods.txt"
 "${KUBECTL_BIN}" -n diagnosis-sim get hpa >"${RESULTS_DIR}/hpa.txt"
