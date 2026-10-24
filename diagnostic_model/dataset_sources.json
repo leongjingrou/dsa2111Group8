@@ -1,0 +1,106 @@
+{
+  "reviewed_on": "2026-10-25",
+  "policy": "External corpora are kept in separate lanes for diagnosis, escalation evaluation, language style, and jurisdictional safety. No source is treated as clinical validation.",
+  "sources": [
+    {
+      "id": "ddxplus",
+      "name": "DDXPlus",
+      "url": "https://github.com/mila-iqia/ddxplus",
+      "region": "global synthetic",
+      "license": "CC BY 4.0",
+      "role": "diagnosis_and_differential_training",
+      "status": "recommended_research_baseline",
+      "notes": "About 1.3M synthetic patients, 49 pathologies, structured evidence and probability-weighted differential diagnoses. Not Southeast Asian and not recorded dialogue."
+    },
+    {
+      "id": "care_bench",
+      "name": "CARE-Bench public split",
+      "url": "https://github.com/ningkko/CARE-bench",
+      "region": "global source-grounded",
+      "license": "CC BY-NC 4.0 dataset; code license unspecified",
+      "role": "stop_and_escalation_evaluation_only",
+      "status": "recommended_noncommercial_evaluation",
+      "notes": "439 public cases and 925 labeled disclosure prefixes. Keep out of training and respect source-level terms."
+    },
+    {
+      "id": "openmed_meddialog",
+      "name": "OpenMed MedDialog",
+      "url": "https://huggingface.co/datasets/OpenMed/MedDialog",
+      "region": "global English online Q&A",
+      "license": "Apache-2.0 as stated by dataset card",
+      "role": "conversation_style_audit",
+      "status": "usable_with_quality_review",
+      "notes": "Single-turn patient/doctor pairs without dependable diagnosis labels; source responses may be inaccurate."
+    },
+    {
+      "id": "sg_moh_emergency",
+      "name": "Singapore MOH — Getting medical help",
+      "url": "https://www.moh.gov.sg/seeking-healthcare/getting-medical-help/",
+      "region": "Singapore",
+      "license": "Government website terms; facts encoded with source attribution",
+      "role": "jurisdictional_safety_override",
+      "status": "recommended_with_review_date",
+      "notes": "Emergency warning signs and local care pathway. This overrides learned stop confidence but does not supply diagnosis labels."
+    },
+    {
+      "id": "sg_moh_condition_catalogue",
+      "name": "Singapore MOH Health Diseases and Conditions",
+      "url": "https://data.gov.sg/datasets/d_01d45cd7b2113dc0c433bcd5218b67b8/view",
+      "region": "Singapore",
+      "license": "Singapore Open Data Licence",
+      "role": "local_condition_coverage_audit",
+      "status": "recommended_catalogue_only",
+      "notes": "42 condition names only; no symptoms, conversations, diagnoses, or outcomes."
+    },
+    {
+      "id": "vimed_sft",
+      "name": "ViMed-SFT",
+      "url": "https://huggingface.co/datasets/quannguyen204/medical_sft_crawl_vi_10k_v1",
+      "region": "Vietnam",
+      "license": "Apache-2.0 as stated by dataset card",
+      "role": "vietnamese_language_and_style_audit",
+      "status": "pilot_after_provenance_review",
+      "notes": "10,085 Vietnamese medical QA conversations; crawl and label provenance require review before training."
+    },
+    {
+      "id": "indohealth_ncd_sample",
+      "name": "IndoHealth-NLP NCD sample",
+      "url": "https://huggingface.co/datasets/IndoHealth-NLP/NCD_Instruct-Tuning_Medical_QA_Indonesian",
+      "region": "Indonesia",
+      "license": "CC BY-NC 4.0",
+      "role": "indonesian_language_and_ncd_style_audit",
+      "status": "noncommercial_sample_evaluation",
+      "notes": "200-row public sample; educational nurse-triage responses, not diagnosis labels."
+    },
+    {
+      "id": "sea_dialogues",
+      "name": "SEADialogues",
+      "url": "https://huggingface.co/datasets/SEACrowd/SEADialogues",
+      "region": "Southeast Asia multilingual",
+      "license": "CC BY-SA 4.0",
+      "role": "cultural_and_language_robustness_only",
+      "status": "usable_nonmedical_auxiliary",
+      "notes": "32,000 culturally grounded dialogues across eight regional languages; it is not medical data."
+    },
+    {
+      "id": "vimq",
+      "name": "ViMQ",
+      "url": "https://github.com/tadeephuy/ViMQ",
+      "region": "Vietnam",
+      "license": "verify repository terms before reuse",
+      "role": "vietnamese_intent_and_entity_evaluation",
+      "status": "hold_pending_license_review",
+      "notes": "9,000 patient questions with intent and medical-entity annotations; not a diagnostic conversation corpus."
+    },
+    {
+      "id": "meddies_consultant",
+      "name": "Meddies Consultant / HoangHa medical-data",
+      "url": "https://huggingface.co/datasets/HoangHa/medical-data",
+      "region": "Vietnam",
+      "license": "other / custom terms not established in card",
+      "role": "potential_multiturn_language_audit",
+      "status": "hold_pending_license_and_generation_audit",
+      "notes": "Large Vietnamese-first multi-turn corpus with disease targets, but licensing and synthetic-generation provenance need resolution."
+    }
+  ]
+}

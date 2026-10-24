@@ -157,3 +157,51 @@ Laya fine-tune, split evaluation, stop-controller fit and PNG export using the
 persistent model/cache/result paths under `/home/ubuntu/dsa2111-persistent`.
 It also logs Bayesian correctness intervals, Gaussian confidence intervals,
 diagnosis-specific narrowing plots, and a matched EBM/Laya comparison bundle.
+
+## V3: live conversation and external grounding
+
+`live_conversation.py` turns either saved model family into a clinician-led
+session. It opens with “Hello, what seems to be the problem today?”, accepts
+free-text patient replies, records only explicitly stated positive or negative
+findings, and emits diagnosis, escalation, and stop confidence after every
+reply. The learned controller can stop from answer two onward; answer five is
+the hard cap. Singapore MOH emergency signs are a separate deterministic safety
+override and can stop before the learned minimum.
+
+```bash
+python -m diagnostic_model.live_conversation \
+  --backend ebm \
+  --model /path/to/ebm_sequential_models.joblib \
+  --stopping /path/to/ebm_stopping_controller.joblib \
+  --log live-session.json
+```
+
+Use `--backend laya --model /path/to/laya-model --device cuda` with the Laya
+stopping artifact for the equivalent Laya session. `--script replies.json`
+replays a JSON list of patient replies for matched, reproducible comparisons.
+
+The external-source registry is `dataset_sources.json`. Run
+`python -m diagnostic_model.grounding audit` to inspect it. The recommended
+data lanes are deliberately separate:
+
+- DDXPlus supplies synthetic evidence, pathology, and differential labels for
+  research retraining; `grounding convert-ddxplus` preserves its official
+  train/validation/test split and reconstructs a maximum-five-answer transcript;
+- CARE-Bench is reserved for non-commercial stop/escalation evaluation;
+- MedDialog and Southeast Asian corpora are language/style robustness inputs,
+  not trusted diagnosis labels;
+- Singapore MOH and data.gov.sg sources provide local safety and condition
+  coverage checks, not patient-level training records.
+
+See [GROUNDING_SOURCES.md](GROUNDING_SOURCES.md) for the reviewed source table,
+licensing constraints, and the proposed Southeast Asian evaluation matrix.
+
+For a few human-inspectable raw outputs, export from either model's decision
+log. The JSON keeps the model's final response and source truth in separate
+objects and includes the complete probability trace:
+
+```bash
+python -m diagnostic_model.export_raw_samples \
+  /path/to/ebm_sequential_decisions.jsonl \
+  raw-ebm-samples.json --model EBM --count 4
+```

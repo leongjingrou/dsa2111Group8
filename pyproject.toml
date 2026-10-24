@@ -27,3 +27,6 @@ addopts = "-q -p no:cacheprovider"
 
 [tool.setuptools.packages.find]
 include = ["data*", "diagnostic_model*", "knowledge_base*"]
+
+[tool.setuptools.package-data]
+diagnostic_model = ["dataset_sources.json"]
