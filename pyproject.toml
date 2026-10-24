@@ -23,3 +23,6 @@ laya = ["laya==0.4.12"]
 [tool.pytest.ini_options]
 testpaths = ["knowledge_base", "diagnostic_model/tests"]
 addopts = "-q -p no:cacheprovider"
+
+[tool.setuptools.packages.find]
+include = ["data*", "diagnostic_model*", "knowledge_base*"]

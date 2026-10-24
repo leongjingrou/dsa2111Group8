@@ -111,3 +111,40 @@ are not clinical performance or deployable probability calibration.
 
 The matched server results and the accepted/rejected Laya design comparison are
 recorded in [SCENARIO_RESULTS.md](SCENARIO_RESULTS.md).
+
+## V2: fixed Q&A with learned stopping
+
+The v2 pipeline keeps every consultation at a maximum of five doctor/patient
+Q&A pairs. Both approaches are trained and evaluated at every partial state:
+
+- the sequential EBM masks evidence that has not yet been asked and trains its
+  diagnosis, scope and escalation models on answers 1 through 5;
+- the Laya fine-tune export contains the same five partial conversational
+  states rather than only the complete conversation;
+- a separate stop/continue controller learns from live diagnosis/escalation
+  confidence, probability margins, prediction stability and answer number;
+- the stop threshold is chosen on validation data with an explicit penalty for
+  urgent false negatives, then reported once on the untouched test split.
+
+Run the local EBM pipeline and export its overview plus individual maps:
+
+```bash
+python -m diagnostic_model.sequential_ebm data/generated/synthetic_scenarios.csv \
+  --output-dir diagnostic_model/artifacts_v2/ebm
+python -m diagnostic_model.export_stopping_visuals \
+  diagnostic_model/artifacts_v2/ebm/ebm_sequential_metrics.json \
+  diagnostic_model/artifacts_v2/ebm/ebm_sequential_decisions.jsonl \
+  --output-dir diagnostic_model/visualizations_v2 --approach EBM
+```
+
+`write_sequential_rows` in `laya_finetune.py` exports stratified train,
+validation and test JSONL files for Laya. After fine-tuning, run:
+
+```bash
+python -m diagnostic_model.laya_sequential data/generated/synthetic_scenarios.csv \
+  --model-dir /path/to/laya-v2 --output-dir diagnostic_model/artifacts_v2/laya
+```
+
+The images distinguish model confidence from the learned stop probability and
+show the forced fifth-answer fallback. These outputs remain synthetic pipeline
+checks, not evidence of clinical safety or effectiveness.

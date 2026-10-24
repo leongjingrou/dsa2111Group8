@@ -100,6 +100,40 @@ def scenario_split(data, test_size=0.25, seed=SEED):
     return np.sort(train_index), np.sort(test_index)
 
 
+def scenario_train_validation_test_split(
+    data, validation_size=0.2, test_size=0.2, seed=SEED,
+):
+    """Return deterministic, matched train/validation/test indices.
+
+    Both holdouts are stratified by diagnosis and escalation.  The validation
+    split is reserved for selecting the stopping threshold; it is not folded
+    back into training or used as the final test set.
+    """
+    if validation_size <= 0 or test_size <= 0 or validation_size + test_size >= 1:
+        raise ValueError("validation_size and test_size must be positive and sum to < 1")
+    targets = scenario_targets(data)
+    strata = data["condition_id"].astype(str) + "|" + targets["escalation"].astype(str)
+    train_index, holdout_index = train_test_split(
+        data.index.to_numpy(),
+        test_size=validation_size + test_size,
+        random_state=seed,
+        stratify=strata,
+    )
+    holdout_strata = strata.loc[holdout_index]
+    relative_test_size = test_size / (validation_size + test_size)
+    validation_index, test_index = train_test_split(
+        holdout_index,
+        test_size=relative_test_size,
+        random_state=seed + 1,
+        stratify=holdout_strata,
+    )
+    return {
+        "train": np.sort(train_index),
+        "validation": np.sort(validation_index),
+        "test": np.sort(test_index),
+    }
+
+
 def load_scenarios(path=DEFAULT_SCENARIO_PATH):
     data = pd.read_csv(path)
     # Validate eagerly so failures happen before model fitting.
