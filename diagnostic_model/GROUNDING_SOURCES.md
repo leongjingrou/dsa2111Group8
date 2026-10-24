@@ -23,6 +23,9 @@ and Ghosn, J. (2022), “DDXPlus: A New Dataset for Automatic Medical
 Diagnosis,” *NeurIPS 2022 Datasets and Benchmarks Track*,
 [arXiv:2205.09148](https://arxiv.org/abs/2205.09148). The corresponding data and
 documentation are the [Mila-IQIA DDXPlus repository](https://github.com/mila-iqia/ddxplus).
+The server pipeline fixes the English data release to Figshare version 2,
+[doi:10.6084/m9.figshare.22687585.v2](https://doi.org/10.6084/m9.figshare.22687585.v2),
+and hashes every extracted source file.
 
 In this project, “DDXPlus-grounded” means that age, sex, evidence values,
 simulated pathology, differential distribution, and official split come from a
@@ -52,6 +55,21 @@ independent axes:
 Results must be reported per country/language and never collapsed into a single
 “SEA score.” Local clinician review is still required before adding a language
 or condition to the supported set.
+
+## Seeded generation contract
+
+The V4 generator uses DDXPlus as the medical seed and public ViMed-SFT and
+IndoHealth preview rows as Southeast Asian style seeds. It assigns every
+regional record to exactly one train/validation/test partition by a stable hash
+and pairs only within that partition. A generated record carries both source
+IDs, URLs, licences, record IDs, a hash/excerpt of the style seed, and the
+generation seed.
+
+The regional text is deliberately not inserted as clinical evidence. It cannot
+change the DDXPlus pathology, differential, or evidence tokens. This produces a
+traceable augmentation/evaluation input while preventing an unverified QA
+answer or a non-medical cultural corpus from becoming a diagnosis label. It is
+still synthetic and does not establish Southeast Asian clinical validity.
 
 ## Leakage and licensing controls
 
