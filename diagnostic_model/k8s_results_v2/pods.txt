@@ -1,0 +1,8 @@
+NAME                             READY   STATUS      RESTARTS   AGE     IP          NODE                         NOMINATED NODE   READINESS GATES
+diagnosis-api-8458b99cb5-4m8wr   1/1     Running     0          3m30s   10.42.0.9   k3d-diagnosis-sim-agent-0    <none>           <none>
+diagnosis-api-8458b99cb5-k6dv7   1/1     Running     0          4m1s    10.42.0.8   k3d-diagnosis-sim-agent-0    <none>           <none>
+diagnosis-api-8458b99cb5-rw7qk   1/1     Running     0          8m16s   10.42.2.4   k3d-diagnosis-sim-server-0   <none>           <none>
+diagnosis-api-8458b99cb5-stxnk   1/1     Running     0          3m30s   10.42.1.7   k3d-diagnosis-sim-agent-1    <none>           <none>
+diagnosis-api-8458b99cb5-tbr7v   1/1     Running     0          4m      10.42.2.5   k3d-diagnosis-sim-server-0   <none>           <none>
+diagnosis-api-8458b99cb5-wtv5p   1/1     Running     0          7m30s   10.42.1.6   k3d-diagnosis-sim-agent-1    <none>           <none>
+load-driver                      0/1     Completed   0          4m22s   10.42.0.7   k3d-diagnosis-sim-agent-0    <none>           <none>

@@ -1,0 +1,8 @@
+c7e9f1b2d8936e53ed3b251b549f69ef32721593
+ip-10-0-9-13
+k3d version v5.9.0
+k3s version v1.35.5-k3s1 (default)
+Client Version: v1.35.5
+Kustomize Version: v5.7.1
+29.8.1
+sha256:d0532aed488517d234886debbbc2c8edcdaeee8f3312223fedb3e593799aa7db 907734332

@@ -1,0 +1,139 @@
+{
+  "base_url": "http://diagnosis-api",
+  "seed": 2111,
+  "sessions_per_experiment": 100,
+  "experiments": [
+    {
+      "concurrency": 1,
+      "sessions": 100,
+      "requests": 318,
+      "elapsed_seconds": 57.696,
+      "throughput_requests_per_second": 5.512,
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 171.271,
+        "p95": 271.094,
+        "p99": 318.242,
+        "max": 413.049
+      },
+      "replica_requests": {
+        "diagnosis-api-8458b99cb5-4m8wr": 3,
+        "diagnosis-api-8458b99cb5-k6dv7": 45,
+        "diagnosis-api-8458b99cb5-rw7qk": 122,
+        "diagnosis-api-8458b99cb5-tbr7v": 38,
+        "diagnosis-api-8458b99cb5-wtv5p": 110
+      },
+      "device_sessions": {
+        "desktop": 33,
+        "mobile": 34,
+        "tablet": 33
+      },
+      "stop_turns": {
+        "2": 12,
+        "3": 69,
+        "4": 8,
+        "5": 11
+      }
+    },
+    {
+      "concurrency": 8,
+      "sessions": 100,
+      "requests": 310,
+      "elapsed_seconds": 31.251,
+      "throughput_requests_per_second": 9.92,
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 606.56,
+        "p95": 1809.572,
+        "p99": 2098.44,
+        "max": 2750.674
+      },
+      "replica_requests": {
+        "diagnosis-api-8458b99cb5-4m8wr": 54,
+        "diagnosis-api-8458b99cb5-k6dv7": 44,
+        "diagnosis-api-8458b99cb5-rw7qk": 55,
+        "diagnosis-api-8458b99cb5-stxnk": 47,
+        "diagnosis-api-8458b99cb5-tbr7v": 50,
+        "diagnosis-api-8458b99cb5-wtv5p": 60
+      },
+      "device_sessions": {
+        "desktop": 33,
+        "mobile": 34,
+        "tablet": 33
+      },
+      "stop_turns": {
+        "2": 17,
+        "3": 63,
+        "4": 13,
+        "5": 7
+      }
+    },
+    {
+      "concurrency": 32,
+      "sessions": 100,
+      "requests": 300,
+      "elapsed_seconds": 30.575,
+      "throughput_requests_per_second": 9.812,
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 2343.852,
+        "p95": 6592.898,
+        "p99": 6959.567,
+        "max": 7541.664
+      },
+      "replica_requests": {
+        "diagnosis-api-8458b99cb5-4m8wr": 42,
+        "diagnosis-api-8458b99cb5-k6dv7": 54,
+        "diagnosis-api-8458b99cb5-rw7qk": 54,
+        "diagnosis-api-8458b99cb5-stxnk": 49,
+        "diagnosis-api-8458b99cb5-tbr7v": 42,
+        "diagnosis-api-8458b99cb5-wtv5p": 59
+      },
+      "device_sessions": {
+        "desktop": 33,
+        "mobile": 34,
+        "tablet": 33
+      },
+      "stop_turns": {
+        "2": 22,
+        "3": 63,
+        "4": 8,
+        "5": 7
+      }
+    },
+    {
+      "concurrency": 64,
+      "sessions": 100,
+      "requests": 330,
+      "elapsed_seconds": 34.147,
+      "throughput_requests_per_second": 9.664,
+      "error_rate": 0.0,
+      "latency_ms": {
+        "p50": 4766.659,
+        "p95": 13786.84,
+        "p99": 15186.873,
+        "max": 15671.145
+      },
+      "replica_requests": {
+        "diagnosis-api-8458b99cb5-4m8wr": 57,
+        "diagnosis-api-8458b99cb5-k6dv7": 54,
+        "diagnosis-api-8458b99cb5-rw7qk": 63,
+        "diagnosis-api-8458b99cb5-stxnk": 58,
+        "diagnosis-api-8458b99cb5-tbr7v": 44,
+        "diagnosis-api-8458b99cb5-wtv5p": 54
+      },
+      "device_sessions": {
+        "desktop": 33,
+        "mobile": 34,
+        "tablet": 33
+      },
+      "stop_turns": {
+        "2": 13,
+        "3": 60,
+        "4": 11,
+        "5": 16
+      }
+    }
+  ],
+  "warning": "Synthetic load and synthetic patient data; not a clinical or capacity SLA."
+}

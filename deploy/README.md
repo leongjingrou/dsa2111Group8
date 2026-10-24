@@ -52,6 +52,13 @@ The scripted K3d run creates a two-agent cluster, imports the local image,
 deploys the workload, forwards the service, runs concurrent experiments at
 1/4/16/32 devices, and saves results plus pod/HPA/log evidence.
 
+The recorded server run under `diagnostic_model/k8s_results_v2/` used 100
+consultations at 1/8/32/64 concurrent devices. The HPA expanded from two to six
+replicas and all experiments completed without request errors. Throughput
+flattened near 9.8 requests/second after concurrency 8 while p95 latency rose
+from 1.81 seconds at concurrency 8 to 13.79 seconds at concurrency 64, marking
+the tested deployment's saturation region.
+
 ## Laya: GPU overlay
 
 The same API has a `LayaBackend`. Set `MODEL_BACKEND=laya`, mount the trained

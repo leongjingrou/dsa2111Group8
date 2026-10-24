@@ -1,0 +1,523 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.ebm
+#1 transferring dockerfile: 769B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.13-slim
+#2 DONE 0.7s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 144B done
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/library/python:3.13-slim@sha256:57b29a7c050c4e679e4bea572e14b3965cf4b5839de2da49d55e49ffc4024f39
+#4 resolve docker.io/library/python:3.13-slim@sha256:57b29a7c050c4e679e4bea572e14b3965cf4b5839de2da49d55e49ffc4024f39 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 13.63kB done
+#5 DONE 0.0s
+
+#6 [2/5] WORKDIR /app
+#6 CACHED
+
+#7 [3/5] COPY . /app
+#7 DONE 0.1s
+
+#8 [4/5] RUN pip install --no-cache-dir ".[serve]"     && python -m diagnostic_model.sequential_ebm        data/generated/synthetic_scenarios.csv        --output-dir /models        --validation-size 0.2        --test-size 0.2     && rm -f /models/ebm_sequential_decisions.jsonl
+#8 1.633 Processing ./.
+#8 1.635   Installing build dependencies: started
+#8 3.468   Installing build dependencies: finished with status 'done'
+#8 3.469   Getting requirements to build wheel: started
+#8 4.466   Getting requirements to build wheel: finished with status 'done'
+#8 4.467   Preparing metadata (pyproject.toml): started
+#8 5.475   Preparing metadata (pyproject.toml): finished with status 'done'
+#8 5.523 Collecting interpret-core<0.8,>=0.7.8 (from dsa2111-group8-telemedicine==0.1.0)
+#8 5.552   Downloading interpret_core-0.7.8-py3-none-any.whl.metadata (2.9 kB)
+#8 5.573 Collecting joblib<2,>=1.4 (from dsa2111-group8-telemedicine==0.1.0)
+#8 5.577   Downloading joblib-1.6.0-py3-none-any.whl.metadata (6.5 kB)
+#8 5.730 Collecting matplotlib<4,>=3.9 (from dsa2111-group8-telemedicine==0.1.0)
+#8 5.735   Downloading matplotlib-3.11.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
+#8 5.889 Collecting pandas<4,>=2.2 (from dsa2111-group8-telemedicine==0.1.0)
+#8 5.894   Downloading pandas-3.1.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (18 kB)
+#8 6.096 Collecting pillow<13,>=11 (from dsa2111-group8-telemedicine==0.1.0)
+#8 6.100   Downloading pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+#8 6.189 Collecting scikit-learn<2,>=1.6 (from dsa2111-group8-telemedicine==0.1.0)
+#8 6.193   Downloading scikit_learn-1.9.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.3 kB)
+#8 6.326 Collecting scipy<2,>=1.10 (from dsa2111-group8-telemedicine==0.1.0)
+#8 6.330   Downloading scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+#8 6.393 Collecting fastapi<1,>=0.115 (from dsa2111-group8-telemedicine==0.1.0)
+#8 6.396   Downloading fastapi-0.162.0-py3-none-any.whl.metadata (26 kB)
+#8 6.417 Collecting httpx<1,>=0.28 (from dsa2111-group8-telemedicine==0.1.0)
+#8 6.421   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#8 6.442 Collecting uvicorn<1,>=0.34 (from dsa2111-group8-telemedicine==0.1.0)
+#8 6.445   Downloading uvicorn-0.54.0-py3-none-any.whl.metadata (6.6 kB)
+#8 6.468 Collecting starlette>=0.46.0 (from fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 6.472   Downloading starlette-1.9.0-py3-none-any.whl.metadata (6.6 kB)
+#8 6.581 Collecting pydantic>=2.9.0 (from fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 6.584   Downloading pydantic-2.14.1-py3-none-any.whl.metadata (133 kB)
+#8 6.603 Collecting typing-extensions>=4.8.0 (from fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 6.607   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#8 6.614 Collecting typing-inspection>=0.4.2 (from fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 6.617   Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+#8 6.624 Collecting annotated-doc>=0.0.2 (from fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 6.627   Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+#8 6.644 Collecting opentelemetry-api>=1.44.0 (from fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 6.647   Downloading opentelemetry_api-1.45.1-py3-none-any.whl.metadata (1.4 kB)
+#8 6.663 Collecting anyio (from httpx<1,>=0.28->dsa2111-group8-telemedicine==0.1.0)
+#8 6.666   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+#8 6.681 Collecting certifi (from httpx<1,>=0.28->dsa2111-group8-telemedicine==0.1.0)
+#8 6.685   Downloading certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
+#8 6.697 Collecting httpcore==1.* (from httpx<1,>=0.28->dsa2111-group8-telemedicine==0.1.0)
+#8 6.700   Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+#8 6.713 Collecting idna (from httpx<1,>=0.28->dsa2111-group8-telemedicine==0.1.0)
+#8 6.716   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#8 6.724 Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.28->dsa2111-group8-telemedicine==0.1.0)
+#8 6.728   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#8 6.945 Collecting numpy>=1.25 (from interpret-core<0.8,>=0.7.8->dsa2111-group8-telemedicine==0.1.0)
+#8 6.949   Downloading numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+#8 6.963 Collecting cloudpickle>=3.0 (from joblib<2,>=1.4->dsa2111-group8-telemedicine==0.1.0)
+#8 6.966   Downloading cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+#8 7.031 Collecting contourpy>=1.0.1 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.036   Downloading contourpy-1.4.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#8 7.044 Collecting cycler>=0.10 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.047   Downloading cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+#8 7.205 Collecting fonttools>=4.28.2 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.209   Downloading fonttools-4.67.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (137 kB)
+#8 7.290 Collecting kiwisolver>=1.3.1 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.294   Downloading kiwisolver-1.5.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.2 kB)
+#8 7.307 Collecting packaging>=20.0 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.311   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+#8 7.332 Collecting pyparsing>=3 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.335   Downloading pyparsing-3.3.3-py3-none-any.whl.metadata (5.9 kB)
+#8 7.344 Collecting python-dateutil>=2.7 (from matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 7.347   Downloading python_dateutil-3.0.0-py2.py3-none-any.whl.metadata (8.2 kB)
+#8 7.415 Collecting narwhals>=2.0.1 (from scikit-learn<2,>=1.6->dsa2111-group8-telemedicine==0.1.0)
+#8 7.418   Downloading narwhals-2.27.1-py3-none-any.whl.metadata (15 kB)
+#8 7.428 Collecting threadpoolctl>=3.5.0 (from scikit-learn<2,>=1.6->dsa2111-group8-telemedicine==0.1.0)
+#8 7.431   Downloading threadpoolctl-3.7.0-py3-none-any.whl.metadata (24 kB)
+#8 7.451 Collecting click>=7.0 (from uvicorn<1,>=0.34->dsa2111-group8-telemedicine==0.1.0)
+#8 7.454   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#8 7.468 Collecting annotated-types>=0.6.0 (from pydantic>=2.9.0->fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 7.472   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#8 8.229 Collecting pydantic-core==2.50.1 (from pydantic>=2.9.0->fastapi<1,>=0.115->dsa2111-group8-telemedicine==0.1.0)
+#8 8.232   Downloading pydantic_core-2.50.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+#8 8.245 Collecting six>=1.6 (from python-dateutil>=2.7->matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 8.248   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#8 8.258 Collecting tzdata (from python-dateutil>=2.7->matplotlib<4,>=3.9->dsa2111-group8-telemedicine==0.1.0)
+#8 8.262   Downloading tzdata-2026.5-py2.py3-none-any.whl.metadata (1.4 kB)
+#8 8.276 Downloading fastapi-0.162.0-py3-none-any.whl (148 kB)
+#8 8.280 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#8 8.283 Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+#8 8.289 Downloading interpret_core-0.7.8-py3-none-any.whl (15.6 MB)
+#8 8.376    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.6/15.6 MB 182.3 MB/s  0:00:00
+#8 8.380 Downloading joblib-1.6.0-py3-none-any.whl (306 kB)
+#8 8.384 Downloading matplotlib-3.11.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.9 MB)
+#8 8.414    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.9/9.9 MB 354.6 MB/s  0:00:00
+#8 8.417 Downloading pandas-3.1.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (12.0 MB)
+#8 8.449    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.0/12.0 MB 413.8 MB/s  0:00:00
+#8 8.453 Downloading pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+#8 8.475    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 337.1 MB/s  0:00:00
+#8 8.479 Downloading scikit_learn-1.9.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.1 MB)
+#8 8.501    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.1/9.1 MB 446.8 MB/s  0:00:00
+#8 8.505 Downloading scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+#8 8.633    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.3/35.3 MB 280.9 MB/s  0:00:00
+#8 8.637 Downloading numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+#8 8.668    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 591.7 MB/s  0:00:00
+#8 8.672 Downloading uvicorn-0.54.0-py3-none-any.whl (87 kB)
+#8 8.675 Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+#8 8.678 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#8 8.682 Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+#8 8.685 Downloading contourpy-1.4.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (384 kB)
+#8 8.689 Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)
+#8 8.692 Downloading fonttools-4.67.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.4 MB)
+#8 8.713    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 279.0 MB/s  0:00:00
+#8 8.716 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#8 8.720 Downloading kiwisolver-1.5.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.5 MB)
+#8 8.727    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.5/1.5 MB 238.7 MB/s  0:00:00
+#8 8.731 Downloading narwhals-2.27.1-py3-none-any.whl (483 kB)
+#8 8.735 Downloading opentelemetry_api-1.45.1-py3-none-any.whl (60 kB)
+#8 8.738 Downloading packaging-26.3-py3-none-any.whl (129 kB)
+#8 8.741 Downloading pydantic-2.14.1-py3-none-any.whl (488 kB)
+#8 8.746 Downloading pydantic_core-2.50.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+#8 8.751    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 614.9 MB/s  0:00:00
+#8 8.755 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#8 8.758 Downloading pyparsing-3.3.3-py3-none-any.whl (126 kB)
+#8 8.761 Downloading python_dateutil-3.0.0-py2.py3-none-any.whl (94 kB)
+#8 8.769 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#8 8.772 Downloading starlette-1.9.0-py3-none-any.whl (80 kB)
+#8 8.775 Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+#8 8.779 Downloading idna-3.20-py3-none-any.whl (69 kB)
+#8 8.782 Downloading threadpoolctl-3.7.0-py3-none-any.whl (26 kB)
+#8 8.786 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#8 8.789 Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+#8 8.792 Downloading certifi-2026.10.23-py3-none-any.whl (135 kB)
+#8 8.796 Downloading tzdata-2026.5-py2.py3-none-any.whl (347 kB)
+#8 9.317 Building wheels for collected packages: dsa2111-group8-telemedicine
+#8 9.318   Building wheel for dsa2111-group8-telemedicine (pyproject.toml): started
+#8 10.36   Building wheel for dsa2111-group8-telemedicine (pyproject.toml): finished with status 'done'
+#8 10.36   Created wheel for dsa2111-group8-telemedicine: filename=dsa2111_group8_telemedicine-0.1.0-py3-none-any.whl size=57762 sha256=89362745af543c660eabfafd364477c18cc4b744da720d59691f825d29b0a75b
+#8 10.36   Stored in directory: /tmp/pip-ephem-wheel-cache-7fo1ydmf/wheels/19/62/e5/caf0138816cbbc0c92b8fb19626cf9ac282f22194a65231821
+#8 10.36 Successfully built dsa2111-group8-telemedicine
+#8 10.57 Installing collected packages: tzdata, typing-extensions, threadpoolctl, six, pyparsing, pillow, packaging, numpy, narwhals, kiwisolver, idna, h11, fonttools, cycler, cloudpickle, click, certifi, annotated-types, annotated-doc, uvicorn, typing-inspection, scipy, python-dateutil, pydantic-core, opentelemetry-api, joblib, httpcore, contourpy, anyio, starlette, scikit-learn, pydantic, pandas, matplotlib, httpx, interpret-core, fastapi, dsa2111-group8-telemedicine
+#8 32.75 
+#8 32.75 Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.10.23 click-8.5.0 cloudpickle-3.1.2 contourpy-1.4.0 cycler-0.12.1 dsa2111-group8-telemedicine-0.1.0 fastapi-0.162.0 fonttools-4.67.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 interpret-core-0.7.8 joblib-1.6.0 kiwisolver-1.5.1 matplotlib-3.11.2 narwhals-2.27.1 numpy-2.5.4 opentelemetry-api-1.45.1 packaging-26.3 pandas-3.1.0 pillow-12.3.0 pydantic-2.14.1 pydantic-core-2.50.1 pyparsing-3.3.3 python-dateutil-3.0.0 scikit-learn-1.9.1 scipy-1.18.1 six-1.17.0 starlette-1.9.0 threadpoolctl-3.7.0 typing-extensions-4.16.0 typing-inspection-0.4.4 tzdata-2026.5 uvicorn-0.54.0
+#8 32.75 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#8 67.27 {
+#8 67.27   "model": "sequential EBM with learned EBM stopping controller",
+#8 67.27   "fixed_patient_answers": 5,
+#8 67.27   "split": {
+#8 67.27     "train": 1020,
+#8 67.27     "validation": 340,
+#8 67.27     "test": 340
+#8 67.27   },
+#8 67.27   "selected_stop_threshold": 0.9,
+#8 67.27   "threshold_objective": "joint_accuracy - 0.03*question_fraction - 0.5*urgent_miss_rate",
+#8 67.27   "splits": {
+#8 67.27     "train": {
+#8 67.27       "rows": 1020,
+#8 67.27       "condition_accuracy": 0.9696,
+#8 67.27       "escalation_accuracy": 0.9794,
+#8 67.27       "joint_accuracy": 0.95,
+#8 67.27       "urgent_recall": 0.9706,
+#8 67.27       "mean_patient_answers": 3.154,
+#8 67.27       "median_patient_answers": 3.0,
+#8 67.27       "stopped_before_final": 0.9088,
+#8 67.27       "stop_distribution": {
+#8 67.27         "2": 139,
+#8 67.27         "3": 678,
+#8 67.27         "4": 110,
+#8 67.27         "5": 93
+#8 67.27       },
+#8 67.27       "by_patient_answer": [
+#8 67.27         {
+#8 67.27           "patient_answer": 1,
+#8 67.27           "rows": 1020,
+#8 67.27           "condition_accuracy": 0.6706,
+#8 67.27           "escalation_accuracy": 0.6118,
+#8 67.27           "joint_accuracy": 0.4118,
+#8 67.27           "urgent_recall": 0.4961,
+#8 67.27           "mean_patient_answers": 1.0,
+#8 67.27           "median_patient_answers": 1.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "1": 1020
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 2,
+#8 67.27           "rows": 1020,
+#8 67.27           "condition_accuracy": 0.7255,
+#8 67.27           "escalation_accuracy": 0.9127,
+#8 67.27           "joint_accuracy": 0.6647,
+#8 67.27           "urgent_recall": 0.9078,
+#8 67.27           "mean_patient_answers": 2.0,
+#8 67.27           "median_patient_answers": 2.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "2": 1020
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 3,
+#8 67.27           "rows": 1020,
+#8 67.27           "condition_accuracy": 0.9451,
+#8 67.27           "escalation_accuracy": 0.9706,
+#8 67.27           "joint_accuracy": 0.9186,
+#8 67.27           "urgent_recall": 0.9647,
+#8 67.27           "mean_patient_answers": 3.0,
+#8 67.27           "median_patient_answers": 3.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "3": 1020
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 4,
+#8 67.27           "rows": 1020,
+#8 67.27           "condition_accuracy": 0.9657,
+#8 67.27           "escalation_accuracy": 0.9775,
+#8 67.27           "joint_accuracy": 0.9451,
+#8 67.27           "urgent_recall": 0.9706,
+#8 67.27           "mean_patient_answers": 4.0,
+#8 67.27           "median_patient_answers": 4.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "4": 1020
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 5,
+#8 67.27           "rows": 1020,
+#8 67.27           "condition_accuracy": 0.9725,
+#8 67.27           "escalation_accuracy": 0.9863,
+#8 67.27           "joint_accuracy": 0.9598,
+#8 67.27           "urgent_recall": 0.9804,
+#8 67.27           "mean_patient_answers": 5.0,
+#8 67.27           "median_patient_answers": 5.0,
+#8 67.27           "stopped_before_final": 0.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "5": 1020
+#8 67.27           }
+#8 67.27         }
+#8 67.27       ],
+#8 67.27       "answer_5_baseline": {
+#8 67.27         "patient_answer": 5,
+#8 67.27         "rows": 1020,
+#8 67.27         "condition_accuracy": 0.9725,
+#8 67.27         "escalation_accuracy": 0.9863,
+#8 67.27         "joint_accuracy": 0.9598,
+#8 67.27         "urgent_recall": 0.9804,
+#8 67.27         "mean_patient_answers": 5.0,
+#8 67.27         "median_patient_answers": 5.0,
+#8 67.27         "stopped_before_final": 0.0,
+#8 67.27         "stop_distribution": {
+#8 67.27           "5": 1020
+#8 67.27         }
+#8 67.27       }
+#8 67.27     },
+#8 67.27     "validation": {
+#8 67.27       "rows": 340,
+#8 67.27       "condition_accuracy": 0.9559,
+#8 67.27       "escalation_accuracy": 0.9735,
+#8 67.27       "joint_accuracy": 0.9294,
+#8 67.27       "urgent_recall": 0.9706,
+#8 67.27       "mean_patient_answers": 3.221,
+#8 67.27       "median_patient_answers": 3.0,
+#8 67.27       "stopped_before_final": 0.9029,
+#8 67.27       "stop_distribution": {
+#8 67.27         "2": 45,
+#8 67.27         "3": 208,
+#8 67.27         "4": 54,
+#8 67.27         "5": 33
+#8 67.27       },
+#8 67.27       "by_patient_answer": [
+#8 67.27         {
+#8 67.27           "patient_answer": 1,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.6735,
+#8 67.27           "escalation_accuracy": 0.6265,
+#8 67.27           "joint_accuracy": 0.4088,
+#8 67.27           "urgent_recall": 0.5,
+#8 67.27           "mean_patient_answers": 1.0,
+#8 67.27           "median_patient_answers": 1.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "1": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 2,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.7029,
+#8 67.27           "escalation_accuracy": 0.9029,
+#8 67.27           "joint_accuracy": 0.6294,
+#8 67.27           "urgent_recall": 0.9059,
+#8 67.27           "mean_patient_answers": 2.0,
+#8 67.27           "median_patient_answers": 2.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "2": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 3,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.9353,
+#8 67.27           "escalation_accuracy": 0.9618,
+#8 67.27           "joint_accuracy": 0.8971,
+#8 67.27           "urgent_recall": 0.9471,
+#8 67.27           "mean_patient_answers": 3.0,
+#8 67.27           "median_patient_answers": 3.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "3": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 4,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.9618,
+#8 67.27           "escalation_accuracy": 0.9588,
+#8 67.27           "joint_accuracy": 0.9206,
+#8 67.27           "urgent_recall": 0.9412,
+#8 67.27           "mean_patient_answers": 4.0,
+#8 67.27           "median_patient_answers": 4.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "4": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 5,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.9676,
+#8 67.27           "escalation_accuracy": 0.9765,
+#8 67.27           "joint_accuracy": 0.9441,
+#8 67.27           "urgent_recall": 0.9765,
+#8 67.27           "mean_patient_answers": 5.0,
+#8 67.27           "median_patient_answers": 5.0,
+#8 67.27           "stopped_before_final": 0.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "5": 340
+#8 67.27           }
+#8 67.27         }
+#8 67.27       ],
+#8 67.27       "answer_5_baseline": {
+#8 67.27         "patient_answer": 5,
+#8 67.27         "rows": 340,
+#8 67.27         "condition_accuracy": 0.9676,
+#8 67.27         "escalation_accuracy": 0.9765,
+#8 67.27         "joint_accuracy": 0.9441,
+#8 67.27         "urgent_recall": 0.9765,
+#8 67.27         "mean_patient_answers": 5.0,
+#8 67.27         "median_patient_answers": 5.0,
+#8 67.27         "stopped_before_final": 0.0,
+#8 67.27         "stop_distribution": {
+#8 67.27           "5": 340
+#8 67.27         }
+#8 67.27       }
+#8 67.27     },
+#8 67.27     "test": {
+#8 67.27       "rows": 340,
+#8 67.27       "condition_accuracy": 0.9353,
+#8 67.27       "escalation_accuracy": 0.9559,
+#8 67.27       "joint_accuracy": 0.8912,
+#8 67.27       "urgent_recall": 0.9412,
+#8 67.27       "mean_patient_answers": 3.212,
+#8 67.27       "median_patient_answers": 3.0,
+#8 67.27       "stopped_before_final": 0.8824,
+#8 67.27       "stop_distribution": {
+#8 67.27         "2": 49,
+#8 67.27         "3": 210,
+#8 67.27         "4": 41,
+#8 67.27         "5": 40
+#8 67.27       },
+#8 67.27       "by_patient_answer": [
+#8 67.27         {
+#8 67.27           "patient_answer": 1,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.6676,
+#8 67.27           "escalation_accuracy": 0.6265,
+#8 67.27           "joint_accuracy": 0.4176,
+#8 67.27           "urgent_recall": 0.5412,
+#8 67.27           "mean_patient_answers": 1.0,
+#8 67.27           "median_patient_answers": 1.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "1": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 2,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.6971,
+#8 67.27           "escalation_accuracy": 0.9118,
+#8 67.27           "joint_accuracy": 0.6324,
+#8 67.27           "urgent_recall": 0.8824,
+#8 67.27           "mean_patient_answers": 2.0,
+#8 67.27           "median_patient_answers": 2.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "2": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 3,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.9235,
+#8 67.27           "escalation_accuracy": 0.95,
+#8 67.27           "joint_accuracy": 0.8765,
+#8 67.27           "urgent_recall": 0.9294,
+#8 67.27           "mean_patient_answers": 3.0,
+#8 67.27           "median_patient_answers": 3.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "3": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 4,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.9382,
+#8 67.27           "escalation_accuracy": 0.9471,
+#8 67.27           "joint_accuracy": 0.8853,
+#8 67.27           "urgent_recall": 0.9235,
+#8 67.27           "mean_patient_answers": 4.0,
+#8 67.27           "median_patient_answers": 4.0,
+#8 67.27           "stopped_before_final": 1.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "4": 340
+#8 67.27           }
+#8 67.27         },
+#8 67.27         {
+#8 67.27           "patient_answer": 5,
+#8 67.27           "rows": 340,
+#8 67.27           "condition_accuracy": 0.9441,
+#8 67.27           "escalation_accuracy": 0.9588,
+#8 67.27           "joint_accuracy": 0.9029,
+#8 67.27           "urgent_recall": 0.9471,
+#8 67.27           "mean_patient_answers": 5.0,
+#8 67.27           "median_patient_answers": 5.0,
+#8 67.27           "stopped_before_final": 0.0,
+#8 67.27           "stop_distribution": {
+#8 67.27             "5": 340
+#8 67.27           }
+#8 67.27         }
+#8 67.27       ],
+#8 67.27       "answer_5_baseline": {
+#8 67.27         "patient_answer": 5,
+#8 67.27         "rows": 340,
+#8 67.27         "condition_accuracy": 0.9441,
+#8 67.27         "escalation_accuracy": 0.9588,
+#8 67.27         "joint_accuracy": 0.9029,
+#8 67.27         "urgent_recall": 0.9471,
+#8 67.27         "mean_patient_answers": 5.0,
+#8 67.27         "median_patient_answers": 5.0,
+#8 67.27         "stopped_before_final": 0.0,
+#8 67.27         "stop_distribution": {
+#8 67.27           "5": 340
+#8 67.27         }
+#8 67.27       }
+#8 67.27     }
+#8 67.27   },
+#8 67.27   "warning": "Synthetic generator data; not clinical validation."
+#8 67.27 }
+#8 DONE 67.5s
+
+#9 [5/5] RUN useradd --uid 10001 --create-home appuser     && chown -R appuser:appuser /app /models
+#9 DONE 0.7s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 21.4s done
+#10 exporting manifest sha256:03fbe78ed73e4cf48d0e710d35a40bc04bf7e2cac7c991cf3aa97213ae46b656 0.0s done
+#10 exporting config sha256:fac7b3b6d9a8523716d8e22f6ba0fa8a8e11f4a47b9a3b5924fbf42396265902 0.0s done
+#10 exporting attestation manifest sha256:81663cf461017048bf6773eb24f2bcb7babf207ebc51aa318c363c5621cc417c 0.0s done
+#10 exporting manifest list sha256:d0532aed488517d234886debbbc2c8edcdaeee8f3312223fedb3e593799aa7db 0.0s done
+#10 naming to docker.io/library/diagnosis-api:local done
+#10 unpacking to docker.io/library/diagnosis-api:local
+#10 unpacking to docker.io/library/diagnosis-api:local 4.8s done
+#10 DONE 26.3s
+[36mINFO[0m[0000] Importing image(s) into cluster 'diagnosis-sim' 
+[36mINFO[0m[0000] Starting new tools node...                   
+[36mINFO[0m[0003] Starting node 'k3d-diagnosis-sim-tools'      
+[36mINFO[0m[0003] Saving 1 image(s) from runtime...            
+[36mINFO[0m[0008] Importing images into nodes...               
+[36mINFO[0m[0008] Importing images from tarball '/k3d/images/k3d-diagnosis-sim-images-20261024090822.tar' into node 'k3d-diagnosis-sim-agent-0'... 
+[36mINFO[0m[0008] Importing images from tarball '/k3d/images/k3d-diagnosis-sim-images-20261024090822.tar' into node 'k3d-diagnosis-sim-agent-1'... 
+[36mINFO[0m[0008] Importing images from tarball '/k3d/images/k3d-diagnosis-sim-images-20261024090822.tar' into node 'k3d-diagnosis-sim-server-0'... 
+[36mINFO[0m[0027] Removing the tarball(s) from image volume... 
+[36mINFO[0m[0028] Removing k3d-tools node...                   
+[36mINFO[0m[0038] Successfully imported image(s)               
+[36mINFO[0m[0038] Successfully imported 1 image(s) into 1 cluster(s) 
+namespace/diagnosis-sim unchanged
+service/diagnosis-api unchanged
+deployment.apps/diagnosis-api configured
+poddisruptionbudget.policy/diagnosis-api configured
+horizontalpodautoscaler.autoscaling/diagnosis-api unchanged
+deployment "diagnosis-api" successfully rolled out
+pod/load-driver created
+pod/load-driver condition met
+error: cannot exec into a container in a completed pod; current phase is Succeeded

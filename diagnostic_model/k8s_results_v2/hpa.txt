@@ -1,0 +1,2 @@
+NAME            REFERENCE                  TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+diagnosis-api   Deployment/diagnosis-api   cpu: 0%/60%   2         6         6          8m16s

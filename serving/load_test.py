@@ -108,7 +108,7 @@ def summarize(concurrency, sessions, elapsed):
 
 
 def draw_report(report, path):
-    width, height = 1500, 850
+    width, height = 1500, 980
     image = Image.new("RGB", (width, height), "white")
     draw = ImageDraw.Draw(image)
     font = ImageFont.load_default(size=22)
@@ -122,22 +122,32 @@ def draw_report(report, path):
         left = 70 + panel * 740
         top = 125
         draw.text((left, top), label, fill="#14213d", font=font)
-        baseline = 700
+        baseline = 690
         draw.line((left, baseline, left + 620, baseline), fill="#6c757d", width=2)
         for index, item in enumerate(experiments):
             x = left + 35 + index * max(100, 560 // max(1, len(experiments)))
             if panel == 0:
                 for offset, key in enumerate(("p50", "p95", "p99")):
                     value = item["latency_ms"][key] or 0
-                    bar_height = 500 * value / maximum
+                    bar_height = 480 * value / maximum
                     draw.rectangle((x + offset * 22, baseline - bar_height, x + offset * 22 + 18, baseline), fill=colors[key])
             else:
                 value = item["throughput_requests_per_second"]
-                bar_height = 500 * value / maximum
+                bar_height = 480 * value / maximum
                 draw.rectangle((x, baseline - bar_height, x + 55, baseline), fill="#3a86ff")
+                draw.text((x, baseline - bar_height - 30), f"{value:.2f}", fill="#14213d", font=font)
             draw.text((x, baseline + 15), str(item["concurrency"]), fill="#14213d", font=font)
-        draw.text((left + 210, 770), "Concurrent devices", fill="#495057", font=font)
-    draw.text((70, 810), "Latency bars: green p50, amber p95, red p99", fill="#495057", font=font)
+            if panel == 0:
+                latency = item["latency_ms"]
+                draw.multiline_text(
+                    (x - 12, baseline + 48),
+                    f"p50 {latency['p50']:.0f}\np95 {latency['p95']:.0f}\np99 {latency['p99']:.0f}",
+                    fill="#495057",
+                    font=ImageFont.load_default(size=16),
+                    spacing=4,
+                )
+        draw.text((left + 210, 855), "Concurrent devices", fill="#495057", font=font)
+    draw.text((70, 925), "Latency values are milliseconds: green p50, amber p95, red p99", fill="#495057", font=font)
     image.save(path)
 
 
