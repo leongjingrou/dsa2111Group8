@@ -40,8 +40,10 @@ independent axes:
 1. **Clinical content:** DDXPlus for diagnosis and differential distributions.
 2. **Question sufficiency:** CARE-Bench for whether the system should ask,
    recommend routine care, or escalate.
-3. **Jurisdictional safety:** Singapore MOH warning signs override learned
-   confidence; the source and review date appear in every affected log.
+3. **Jurisdictional safety:** an optional Singapore MOH profile can override
+   learned stopping confidence; it is disabled by default, must be selected
+   explicitly, and the source plus profile decision appear in every affected
+   log alongside the untouched model decision.
 4. **Language and culture:** English, Vietnamese, Indonesian, Malay, Tamil,
    Tagalog and Thai paraphrases are scored separately for extraction stability,
    question count, urgent recall, calibration and abstention. SEADialogues may

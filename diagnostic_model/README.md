@@ -165,14 +165,16 @@ session. It opens with “Hello, what seems to be the problem today?”, accepts
 free-text patient replies, records only explicitly stated positive or negative
 findings, and emits diagnosis, escalation, and stop confidence after every
 reply. The learned controller can stop from answer two onward; answer five is
-the hard cap. Singapore MOH emergency signs are a separate deterministic safety
-override and can stop before the learned minimum.
+the hard cap. An optional Singapore MOH safety profile can stop before the
+learned minimum; it is disabled by default and its decision is logged separately
+from the raw model stop.
 
 ```bash
 python -m diagnostic_model.live_conversation \
   --backend ebm \
   --model /path/to/ebm_sequential_models.joblib \
   --stopping /path/to/ebm_stopping_controller.joblib \
+  --safety-profile sg_moh \
   --log live-session.json
 ```
 

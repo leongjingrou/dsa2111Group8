@@ -204,12 +204,15 @@ class LayaLivePredictor:
 
 
 class LiveConsultation:
-    def __init__(self, predictor, stopping_path, minimum_answers=2):
+    def __init__(self, predictor, stopping_path, minimum_answers=2, safety_profile="none"):
+        if safety_profile not in {"none", "sg_moh"}:
+            raise ValueError(f"Unknown safety profile: {safety_profile}")
         stopping = joblib.load(stopping_path)
         self.predictor = predictor
         self.stop_model = stopping["model"]
         self.stop_threshold = float(stopping["threshold"])
         self.minimum_answers = minimum_answers
+        self.safety_profile = safety_profile
         self.evidence = EvidenceState()
         self.turns = [{"role": "doctor", "content": GREETING}]
         self.trace = []
@@ -226,17 +229,25 @@ class LiveConsultation:
                       "answers": answers}
         self.trace.append(checkpoint)
         stop_probability = stopping_probabilities(self.stop_model, [self.trace])[0][-1]
-        emergency = emergency_findings(patient_message)
-        stop = bool(emergency) or answer_number >= MAX_PATIENT_ANSWERS or (
+        model_stop = answer_number >= MAX_PATIENT_ANSWERS or (
             answer_number >= self.minimum_answers and stop_probability >= self.stop_threshold
         )
-        reason = "singapore_moh_emergency_override" if emergency else (
+        safety_findings = (
+            emergency_findings(patient_message) if self.safety_profile == "sg_moh" else []
+        )
+        safety_override = bool(safety_findings)
+        stop = safety_override or model_stop
+        reason = "safety_profile_sg_moh" if safety_override else (
             "maximum_questions" if answer_number >= MAX_PATIENT_ANSWERS else
             "learned_stop_threshold" if stop else "more_information_needed"
         )
         checkpoint.update({"stop_probability": round(float(stop_probability), 4),
-                           "stop_threshold": self.stop_threshold, "stop": stop,
-                           "stop_reason": reason, "emergency_findings": emergency})
+                           "stop_threshold": self.stop_threshold,
+                           "model_stop": bool(model_stop),
+                           "safety_profile": self.safety_profile,
+                           "safety_override_applied": safety_override,
+                           "safety_findings": safety_findings,
+                           "stop": stop, "stop_reason": reason})
         if stop:
             self.finished = True
             next_message = self._summary(checkpoint)
@@ -252,7 +263,7 @@ class LiveConsultation:
         escalation = checkpoint["answers"]["escalation"]
         ranked = sorted(condition["probabilities"].items(), key=lambda item: item[1], reverse=True)[:3]
         differential = ", ".join(f"{name} {value:.0%}" for name, value in ranked)
-        if checkpoint["emergency_findings"]:
+        if checkpoint["safety_override_applied"]:
             action = "The safety screen indicates urgent emergency assessment in Singapore; call 995 if this is happening now."
         else:
             action = f"The model's current escalation category is {escalation['choice']} ({escalation['answer_confidence']:.0%})."
@@ -282,12 +293,18 @@ def main():
     parser.add_argument("--model", required=True, help="EBM joblib file or Laya model directory")
     parser.add_argument("--stopping", required=True, type=Path)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument(
+        "--safety-profile", choices=("none", "sg_moh"), default="none",
+        help="Optional jurisdictional safety guard; always logged separately from model stopping",
+    )
     parser.add_argument("--script", type=Path, help="JSON list of patient replies; omit for interactive input")
     parser.add_argument("--log", type=Path)
     args = parser.parse_args()
     predictor = (EBMLivePredictor(args.model) if args.backend == "ebm"
                  else LayaLivePredictor(args.model, args.device))
-    session = LiveConsultation(predictor, args.stopping)
+    session = LiveConsultation(
+        predictor, args.stopping, safety_profile=args.safety_profile
+    )
     scripted = json.loads(args.script.read_text(encoding="utf-8")) if args.script else None
     print(f"Doctor: {GREETING}")
     events = []
@@ -304,7 +321,11 @@ def main():
         _print_checkpoint(checkpoint)
     if args.log:
         args.log.parent.mkdir(parents=True, exist_ok=True)
-        args.log.write_text(json.dumps({"turns": session.turns, "checkpoints": events}, indent=2), encoding="utf-8")
+        args.log.write_text(json.dumps({
+            "safety_profile": session.safety_profile,
+            "turns": session.turns,
+            "checkpoints": events,
+        }, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

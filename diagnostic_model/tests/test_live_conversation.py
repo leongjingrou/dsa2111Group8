@@ -77,11 +77,22 @@ def test_live_chain_stops_when_controller_crosses_threshold(tmp_path):
 
 
 def test_emergency_override_stops_before_model_minimum(tmp_path):
-    session = LiveConsultation(FakePredictor(), _stopping_file(tmp_path))
+    session = LiveConsultation(
+        FakePredictor(), _stopping_file(tmp_path), safety_profile="sg_moh"
+    )
     event = session.receive("I have chest pain and trouble breathing")
     assert event["stop"] is True
-    assert event["stop_reason"] == "singapore_moh_emergency_override"
-    assert set(event["emergency_findings"]) == {"chest pain", "breathing difficulty"}
+    assert event["model_stop"] is False
+    assert event["stop_reason"] == "safety_profile_sg_moh"
+    assert set(event["safety_findings"]) == {"chest pain", "breathing difficulty"}
+
+
+def test_safety_profile_is_explicit_and_disabled_by_default(tmp_path):
+    session = LiveConsultation(FakePredictor(), _stopping_file(tmp_path))
+    event = session.receive("I have chest pain and trouble breathing")
+    assert event["safety_profile"] == "none"
+    assert event["safety_override_applied"] is False
+    assert event["stop"] is False
 
 
 def test_dataset_registry_has_separate_grounding_roles():
