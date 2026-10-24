@@ -9,6 +9,14 @@ IMAGE_NAME="${IMAGE_NAME:-diagnosis-api:locust}"
 RESULTS_DIR="${RESULTS_DIR:-diagnostic_model/k8s_results_v4/ebm}"
 RUN_TIME="${RUN_TIME:-7m15s}"
 LOCUST_WORKERS="${LOCUST_WORKERS:-4}"
+MONITOR_PID=""
+
+cleanup() {
+  if [[ -n "${MONITOR_PID}" ]]; then
+    kill "${MONITOR_PID}" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
 
 if ! "${K3D_BIN}" cluster get "${CLUSTER_NAME}" >/dev/null 2>&1; then
   "${K3D_BIN}" cluster create "${CLUSTER_NAME}" --agents 2 --wait
@@ -39,17 +47,35 @@ mkdir -p "${RESULTS_DIR}"
   --csv /tmp/results/locust --csv-full-history \
   --html /tmp/results/locust-report.html
 
+(
+  while "${KUBECTL_BIN}" -n diagnosis-sim get pod locust-master >/dev/null 2>&1; do
+    phase="$("${KUBECTL_BIN}" -n diagnosis-sim get pod locust-master -o jsonpath='{.status.phase}')"
+    if [[ "${phase}" == "Succeeded" ]] || [[ "${phase}" == "Failed" ]]; then
+      break
+    fi
+    date --iso-8601=seconds
+    "${KUBECTL_BIN}" -n diagnosis-sim get hpa diagnosis-api
+    "${KUBECTL_BIN}" -n diagnosis-sim get deployment diagnosis-api locust-worker
+    "${KUBECTL_BIN}" -n diagnosis-sim top pods 2>/dev/null || true
+    sleep 5
+  done
+) >"${RESULTS_DIR}/cluster-timeseries.log" &
+MONITOR_PID=$!
+
 if ! "${KUBECTL_BIN}" -n diagnosis-sim wait \
   --for=jsonpath='{.status.phase}'=Succeeded pod/locust-master --timeout=900s; then
   "${KUBECTL_BIN}" -n diagnosis-sim logs locust-master >"${RESULTS_DIR}/locust-master.log" || true
   exit 1
 fi
+wait "${MONITOR_PID}" || true
+MONITOR_PID=""
 "${KUBECTL_BIN}" -n diagnosis-sim logs locust-master >"${RESULTS_DIR}/locust-master.log"
 "${KUBECTL_BIN}" -n diagnosis-sim logs deployment/locust-worker --prefix \
   >"${RESULTS_DIR}/locust-workers.log" || true
 "${KUBECTL_BIN}" -n diagnosis-sim cp locust-master:/tmp/results "${RESULTS_DIR}/raw"
 "${PYTHON_BIN}" -m serving.locust_report \
-  "${RESULTS_DIR}/raw/locust_stats_history.csv" --output-dir "${RESULTS_DIR}"
+  "${RESULTS_DIR}/raw/locust_stats_history.csv" --output-dir "${RESULTS_DIR}" \
+  --workers "${LOCUST_WORKERS}" --api-replica-ceiling 12
 "${KUBECTL_BIN}" -n diagnosis-sim get pods -o wide >"${RESULTS_DIR}/pods.txt"
 "${KUBECTL_BIN}" -n diagnosis-sim get deployment locust-worker -o wide \
   >"${RESULTS_DIR}/locust-worker-deployment.txt"

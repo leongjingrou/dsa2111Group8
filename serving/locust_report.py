@@ -16,7 +16,7 @@ def _number(row, *names, default=0.0):
     return default
 
 
-def summarize_history(path):
+def summarize_history(path, workers=None, api_replica_ceiling=None):
     with Path(path).open(newline="", encoding="utf-8") as source:
         rows = [row for row in csv.DictReader(source) if row.get("Name") == "Aggregated"]
     if not rows:
@@ -46,12 +46,17 @@ def summarize_history(path):
             "median_p95_ms": round(sorted(v["p95_ms"] for v in values)[len(values) // 2], 3),
             "max_p99_ms": round(max(v["p99_ms"] for v in values), 3),
         })
-    return {
+    report = {
         "maximum_users_observed": max(point["users"] for point in points),
         "points": points,
         "stages": stages,
         "warning": "Synthetic workload on one server; not a production capacity SLA or clinical validation.",
     }
+    if workers is not None:
+        report["locust_worker_pods"] = workers
+    if api_replica_ceiling is not None:
+        report["api_replica_ceiling"] = api_replica_ceiling
+    return report
 
 
 def draw_report(report, output):
@@ -97,8 +102,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("history", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--workers", type=int)
+    parser.add_argument("--api-replica-ceiling", type=int)
     args = parser.parse_args()
-    report = summarize_history(args.history)
+    report = summarize_history(args.history, args.workers, args.api_replica_ceiling)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "locust-summary.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     draw_report(report, args.output_dir / "locust-timeseries.png")

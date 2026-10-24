@@ -69,7 +69,9 @@ independently to at most 12 replicas.
 
 The script saves Locust's full time-series CSV, HTML report, failures and
 exceptions, a compact JSON/PNG summary, pod logs, node placement, and final HPA
-state. A 1,024-user run is intentionally a stress/saturation experiment:
+state. It also samples HPA state, deployments, and pod CPU/memory every five
+seconds during the ramp so scaling can be aligned with latency and throughput.
+A 1,024-user run is intentionally a stress/saturation experiment:
 success is not assumed, and timeout/error growth is part of the result. The
 load generator runs inside the same K3d cluster and therefore consumes
 resources on the same single physical server; that limitation must remain attached to

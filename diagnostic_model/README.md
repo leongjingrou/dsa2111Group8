@@ -212,6 +212,17 @@ This is constrained synthetic augmentation, not evidence that the clinical
 labels have been validated in a Southeast Asian population. Keep country and
 language results separate in evaluation.
 
+On the project server, `scripts/run_grounded_generation_server.sh` fetches the
+public preview rows from ViMed-SFT and the IndoHealth NCD sample, uniformly
+reservoir-samples 5,000/1,000/1,000 cases from the official DDXPlus
+train/validation/test files, and creates 10,000/1,000/1,000 constrained records.
+It also writes SHA-256 checksums. The official DDXPlus split is preserved and a
+regional seed is never reused across assigned splits.
+If an official DDXPlus split is missing, the script first downloads and
+extracts the fixed English Figshare v2 release (DOI
+`10.6084/m9.figshare.22687585.v2`) and records SHA-256 hashes of the extracted
+source files.
+
 See [GROUNDING_SOURCES.md](GROUNDING_SOURCES.md) for the reviewed source table,
 licensing constraints, and the proposed Southeast Asian evaluation matrix.
 

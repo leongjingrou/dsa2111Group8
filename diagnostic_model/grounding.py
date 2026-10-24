@@ -4,6 +4,7 @@ import argparse
 import ast
 import csv
 import json
+import random
 from pathlib import Path
 
 
@@ -12,7 +13,8 @@ DDXPLUS_URL = "https://github.com/mila-iqia/ddxplus"
 DDXPLUS_CITATION = (
     "Fansi Tchango A, Goel R, Wen Z, Martel J, Ghosn J. "
     "DDXPlus: A New Dataset for Automatic Medical Diagnosis. NeurIPS 2022. "
-    "arXiv:2205.09148."
+    "arXiv:2205.09148. English dataset release: Figshare, version 2, "
+    "doi:10.6084/m9.figshare.22687585.v2."
 )
 
 
@@ -125,13 +127,30 @@ def ddxplus_record(row, evidence_metadata, split, maximum_answers=5):
     }
 
 
-def convert_ddxplus(csv_path, evidences_path, output_path, split, maximum_answers=5, limit=None):
+def convert_ddxplus(
+    csv_path, evidences_path, output_path, split, maximum_answers=5,
+    limit=None, sample_size=None, seed=2111,
+):
+    if limit is not None and sample_size is not None:
+        raise ValueError("limit and sample_size are mutually exclusive")
     metadata = json.loads(Path(evidences_path).read_text(encoding="utf-8"))
     count = 0
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with Path(csv_path).open(encoding="utf-8", newline="") as source, output_path.open("w", encoding="utf-8", newline="\n") as target:
-        for row in csv.DictReader(source):
+        rows = csv.DictReader(source)
+        if sample_size is not None:
+            rng = random.Random(seed)
+            reservoir = []
+            for seen, row in enumerate(rows, 1):
+                if seen <= sample_size:
+                    reservoir.append(row)
+                else:
+                    replacement = rng.randrange(seen)
+                    if replacement < sample_size:
+                        reservoir[replacement] = row
+            rows = reservoir
+        for row in rows:
             target.write(json.dumps(ddxplus_record(row, metadata, split, maximum_answers), ensure_ascii=False) + "\n")
             count += 1
             if limit is not None and count >= limit:
@@ -150,12 +169,14 @@ def main():
     convert.add_argument("--split", required=True, choices=("train", "validate", "test"))
     convert.add_argument("--maximum-answers", type=int, default=5)
     convert.add_argument("--limit", type=int)
+    convert.add_argument("--sample-size", type=int, help="Uniform reservoir sample from the full split")
+    convert.add_argument("--seed", type=int, default=2111)
     args = parser.parse_args()
     if args.command == "audit":
         print(json.dumps(load_registry(), indent=2))
     else:
         count = convert_ddxplus(args.csv, args.evidences, args.output, args.split,
-                                args.maximum_answers, args.limit)
+                                args.maximum_answers, args.limit, args.sample_size, args.seed)
         print(json.dumps({"rows": count, "output": str(args.output)}))
 
 

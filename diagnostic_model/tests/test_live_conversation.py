@@ -155,6 +155,31 @@ def test_ddxplus_multichoice_values_share_one_question(tmp_path):
     assert len(matching) == 1
 
 
+def test_ddxplus_reservoir_sample_is_deterministic_and_not_first_rows(tmp_path):
+    metadata = {"E1": {"question_en": "Do you have a cough?", "value_meaning": {}}}
+    evidence_path = tmp_path / "evidences.json"
+    evidence_path.write_text(json.dumps(metadata), encoding="utf-8")
+    csv_path = tmp_path / "patients.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=[
+            "PATIENT_ID", "AGE", "SEX", "PATHOLOGY", "EVIDENCES",
+            "INITIAL_EVIDENCE", "DIFFERENTIAL_DIAGNOSIS",
+        ])
+        writer.writeheader()
+        for index in range(30):
+            writer.writerow({
+                "PATIENT_ID": f"p{index}", "AGE": "30", "SEX": "F",
+                "PATHOLOGY": "Example", "EVIDENCES": "['E1']",
+                "INITIAL_EVIDENCE": "E1", "DIFFERENTIAL_DIAGNOSIS": "[]",
+            })
+    first, second = tmp_path / "first.jsonl", tmp_path / "second.jsonl"
+    assert convert_ddxplus(csv_path, evidence_path, first, "train", sample_size=5, seed=7) == 5
+    assert convert_ddxplus(csv_path, evidence_path, second, "train", sample_size=5, seed=7) == 5
+    assert first.read_text(encoding="utf-8") == second.read_text(encoding="utf-8")
+    ids = {json.loads(line)["source_patient_id"] for line in first.read_text().splitlines()}
+    assert ids != {"p0", "p1", "p2", "p3", "p4"}
+
+
 def test_raw_sample_export_keeps_prediction_and_source_truth_separate(tmp_path):
     answer = {
         "condition": {"choice": "influenza", "probabilities": {"influenza": 0.8, "common_cold": 0.2}, "answer_confidence": 0.8},
