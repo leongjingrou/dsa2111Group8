@@ -3,7 +3,7 @@ set -euo pipefail
 
 DDX_ROOT="${DDX_ROOT:-/home/ubuntu/dsa2111-persistent/datasets/ddxplus-english}"
 RESULTS_DIR="${RESULTS_DIR:-/home/ubuntu/dsa2111-persistent/results/grounded-v4}"
-PYTHON_BIN="${PYTHON_BIN:-python}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
 EVIDENCES="${EVIDENCES:-${DDX_ROOT}/release_evidences.json}"
 
 DDX_ROOT="${DDX_ROOT}" scripts/prepare_ddxplus_english.sh

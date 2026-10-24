@@ -3,7 +3,7 @@ set -euo pipefail
 
 K3D_BIN="${K3D_BIN:-k3d}"
 KUBECTL_BIN="${KUBECTL_BIN:-kubectl}"
-PYTHON_BIN="${PYTHON_BIN:-python}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
 CLUSTER_NAME="${CLUSTER_NAME:-diagnosis-sim}"
 IMAGE_NAME="${IMAGE_NAME:-diagnosis-api:locust}"
 RESULTS_DIR="${RESULTS_DIR:-diagnostic_model/k8s_results_v4/ebm}"
