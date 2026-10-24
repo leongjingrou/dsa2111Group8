@@ -9,6 +9,7 @@ IMAGE_NAME="${IMAGE_NAME:-diagnosis-api:locust}"
 RESULTS_DIR="${RESULTS_DIR:-diagnostic_model/k8s_results_v4/ebm}"
 RUN_TIME="${RUN_TIME:-7m15s}"
 LOCUST_WORKERS="${LOCUST_WORKERS:-4}"
+LOCUST_STAGES="${LOCUST_STAGES:-45:8:2,105:32:4,165:128:16,225:256:32,285:512:64,405:1024:128}"
 MONITOR_PID=""
 
 cleanup() {
@@ -39,6 +40,7 @@ mkdir -p "${RESULTS_DIR}"
   --image-pull-policy IfNotPresent \
   --restart Never \
   --labels app.kubernetes.io/name=locust-master \
+  --env "LOCUST_STAGES=${LOCUST_STAGES}" \
   --command -- \
   locust -f /app/serving/locustfile.py \
   --master --expect-workers "${LOCUST_WORKERS}" \
