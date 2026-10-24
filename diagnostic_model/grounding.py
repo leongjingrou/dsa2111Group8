@@ -41,6 +41,23 @@ def _evidence_parts(token):
     return pieces[0], pieces[1] if len(pieces) == 2 else None
 
 
+def _group_evidences(tokens):
+    """Combine DDXPlus multi-choice values that share one question code."""
+    order = []
+    values = {}
+    for token in tokens:
+        code, value = _evidence_parts(token)
+        if code not in values:
+            order.append(code)
+            values[code] = []
+        if value is not None:
+            values[code].append(value)
+    return [
+        code if not values[code] else f"{code}_@_{'|||'.join(values[code])}"
+        for code in order
+    ]
+
+
 def _answer_for(token, metadata):
     code, value = _evidence_parts(token)
     detail = metadata.get(code, {})
@@ -66,7 +83,9 @@ def ddxplus_record(row, evidence_metadata, split, maximum_answers=5):
     """Create an auditable fixed-cap transcript; it is reconstructed, not recorded."""
     evidences = list(_structured(row["EVIDENCES"]))
     initial = str(row.get("INITIAL_EVIDENCE", evidences[0] if evidences else ""))
-    ordered = [initial] + [item for item in evidences if _evidence_parts(item)[0] != _evidence_parts(initial)[0]]
+    initial_code = _evidence_parts(initial)[0]
+    grouped = _group_evidences(evidences)
+    ordered = [initial] + [item for item in grouped if _evidence_parts(item)[0] != initial_code]
     selected = ordered[:maximum_answers]
     turns = [{"role": "doctor", "content": "Hello, what seems to be the problem today?"}]
     for index, token in enumerate(selected):

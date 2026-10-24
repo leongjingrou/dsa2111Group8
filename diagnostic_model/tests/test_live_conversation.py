@@ -119,6 +119,28 @@ def test_ddxplus_conversion_preserves_split_and_differential(tmp_path):
     assert sum(turn["role"] == "patient" for turn in record["conversation"]) == 5
 
 
+def test_ddxplus_multichoice_values_share_one_question(tmp_path):
+    metadata = {"E1": {"question_en": "Where is the pain?", "value_meaning": {
+        "V1": {"en": "chest"}, "V2": {"en": "back"},
+    }}}
+    evidence_path = tmp_path / "evidences.json"
+    evidence_path.write_text(json.dumps(metadata), encoding="utf-8")
+    csv_path = tmp_path / "patients.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=[
+            "AGE", "SEX", "PATHOLOGY", "EVIDENCES", "INITIAL_EVIDENCE", "DIFFERENTIAL_DIAGNOSIS",
+        ])
+        writer.writeheader()
+        writer.writerow({"AGE": "40", "SEX": "M", "PATHOLOGY": "Example",
+                         "EVIDENCES": "['E1_@_V1', 'E1_@_V2']", "INITIAL_EVIDENCE": "E0",
+                         "DIFFERENTIAL_DIAGNOSIS": "[]"})
+    output = tmp_path / "converted.jsonl"
+    convert_ddxplus(csv_path, evidence_path, output, "test")
+    record = json.loads(output.read_text(encoding="utf-8"))
+    matching = [turn for turn in record["conversation"] if turn["role"] == "patient" and "chest, back" in turn["content"]]
+    assert len(matching) == 1
+
+
 def test_raw_sample_export_keeps_prediction_and_source_truth_separate(tmp_path):
     answer = {
         "condition": {"choice": "influenza", "probabilities": {"influenza": 0.8, "common_cold": 0.2}, "answer_confidence": 0.8},
