@@ -1,0 +1,23 @@
+FROM python:3.13-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    MODEL_BACKEND=ebm \
+    MODEL_ARTIFACT_DIR=/models \
+    SCENARIO_DATA=/app/data/generated/synthetic_scenarios.csv
+
+WORKDIR /app
+COPY . /app
+RUN pip install --no-cache-dir ".[serve]" \
+    && python -m diagnostic_model.sequential_ebm \
+       data/generated/synthetic_scenarios.csv \
+       --output-dir /models \
+       --validation-size 0.2 \
+       --test-size 0.2 \
+    && rm -f /models/ebm_sequential_decisions.jsonl
+
+RUN useradd --uid 10001 --create-home appuser \
+    && chown -R appuser:appuser /app /models
+USER 10001
+EXPOSE 8080
+CMD ["uvicorn", "serving.app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

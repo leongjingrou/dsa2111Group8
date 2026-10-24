@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diagnosis-api
+  namespace: diagnosis-sim
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: api
+          image: diagnosis-laya-api:local
+          env:
+            - name: MODEL_BACKEND
+              value: laya
+            - name: LAYA_MODEL_DIR
+              value: /models/laya
+            - name: MODEL_ARTIFACT_DIR
+              value: /models/results
+            - name: LAYA_DEVICE
+              value: cuda
+          resources:
+            requests:
+              cpu: "1"
+              memory: 3Gi
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "4"
+              memory: 8Gi
+              nvidia.com/gpu: "1"
+          volumeMounts:
+            - name: laya-models
+              mountPath: /models
+              readOnly: true
+      volumes:
+        - name: laya-models
+          persistentVolumeClaim:
+            claimName: laya-models
