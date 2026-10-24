@@ -1,0 +1,227 @@
+{
+  "safety_profile": "none",
+  "turns": [
+    {
+      "role": "doctor",
+      "content": "Hello, what seems to be the problem today?"
+    },
+    {
+      "role": "patient",
+      "content": "I have a cough and chest pain and I am having trouble breathing."
+    },
+    {
+      "role": "doctor",
+      "content": "How long has this been going on, how severe is it, and is it getting better or worse?"
+    },
+    {
+      "role": "patient",
+      "content": "It started today. It is severe and getting worse."
+    },
+    {
+      "role": "doctor",
+      "content": "What other symptoms have you noticed?"
+    },
+    {
+      "role": "patient",
+      "content": "I also feel weak and dizzy."
+    },
+    {
+      "role": "doctor",
+      "content": "I need to check for warning signs. Do you have severe or chest pain, trouble breathing, uncontrolled bleeding, confusion, fainting, weakness or numbness, vision changes, vomiting blood, or continuous vomiting or diarrhoea?"
+    },
+    {
+      "role": "patient",
+      "content": "I have not fainted and I have not vomited blood."
+    },
+    {
+      "role": "doctor",
+      "content": "Lastly, what is your age and temperature? If relevant, are you pregnant?"
+    },
+    {
+      "role": "patient",
+      "content": "I am 58, male, and my temperature is 38.2 C."
+    }
+  ],
+  "checkpoints": [
+    {
+      "patient_answer": 1,
+      "latest_response": "I have a cough and chest pain and I am having trouble breathing.",
+      "answers": {
+        "condition": {
+          "choice": "out_of_scope",
+          "probabilities": {
+            "allergic_rhinitis": 4.5575101207804564e-05,
+            "common_cold": 0.0013276682399760004,
+            "gastroenteritis": 1.1367003008263445e-05,
+            "influenza": 0.339701784178363,
+            "migraine": 3.364775992474465e-05,
+            "out_of_scope": 0.6588794168167588,
+            "urinary_tract_infection": 5.40900761476711e-07
+          },
+          "answer_confidence": 0.6588794168167588
+        },
+        "escalation": {
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.036591815064594524,
+            "urgent": 0.9634081849354055
+          },
+          "answer_confidence": 0.9634081849354055
+        }
+      },
+      "stop_probability": 0.5699,
+      "stop_threshold": 0.9,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "How long has this been going on, how severe is it, and is it getting better or worse?"
+    },
+    {
+      "patient_answer": 2,
+      "latest_response": "It started today. It is severe and getting worse.",
+      "answers": {
+        "condition": {
+          "choice": "out_of_scope",
+          "probabilities": {
+            "allergic_rhinitis": 5.209597718263303e-08,
+            "common_cold": 0.00023708023556929627,
+            "gastroenteritis": 1.9331940690926943e-05,
+            "influenza": 0.44372573742438765,
+            "migraine": 0.0007757765871072049,
+            "out_of_scope": 0.555240901444768,
+            "urinary_tract_infection": 1.1202714997805148e-06
+          },
+          "answer_confidence": 0.555240901444768
+        },
+        "escalation": {
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.0035396177943879392,
+            "urgent": 0.9964603822056121
+          },
+          "answer_confidence": 0.9964603822056121
+        }
+      },
+      "stop_probability": 0.6388,
+      "stop_threshold": 0.9,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "What other symptoms have you noticed?"
+    },
+    {
+      "patient_answer": 3,
+      "latest_response": "I also feel weak and dizzy.",
+      "answers": {
+        "condition": {
+          "choice": "out_of_scope",
+          "probabilities": {
+            "allergic_rhinitis": 5.220181757794786e-07,
+            "common_cold": 0.0007233243429630709,
+            "gastroenteritis": 2.4868391757823e-05,
+            "influenza": 0.32346526027775707,
+            "migraine": 4.479545205927911e-05,
+            "out_of_scope": 0.6757406880957408,
+            "urinary_tract_infection": 5.414215460308518e-07
+          },
+          "answer_confidence": 0.6757406880957408
+        },
+        "escalation": {
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.018385949848357397,
+            "urgent": 0.9816140501516426
+          },
+          "answer_confidence": 0.9816140501516426
+        }
+      },
+      "stop_probability": 0.8441,
+      "stop_threshold": 0.9,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "I need to check for warning signs. Do you have severe or chest pain, trouble breathing, uncontrolled bleeding, confusion, fainting, weakness or numbness, vision changes, vomiting blood, or continuous vomiting or diarrhoea?"
+    },
+    {
+      "patient_answer": 4,
+      "latest_response": "I have not fainted and I have not vomited blood.",
+      "answers": {
+        "condition": {
+          "choice": "out_of_scope",
+          "probabilities": {
+            "allergic_rhinitis": 5.555204112586495e-07,
+            "common_cold": 0.0007333731468080478,
+            "gastroenteritis": 2.5727953165966094e-05,
+            "influenza": 0.3180376911236862,
+            "migraine": 4.2986417756369196e-05,
+            "out_of_scope": 0.6811591175033573,
+            "urinary_tract_infection": 5.483348147491313e-07
+          },
+          "answer_confidence": 0.6811591175033573
+        },
+        "escalation": {
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.022627266528644108,
+            "urgent": 0.9773727334713559
+          },
+          "answer_confidence": 0.9773727334713559
+        }
+      },
+      "stop_probability": 0.8471,
+      "stop_threshold": 0.9,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "Lastly, what is your age and temperature? If relevant, are you pregnant?"
+    },
+    {
+      "patient_answer": 5,
+      "latest_response": "I am 58, male, and my temperature is 38.2 C.",
+      "answers": {
+        "condition": {
+          "choice": "out_of_scope",
+          "probabilities": {
+            "allergic_rhinitis": 3.6769837125297715e-07,
+            "common_cold": 0.0004955471776803146,
+            "gastroenteritis": 1.8486711554251622e-05,
+            "influenza": 0.1918308148381104,
+            "migraine": 1.592623686092113e-05,
+            "out_of_scope": 0.8076385164630026,
+            "urinary_tract_infection": 3.408744203259e-07
+          },
+          "answer_confidence": 0.8076385164630026
+        },
+        "escalation": {
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.028022657076246293,
+            "urgent": 0.9719773429237537
+          },
+          "answer_confidence": 0.9719773429237537
+        }
+      },
+      "stop_probability": 0.9344,
+      "stop_threshold": 0.9,
+      "model_stop": true,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": true,
+      "stop_reason": "maximum_questions",
+      "doctor_response": "I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 81%, influenza 19%, common_cold 0%. The model's current escalation category is urgent (97%). This is research output, not a diagnosis."
+    }
+  ]
+}

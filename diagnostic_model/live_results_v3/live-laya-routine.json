@@ -1,0 +1,277 @@
+{
+  "safety_profile": "none",
+  "turns": [
+    {
+      "role": "doctor",
+      "content": "Hello, what seems to be the problem today?"
+    },
+    {
+      "role": "patient",
+      "content": "I have a cough, chills, body aches, and fatigue."
+    },
+    {
+      "role": "doctor",
+      "content": "How long has this been going on, how severe is it, and is it getting better or worse?"
+    },
+    {
+      "role": "patient",
+      "content": "It started 3 days ago. It is moderate and getting a little worse."
+    },
+    {
+      "role": "doctor",
+      "content": "What other symptoms have you noticed?"
+    },
+    {
+      "role": "patient",
+      "content": "I also have a sore throat and headache, but no shortness of breath."
+    },
+    {
+      "role": "doctor",
+      "content": "I need to check for warning signs. Do you have severe or chest pain, trouble breathing, uncontrolled bleeding, confusion, fainting, weakness or numbness, vision changes, vomiting blood, or continuous vomiting or diarrhoea?"
+    },
+    {
+      "role": "patient",
+      "content": "No chest pain, confusion, fainting, weakness, vomiting blood, or continuous vomiting or diarrhoea."
+    },
+    {
+      "role": "doctor",
+      "content": "Lastly, what is your age and temperature? If relevant, are you pregnant?"
+    },
+    {
+      "role": "patient",
+      "content": "I am 31, male, and my temperature is 38.4 C."
+    }
+  ],
+  "checkpoints": [
+    {
+      "patient_answer": 1,
+      "latest_response": "I have a cough, chills, body aches, and fatigue.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.0527,
+            "influenza": 0.1086,
+            "gastroenteritis": 0.0574,
+            "migraine": 0.0431,
+            "allergic_rhinitis": 0.0419,
+            "urinary_tract_infection": 0.0446,
+            "out_of_scope": 0.6518
+          },
+          "confidence": 0.3596,
+          "answer_confidence": 0.6518,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.3499,
+            "urgent": 0.6501
+          },
+          "confidence": 0.066,
+          "answer_confidence": 0.6501,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.2845,
+      "stop_threshold": 0.75,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "How long has this been going on, how severe is it, and is it getting better or worse?"
+    },
+    {
+      "patient_answer": 2,
+      "latest_response": "It started 3 days ago. It is moderate and getting a little worse.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.0585,
+            "influenza": 0.1233,
+            "gastroenteritis": 0.0957,
+            "migraine": 0.0813,
+            "allergic_rhinitis": 0.0665,
+            "urinary_tract_infection": 0.0736,
+            "out_of_scope": 0.5011
+          },
+          "confidence": 0.1925,
+          "answer_confidence": 0.5011,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "routine",
+          "probabilities": {
+            "routine": 0.9599,
+            "urgent": 0.0401
+          },
+          "confidence": 0.7573,
+          "answer_confidence": 0.9599,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.3442,
+      "stop_threshold": 0.75,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "What other symptoms have you noticed?"
+    },
+    {
+      "patient_answer": 3,
+      "latest_response": "I also have a sore throat and headache, but no shortness of breath.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.1106,
+            "influenza": 0.1078,
+            "gastroenteritis": 0.0724,
+            "migraine": 0.0832,
+            "allergic_rhinitis": 0.0405,
+            "urinary_tract_infection": 0.0389,
+            "out_of_scope": 0.5465
+          },
+          "confidence": 0.2461,
+          "answer_confidence": 0.5465,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "routine",
+          "probabilities": {
+            "routine": 0.9786,
+            "urgent": 0.0214
+          },
+          "confidence": 0.8507,
+          "answer_confidence": 0.9786,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.625,
+      "stop_threshold": 0.75,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "I need to check for warning signs. Do you have severe or chest pain, trouble breathing, uncontrolled bleeding, confusion, fainting, weakness or numbness, vision changes, vomiting blood, or continuous vomiting or diarrhoea?"
+    },
+    {
+      "patient_answer": 4,
+      "latest_response": "No chest pain, confusion, fainting, weakness, vomiting blood, or continuous vomiting or diarrhoea.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.0834,
+            "influenza": 0.0497,
+            "gastroenteritis": 0.0306,
+            "migraine": 0.0256,
+            "allergic_rhinitis": 0.0201,
+            "urinary_tract_infection": 0.0186,
+            "out_of_scope": 0.7721
+          },
+          "confidence": 0.5329,
+          "answer_confidence": 0.7721,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "routine",
+          "probabilities": {
+            "routine": 0.7976,
+            "urgent": 0.2024
+          },
+          "confidence": 0.2733,
+          "answer_confidence": 0.7976,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.6853,
+      "stop_threshold": 0.75,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "Lastly, what is your age and temperature? If relevant, are you pregnant?"
+    },
+    {
+      "patient_answer": 5,
+      "latest_response": "I am 31, male, and my temperature is 38.4 C.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.0958,
+            "influenza": 0.1083,
+            "gastroenteritis": 0.0669,
+            "migraine": 0.0345,
+            "allergic_rhinitis": 0.0236,
+            "urinary_tract_infection": 0.0216,
+            "out_of_scope": 0.6492
+          },
+          "confidence": 0.3759,
+          "answer_confidence": 0.6492,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "routine",
+          "probabilities": {
+            "routine": 0.7966,
+            "urgent": 0.2034
+          },
+          "confidence": 0.2713,
+          "answer_confidence": 0.7966,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.5508,
+      "stop_threshold": 0.75,
+      "model_stop": true,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": true,
+      "stop_reason": "maximum_questions",
+      "doctor_response": "I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 65%, influenza 11%, common_cold 10%. The model's current escalation category is routine (80%). This is research output, not a diagnosis."
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "safety_profile": "none",
+  "turns": [
+    {
+      "role": "doctor",
+      "content": "Hello, what seems to be the problem today?"
+    },
+    {
+      "role": "patient",
+      "content": "I have a cough and chest pain and I am having trouble breathing."
+    },
+    {
+      "role": "doctor",
+      "content": "How long has this been going on, how severe is it, and is it getting better or worse?"
+    },
+    {
+      "role": "patient",
+      "content": "It started today. It is severe and getting worse."
+    }
+  ],
+  "checkpoints": [
+    {
+      "patient_answer": 1,
+      "latest_response": "I have a cough and chest pain and I am having trouble breathing.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.0555,
+            "influenza": 0.0486,
+            "gastroenteritis": 0.0333,
+            "migraine": 0.0241,
+            "allergic_rhinitis": 0.0218,
+            "urinary_tract_infection": 0.0252,
+            "out_of_scope": 0.7914
+          },
+          "confidence": 0.5519,
+          "answer_confidence": 0.7914,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.0328,
+            "urgent": 0.9672
+          },
+          "confidence": 0.7917,
+          "answer_confidence": 0.9672,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.7544,
+      "stop_threshold": 0.75,
+      "model_stop": false,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": false,
+      "stop_reason": "more_information_needed",
+      "doctor_response": "How long has this been going on, how severe is it, and is it getting better or worse?"
+    },
+    {
+      "patient_answer": 2,
+      "latest_response": "It started today. It is severe and getting worse.",
+      "answers": {
+        "condition": {
+          "type": "choice",
+          "choice": "out_of_scope",
+          "probabilities": {
+            "common_cold": 0.0696,
+            "influenza": 0.0735,
+            "gastroenteritis": 0.0413,
+            "migraine": 0.0251,
+            "allergic_rhinitis": 0.0265,
+            "urinary_tract_infection": 0.0242,
+            "out_of_scope": 0.7398
+          },
+          "confidence": 0.4806,
+          "answer_confidence": 0.7398,
+          "action": {
+            "act_probability": 1.0
+          }
+        },
+        "escalation": {
+          "type": "choice",
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.011,
+            "urgent": 0.989
+          },
+          "confidence": 0.9127,
+          "answer_confidence": 0.989,
+          "action": {
+            "act_probability": 1.0
+          }
+        }
+      },
+      "stop_probability": 0.7815,
+      "stop_threshold": 0.75,
+      "model_stop": true,
+      "safety_profile": "none",
+      "safety_override_applied": false,
+      "safety_findings": [],
+      "stop": true,
+      "stop_reason": "learned_stop_threshold",
+      "doctor_response": "I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 74%, influenza 7%, common_cold 7%. The model's current escalation category is urgent (99%). This is research output, not a diagnosis."
+    }
+  ]
+}

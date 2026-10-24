@@ -1,0 +1,61 @@
+Doctor: Hello, what seems to be the problem today?
+Patient: I have a cough, chills, body aches, and fatigue.
+{
+  "patient_answer": 1,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.6518,
+  "escalation": "urgent",
+  "escalation_confidence": 0.6501,
+  "stop_probability": 0.2845,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: How long has this been going on, how severe is it, and is it getting better or worse?
+Patient: It started 3 days ago. It is moderate and getting a little worse.
+{
+  "patient_answer": 2,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.5011,
+  "escalation": "routine",
+  "escalation_confidence": 0.9599,
+  "stop_probability": 0.3442,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: What other symptoms have you noticed?
+Patient: I also have a sore throat and headache, but no shortness of breath.
+{
+  "patient_answer": 3,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.5465,
+  "escalation": "routine",
+  "escalation_confidence": 0.9786,
+  "stop_probability": 0.625,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: I need to check for warning signs. Do you have severe or chest pain, trouble breathing, uncontrolled bleeding, confusion, fainting, weakness or numbness, vision changes, vomiting blood, or continuous vomiting or diarrhoea?
+Patient: No chest pain, confusion, fainting, weakness, vomiting blood, or continuous vomiting or diarrhoea.
+{
+  "patient_answer": 4,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.7721,
+  "escalation": "routine",
+  "escalation_confidence": 0.7976,
+  "stop_probability": 0.6853,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: Lastly, what is your age and temperature? If relevant, are you pregnant?
+Patient: I am 31, male, and my temperature is 38.4 C.
+{
+  "patient_answer": 5,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.6492,
+  "escalation": "routine",
+  "escalation_confidence": 0.7966,
+  "stop_probability": 0.5508,
+  "stop": true,
+  "stop_reason": "maximum_questions"
+}
+Doctor: I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 65%, influenza 11%, common_cold 10%. The model's current escalation category is routine (80%). This is research output, not a diagnosis.

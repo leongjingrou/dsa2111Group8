@@ -1,0 +1,54 @@
+{
+  "safety_profile": "sg_moh",
+  "turns": [
+    {
+      "role": "doctor",
+      "content": "Hello, what seems to be the problem today?"
+    },
+    {
+      "role": "patient",
+      "content": "I have a cough and chest pain and I am having trouble breathing."
+    }
+  ],
+  "checkpoints": [
+    {
+      "patient_answer": 1,
+      "latest_response": "I have a cough and chest pain and I am having trouble breathing.",
+      "answers": {
+        "condition": {
+          "choice": "out_of_scope",
+          "probabilities": {
+            "allergic_rhinitis": 4.5575101207804564e-05,
+            "common_cold": 0.0013276682399760004,
+            "gastroenteritis": 1.1367003008263445e-05,
+            "influenza": 0.339701784178363,
+            "migraine": 3.364775992474465e-05,
+            "out_of_scope": 0.6588794168167588,
+            "urinary_tract_infection": 5.40900761476711e-07
+          },
+          "answer_confidence": 0.6588794168167588
+        },
+        "escalation": {
+          "choice": "urgent",
+          "probabilities": {
+            "routine": 0.036591815064594524,
+            "urgent": 0.9634081849354055
+          },
+          "answer_confidence": 0.9634081849354055
+        }
+      },
+      "stop_probability": 0.5699,
+      "stop_threshold": 0.9,
+      "model_stop": false,
+      "safety_profile": "sg_moh",
+      "safety_override_applied": true,
+      "safety_findings": [
+        "chest pain",
+        "breathing difficulty"
+      ],
+      "stop": true,
+      "stop_reason": "safety_profile_sg_moh",
+      "doctor_response": "I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 66%, influenza 34%, common_cold 0%. The safety screen indicates urgent emergency assessment in Singapore; call 995 if this is happening now. This is research output, not a diagnosis."
+    }
+  ]
+}
