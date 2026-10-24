@@ -8,6 +8,12 @@ from pathlib import Path
 
 
 REGISTRY_PATH = Path(__file__).with_name("dataset_sources.json")
+DDXPLUS_URL = "https://github.com/mila-iqia/ddxplus"
+DDXPLUS_CITATION = (
+    "Fansi Tchango A, Goel R, Wen Z, Martel J, Ghosn J. "
+    "DDXPlus: A New Dataset for Automatic Medical Diagnosis. NeurIPS 2022. "
+    "arXiv:2205.09148."
+)
 
 
 def load_registry(path=REGISTRY_PATH):
@@ -103,6 +109,8 @@ def ddxplus_record(row, evidence_metadata, split, maximum_answers=5):
         ])
     return {
         "source": "ddxplus",
+        "source_url": DDXPLUS_URL,
+        "source_citation": DDXPLUS_CITATION,
         "source_split": split,
         "source_patient_id": row.get("PATIENT_ID"),
         "age": float(row["AGE"]),

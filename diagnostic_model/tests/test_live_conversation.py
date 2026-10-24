@@ -125,6 +125,8 @@ def test_ddxplus_conversion_preserves_split_and_differential(tmp_path):
     output = tmp_path / "converted.jsonl"
     assert convert_ddxplus(csv_path, evidence_path, output, "test") == 1
     record = json.loads(output.read_text(encoding="utf-8"))
+    assert record["source_url"] == "https://github.com/mila-iqia/ddxplus"
+    assert "arXiv:2205.09148" in record["source_citation"]
     assert record["source_split"] == "test"
     assert record["differential_diagnosis"][0] == ["Influenza", 0.7]
     assert sum(turn["role"] == "patient" for turn in record["conversation"]) == 5
