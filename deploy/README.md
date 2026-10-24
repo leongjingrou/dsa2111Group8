@@ -32,7 +32,7 @@ pseudonymous; the logs are not designed to hold patient-identifying data.
 `deploy/Dockerfile.ebm` trains and packages the evaluated sequential EBM and its
 learned stop controller. The base manifests start two CPU replicas, add health
 checks, resource bounds, topology spreading, a disruption budget, and a CPU HPA
-that can scale from two to six replicas. K3s includes metrics-server by default;
+that can scale from two to twelve replicas. K3s includes metrics-server by default;
 on MicroK8s, enable DNS and metrics-server first.
 
 With Docker, K3d, kubectl, and Python available:
@@ -51,6 +51,24 @@ microk8s kubectl -n diagnosis-sim rollout status deployment/diagnosis-api
 The scripted K3d run creates a two-agent cluster, imports the local image,
 deploys the workload, forwards the service, runs concurrent experiments at
 1/4/16/32 devices, and saves results plus pod/HPA/log evidence.
+
+## V4 staged Locust ramp to 1,024 users
+
+`scripts/run_k3d_locust_test.sh` runs a time-based workload rather than a burst
+of a fixed number of sessions. It ramps through 8, 32, 128, 256, 512, and 1,024
+concurrent virtual users over 6 minutes 45 seconds, with the final 1,024-user
+stage held for two minutes. Each user behaves as one mobile, desktop, or tablet
+patient, waits 0.6-2.4 seconds between answers, follows the learned stopping
+response, and then starts a new consultation. Device mix is 70% mobile, 20%
+desktop, and 10% tablet.
+
+The script saves Locust's full time-series CSV, HTML report, failures and
+exceptions, a compact JSON/PNG summary, pod logs, node placement, and final HPA
+state. A 1,024-user run is intentionally a stress/saturation experiment:
+success is not assumed, and timeout/error growth is part of the result. The
+load generator runs inside the same K3d cluster and therefore consumes
+resources on the same physical server; that limitation must remain attached to
+the results.
 
 ## Laya: GPU overlay
 

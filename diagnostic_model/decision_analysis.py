@@ -1,4 +1,4 @@
-"""Build compact decision-path and confidence-interval data from Laya traces."""
+"""Build model-neutral decision paths and confidence intervals from traces."""
 
 import argparse
 import json
@@ -6,7 +6,7 @@ import math
 from collections import Counter
 from pathlib import Path
 
-from diagnostic_model.laya_model import OUT_OF_SCOPE
+OUT_OF_SCOPE = "out_of_scope"
 
 
 def wilson_interval(successes, total, z=1.96):
@@ -27,22 +27,47 @@ def _pathway(records, dimension):
     edge_counts = Counter()
     for record in records:
         previous = None
-        for step, checkpoint in enumerate(record["confidence_trace"], 1):
+        selected_answer = record.get("selected_answer", len(record["confidence_trace"]))
+        selected_answer = min(selected_answer, len(record["confidence_trace"]))
+        for step, checkpoint in enumerate(record["confidence_trace"][:selected_answer], 1):
             label = checkpoint["answers"][dimension]["choice"]
-            node = f"{step}|{label}"
+            correct = label == record["truth"][dimension]
+            outcome = "correct" if correct else "incorrect"
+            node = f"{step}|{label}|{outcome}"
             node_counts[node] += 1
             if previous is not None:
                 edge_counts[(previous, node)] += 1
             previous = node
-    nodes = [
-        {"id": node, "patient_answer": int(node.split("|", 1)[0]),
-         "label": node.split("|", 1)[1],
-         "display_label": node.split("|", 1)[1].replace("_", " ").title(),
-         "count": count}
-        for node, count in sorted(node_counts.items())
-    ]
+        final_outcome = "correct" if previous.endswith("|correct") else "incorrect"
+        terminal = f"6|finalised_answer_{selected_answer}|{final_outcome}"
+        node_counts[terminal] += 1
+        edge_counts[(previous, terminal)] += 1
+    nodes = []
+    for node, count in sorted(node_counts.items()):
+        step, label, outcome = node.split("|", 2)
+        terminal = label.startswith("finalised_answer_")
+        final_answer = int(label.rsplit("_", 1)[1]) if terminal else None
+        nodes.append({
+            "id": node,
+            "patient_answer": int(step),
+            "label": label,
+            "display_label": (
+                f"Finalised after answer {final_answer}"
+                if terminal else label.replace("_", " ").title()
+            ),
+            "outcome": outcome,
+            "correct": outcome == "correct",
+            "terminal": terminal,
+            "finalized_at_answer": final_answer,
+            "count": count,
+        })
     links = [
-        {"source": source, "target": target, "count": count}
+        {
+            "source": source,
+            "target": target,
+            "target_outcome": target.rsplit("|", 1)[1],
+            "count": count,
+        }
         for (source, target), count in sorted(edge_counts.items())
     ]
     return {"nodes": nodes, "links": links}
@@ -91,6 +116,10 @@ def analyse_decisions(path):
         },
         "interval": "Wilson 95% confidence interval for accuracy",
         "warning": "Synthetic generator holdout; not clinical validation.",
+        "pathway_semantics": (
+            "Paths end at the learned/forced selected answer and flow to an explicit "
+            "correct or incorrect finalisation node. Correctness is against source labels."
+        ),
     }
 
 

@@ -130,7 +130,7 @@ def draw_sample_maps(records, output, approach):
     _title(
         draw,
         f"{approach}: individual five-answer decision maps",
-        "Each tile shows the live diagnosis / escalation confidence and the learned probability of stopping",
+        "Diagnosis matches source answer = green · mismatch = red · stop policy = blue",
         width,
     )
     for sample_index, record in enumerate(samples):
@@ -148,17 +148,21 @@ def draw_sample_maps(records, output, approach):
             x0 = 55 + turn_index * 425
             tile_y = y0 + 47
             stopped = turn_index + 1 == selected
-            border = GREEN if stopped else GRID
+            diagnosis_correct = (
+                checkpoint["answers"]["condition"]["choice"] == truth["condition"]
+            )
+            outcome_colour = GREEN if diagnosis_correct else RED
+            border = outcome_colour
             draw.rounded_rectangle(
                 (x0, tile_y, x0 + tile_width, tile_y + 405),
                 radius=16,
-                fill="#F8FAFC" if not stopped else "#EFFAF6",
+                fill="#F2FBF7" if diagnosis_correct else "#FFF5F5",
                 outline=border,
-                width=5 if stopped else 2,
+                width=5 if stopped else 3,
             )
             draw.text((x0 + 18, tile_y + 16), f"Answer {turn_index + 1}", fill=INK, font=_font(20, True))
             if stopped:
-                draw.text((x0 + 300, tile_y + 18), "STOP", fill=GREEN, font=_font(18, True))
+                draw.text((x0 + 300, tile_y + 18), "STOP", fill=BLUE, font=_font(18, True))
             response = " ".join(textwrap.wrap(checkpoint["latest_response"], width=43)[:3])
             draw.multiline_text(
                 (x0 + 18, tile_y + 55), textwrap.fill(response, 43),
@@ -171,11 +175,17 @@ def draw_sample_maps(records, output, approach):
             draw.text(
                 (x0 + 18, tile_y + 183),
                 f"{condition['choice']}  {condition['answer_confidence']:.0%}",
-                fill=INK,
+                fill=outcome_colour,
                 font=_font(18, True),
             )
+            draw.text(
+                (x0 + 18, tile_y + 207),
+                "MATCH" if diagnosis_correct else "MISMATCH",
+                fill=outcome_colour,
+                font=_font(14, True),
+            )
             draw.text((x0 + 18, tile_y + 229), "Escalation", fill=MUTED, font=_font(15, True))
-            escalation_colour = RED if escalation["choice"] == "urgent" else INK
+            escalation_colour = ORANGE if escalation["choice"] == "urgent" else INK
             draw.text(
                 (x0 + 18, tile_y + 254),
                 f"{escalation['choice']}  {escalation['answer_confidence']:.0%}",
@@ -188,7 +198,7 @@ def draw_sample_maps(records, output, approach):
             draw.rounded_rectangle(
                 (x0 + 18, tile_y + 337, x0 + 18 + 352 * stop_probability, tile_y + 361),
                 9,
-                fill=GREEN if stopped else BLUE,
+                fill=BLUE,
             )
             draw.text((x0 + 315, tile_y + 370), f"{stop_probability:.0%}", fill=INK, font=_font(16, True))
         draw.line((55, y0 + 475, width - 55, y0 + 475), fill=GRID, width=2)

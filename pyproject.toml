@@ -25,13 +25,14 @@ serve = [
   "httpx>=0.28,<1",
   "uvicorn>=0.34,<1",
 ]
+load = ["locust>=2.40,<3"]
 
 [tool.pytest.ini_options]
 testpaths = ["knowledge_base", "diagnostic_model/tests", "serving/tests"]
 addopts = "-q -p no:cacheprovider"
 
 [tool.setuptools.packages.find]
-include = ["data*", "diagnostic_model*", "knowledge_base*"]
+include = ["data*", "diagnostic_model*", "knowledge_base*", "serving*"]
 
 [tool.setuptools.package-data]
 diagnostic_model = ["dataset_sources.json"]

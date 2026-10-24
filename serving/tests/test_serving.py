@@ -5,6 +5,7 @@ from pydantic import ValidationError
 
 from serving.app import Counters, TurnRequest, create_app
 from serving.load_test import summarize
+from serving.locust_report import summarize_history
 
 
 class FakeBackend:
@@ -81,3 +82,18 @@ def test_load_summary_reports_tail_latency_replicas_devices_and_stop_turns():
     assert result["replica_requests"] == {"pod-a": 2, "pod-b": 1}
     assert result["device_sessions"] == {"desktop": 1, "mobile": 1}
     assert result["stop_turns"] == {"2": 1, "3": 1}
+
+
+def test_locust_history_summary_groups_concurrency_stages(tmp_path):
+    history = tmp_path / "history.csv"
+    history.write_text(
+        "Timestamp,User Count,Type,Name,Requests/s,Failures/s,50%,95%,99%\n"
+        "1,8,,Aggregated,4.0,0.0,10,20,30\n"
+        "2,8,,Aggregated,6.0,1.0,12,24,36\n"
+        "3,1024,,Aggregated,8.0,2.0,100,900,1500\n",
+        encoding="utf-8",
+    )
+    report = summarize_history(history)
+    assert report["maximum_users_observed"] == 1024
+    assert report["stages"][0]["mean_requests_per_second"] == 5.0
+    assert report["stages"][-1]["max_p99_ms"] == 1500.0

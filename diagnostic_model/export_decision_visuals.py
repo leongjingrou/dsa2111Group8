@@ -60,15 +60,15 @@ def _bezier(draw, points, fill, width):
     draw.line(sampled, fill=fill, width=max(2, int(width)), joint="curve")
 
 
-def draw_pathway(report, dimension, output, mode, minimum=20):
-    width, height = 2200, 1300
+def draw_pathway(report, dimension, output, mode, approach, minimum=20):
+    width, height = 2500, 1300
     image = Image.new("RGB", (width, height), "#FFFFFF")
     draw = ImageDraw.Draw(image, "RGBA")
     label = "diagnosis" if dimension == "condition" else "escalation"
     _title(
         draw,
-        f"Laya {label} decision pathways — {mode}",
-        f"850 held-out conversations · five patient answers · transitions with at least {minimum} cases",
+        f"{approach} {label} decision pathways — {mode}",
+        f"Green = prediction matches source answer · red = mismatch · transitions with at least {minimum} cases",
         width,
     )
     pathway = report["pathways"][dimension]
@@ -78,13 +78,11 @@ def draw_pathway(report, dimension, output, mode, minimum=20):
     by_step = defaultdict(list)
     for node in nodes:
         by_step[node["patient_answer"]].append(node)
-    label_order = sorted({node["label"] for node in nodes})
-    colours = {name: PALETTE[index % len(PALETTE)] for index, name in enumerate(label_order)}
     top, bottom, gap = 210, 1180, 18
     # Leave enough room after the fifth column for full diagnosis labels.
-    xs = {step: 170 + (step - 1) * 417 for step in range(1, 6)}
+    xs = {step: 120 + (step - 1) * 395 for step in range(1, 7)}
     layout = {}
-    for step in range(1, 6):
+    for step in range(1, 7):
         peers = sorted(by_step[step], key=lambda item: item["label"])
         total = sum(node["count"] for node in peers) or 1
         available = bottom - top - gap * max(0, len(peers) - 1)
@@ -93,7 +91,8 @@ def draw_pathway(report, dimension, output, mode, minimum=20):
             node_height = max(8, available * node["count"] / total)
             layout[node["id"]] = (xs[step], y, y + node_height, node)
             y += node_height + gap
-        draw.text((xs[step] - 36, 164), f"Answer {step}", fill=INK, font=_font(22, True))
+        heading = f"Answer {step}" if step <= 5 else "Finalised"
+        draw.text((xs[step] - 36, 164), heading, fill=INK, font=_font(22, True))
 
     source_offsets = defaultdict(float)
     target_offsets = defaultdict(float)
@@ -112,7 +111,7 @@ def draw_pathway(report, dimension, output, mode, minimum=20):
         source_offsets[link["source"]] += link["count"] * source_scale
         target_offsets[link["target"]] += link["count"] * target_scale
         thickness = max(2, link["count"] * min(source_scale, target_scale) * 0.72)
-        colour = colours[link["source"].split("|", 1)[1]]
+        colour = GREEN if link["target_outcome"] == "correct" else RED
         _bezier(
             draw,
             ((sx + 20, source_y), (sx + 180, source_y), (tx - 160, target_y), (tx, target_y)),
@@ -121,14 +120,20 @@ def draw_pathway(report, dimension, output, mode, minimum=20):
         )
 
     for _, (x, y0, y1, node) in layout.items():
-        colour = colours[node["label"]]
+        colour = GREEN if node["correct"] else RED
         draw.rounded_rectangle((x, y0, x + 20, y1), radius=5, fill=colour)
         text_y = (y0 + y1) / 2 - 11
-        draw.text((x + 29, text_y), f"{node['display_label']}  {node['count']}", fill=INK, font=_font(17, True))
+        symbol = "CORRECT" if node["correct"] else "WRONG"
+        draw.text(
+            (x + 29, text_y),
+            f"{node['display_label']} · {symbol}  {node['count']}",
+            fill=INK,
+            font=_font(16, True),
+        )
 
     draw.text(
         (70, 1243),
-        "Line width represents the number of conversations following each transition. Synthetic holdout; not clinical validation.",
+        "Every path ends where that model finalised. Correctness is against the source label, not a clinician-confirmed diagnosis.",
         fill=MUTED,
         font=_font(18),
     )
@@ -136,13 +141,13 @@ def draw_pathway(report, dimension, output, mode, minimum=20):
     image.save(output, "PNG", optimize=True)
 
 
-def draw_intervals(report, output, mode):
+def draw_intervals(report, output, mode, approach):
     width, height = 1800, 1080
     image = Image.new("RGB", (width, height), "#FFFFFF")
     draw = ImageDraw.Draw(image, "RGBA")
     _title(
         draw,
-        f"Laya accuracy by conversation turn — {mode}",
+        f"{approach} accuracy by conversation turn — {mode}",
         "Point estimate with Wilson 95% confidence interval · n = 850 conversations",
         width,
     )
@@ -190,6 +195,7 @@ def main():
     parser.add_argument("analysis", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--name", required=True, help="Short input-mode label for titles and filenames")
+    parser.add_argument("--approach", default="Laya", help="Model name shown in titles")
     parser.add_argument("--minimum-transition", type=int, default=20)
     args = parser.parse_args()
     report = json.loads(args.analysis.read_text())
@@ -200,9 +206,15 @@ def main():
             dimension,
             args.output_dir / f"{safe_name}-{dimension}-pathways.png",
             args.name,
+            args.approach,
             args.minimum_transition,
         )
-    draw_intervals(report, args.output_dir / f"{safe_name}-confidence-intervals.png", args.name)
+    draw_intervals(
+        report,
+        args.output_dir / f"{safe_name}-confidence-intervals.png",
+        args.name,
+        args.approach,
+    )
     print(json.dumps({"output_dir": str(args.output_dir), "files": 3}, indent=2))
 
 

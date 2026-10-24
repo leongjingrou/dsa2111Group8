@@ -195,6 +195,23 @@ data lanes are deliberately separate:
 - Singapore MOH and data.gov.sg sources provide local safety and condition
   coverage checks, not patient-level training records.
 
+`grounded_generation.py` pairs each converted DDXPlus case with one audited
+Southeast Asian language/style record from the *same assigned split*. DDXPlus
+remains the only source of diagnosis, differential, and evidence. The regional
+record contributes provenance-bearing country/language/style metadata and is
+never allowed to add a symptom or alter a target. The output records source
+URLs, licences, record IDs, hashes, generation seed, and these constraints.
+
+```bash
+python -m diagnostic_model.grounded_generation \
+  ddxplus-train.jsonl sea-style-seeds.jsonl grounded-train.jsonl \
+  --variants-per-case 2 --seed 2111
+```
+
+This is constrained synthetic augmentation, not evidence that the clinical
+labels have been validated in a Southeast Asian population. Keep country and
+language results separate in evaluation.
+
 See [GROUNDING_SOURCES.md](GROUNDING_SOURCES.md) for the reviewed source table,
 licensing constraints, and the proposed Southeast Asian evaluation matrix.
 

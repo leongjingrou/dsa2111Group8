@@ -5,6 +5,7 @@ import joblib
 import numpy as np
 
 from diagnostic_model.grounding import convert_ddxplus, load_registry
+from diagnostic_model.grounded_generation import build_grounded_samples
 from diagnostic_model.export_raw_samples import export_samples
 from diagnostic_model.live_conversation import (
     EvidenceState,
@@ -173,3 +174,29 @@ def test_raw_sample_export_keeps_prediction_and_source_truth_separate(tmp_path):
     assert sample["final_model_response"]["diagnosis"] == "influenza"
     assert sample["source_ground_truth"]["condition"] == "influenza"
     assert sample["comparison"]["joint_correct"] is True
+
+
+def test_grounded_generation_keeps_medical_and_regional_roles_separate():
+    medical = [{
+        "source": "ddxplus", "source_url": "https://github.com/mila-iqia/ddxplus",
+        "source_citation": "DDXPlus citation", "source_split": "train",
+        "source_patient_id": "p1", "target_condition": "Influenza",
+        "differential_diagnosis": [["Influenza", 0.8]],
+        "source_evidence_tokens": ["E1"],
+        "conversation": [
+            {"role": "doctor", "content": "Hello"},
+            {"role": "patient", "content": "I have a cough."},
+        ],
+    }]
+    regional = [{
+        "source_id": "vimed_sft", "record_id": "vi-7", "country": "Vietnam",
+        "language": "vi", "text": "Tôi muốn hỏi về sức khoẻ.", "assigned_split": "train",
+    }]
+    first = build_grounded_samples(medical, regional, seed=7)
+    second = build_grounded_samples(medical, regional, seed=7)
+    assert first == second
+    assert first[0]["target_condition"] == "Influenza"
+    assert first[0]["source_evidence_tokens"] == ["E1"]
+    constraints = first[0]["grounding"]["constraints"]
+    assert constraints["diagnosis_and_evidence_from_ddxplus_only"] is True
+    assert constraints["regional_text_injected_into_clinical_facts"] is False
