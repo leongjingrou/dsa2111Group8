@@ -5,6 +5,11 @@
 - `ebm-sample-maps.png` maps five live checkpoints for selected test cases. The
   green tile is the controller's chosen stop. The examples deliberately include
   an incorrect early-stop case.
+- `ebm-confidence-over-time.png` separates Bayesian credible intervals for
+  diagnosis/escalation correctness from Gaussian intervals for mean confidence,
+  top-two margin and full-distribution concentration on every split.
+- `ebm-diagnosis-narrowing.png` shows, for each true diagnosis, how correctness
+  and probability assigned to that diagnosis change over the five answers.
 
 Matching Laya PNGs are produced by the same renderer after the GPU fine-tune
 writes `laya_sequential_metrics.json` and `laya_sequential_decisions.jsonl`.

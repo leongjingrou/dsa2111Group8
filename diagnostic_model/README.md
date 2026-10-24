@@ -135,6 +135,9 @@ python -m diagnostic_model.export_stopping_visuals \
   diagnostic_model/artifacts_v2/ebm/ebm_sequential_metrics.json \
   diagnostic_model/artifacts_v2/ebm/ebm_sequential_decisions.jsonl \
   --output-dir diagnostic_model/visualizations_v2 --approach EBM
+python -m diagnostic_model.confidence_narrowing \
+  diagnostic_model/artifacts_v2/ebm/ebm_sequential_decisions.jsonl \
+  --output-dir diagnostic_model/visualizations_v2 --approach EBM
 ```
 
 `write_sequential_rows` in `laya_finetune.py` exports stratified train,
@@ -148,3 +151,9 @@ python -m diagnostic_model.laya_sequential data/generated/synthetic_scenarios.cs
 The images distinguish model confidence from the learned stop probability and
 show the forced fifth-answer fallback. These outputs remain synthetic pipeline
 checks, not evidence of clinical safety or effectiveness.
+
+On the existing CUDA server, `scripts/run_laya_v2_server.sh` performs the full
+Laya fine-tune, split evaluation, stop-controller fit and PNG export using the
+persistent model/cache/result paths under `/home/ubuntu/dsa2111-persistent`.
+It also logs Bayesian correctness intervals, Gaussian confidence intervals,
+diagnosis-specific narrowing plots, and a matched EBM/Laya comparison bundle.

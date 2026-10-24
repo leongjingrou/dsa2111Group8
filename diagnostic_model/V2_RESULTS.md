@@ -40,6 +40,21 @@ Turn-level test joint accuracy was 41.76%, 62.94%, 87.65%, 88.53%, and 90.59%
 after answers 1 through 5. Most diagnostic information arrives with the third
 answer (associated symptoms); question 5 still adds measurable value.
 
+The confidence-narrowing audit reaches the same conclusion from the full class
+distribution. On test, mean probability assigned to the true diagnosis rises
+from 53.39% after answer 1 to 88.48% after answer 3 and 91.43% after answer 5.
+The mean effective number of plausible diagnoses falls from 2.665 to 1.308 and
+then 1.226 over the same checkpoints. Influenza remains the principal weakness:
+final test recall is 55.0% and mean probability on the true influenza class is
+55.37%, compared with at least 85.06% mean true-class probability for every
+other displayed diagnosis group.
+
+The plots use Beta(1,1) posteriors for correctness and equal-tailed 95% credible
+intervals. Confidence, margin and entropy-derived concentration are not treated
+as Bayesian posteriors; their bands are explicitly labelled Gaussian 95%
+intervals for the sample mean. This distinction prevents the model's class
+probability from being misrepresented as epistemic clinical certainty.
+
 ## Laya status
 
 The v2 Laya data are exported as 5,100 train states, 1,700 validation states,
@@ -47,16 +62,18 @@ and 1,700 test states. The fine-tune entry point now uses these partial states b
 default, evaluates all three splits, fits a Laya-specific stopping controller,
 and writes the same metrics and decision-map schema as EBM.
 
-A new Laya checkpoint was not trained on this workstation. The official typed
-decision checkpoint is approximately 843 MB and this environment has no CUDA
-device. The repository's existing Laya artifact contains final-answer decisions
-only, not the five confidence states needed to fit or audit a stop policy. It
-would be methodologically invalid to fabricate those missing states or relabel
-the old holdout as a new train/validation/test run.
+A new Laya checkpoint must be trained on the existing CUDA server. The local
+Codex executor does not hold an SSH key or AWS profile for that server; the two
+known NUS hosts currently reject it with `Permission denied (publickey)`. The
+repository's existing Laya artifact contains final-answer decisions only, not
+the five confidence states needed to fit or audit a stop policy. It would be
+methodologically invalid to fabricate those missing states or relabel the old
+holdout as a new train/validation/test run.
 
-Run `diagnostic_model.laya_finetune` on the existing GPU server, then pass its
-v2 metrics and decisions to `diagnostic_model.export_stopping_visuals` to create
-the matching Laya overview and individual maps.
+On the authenticated GPU server, run `scripts/run_laya_v2_server.sh`. It trains
+the v2 Laya head, evaluates all splits, fits the stop controller, and creates the
+matching Laya overview and individual maps under
+`/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-v2/`.
 
 All figures and results use rule-generated synthetic data. They validate the
 pipeline and its audit trail, not clinical safety, calibration, or effectiveness.
