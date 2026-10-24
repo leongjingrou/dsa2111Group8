@@ -25,18 +25,18 @@ The selected threshold was 0.90.
 
 | Split | Diagnosis accuracy | Escalation accuracy | Joint accuracy | Urgent recall | Mean answers | Stopped before answer 5 |
 |---|---:|---:|---:|---:|---:|---:|
-| Train | 96.96% | 98.04% | 95.10% | 97.06% | 3.159 | 90.88% |
-| Validation | 95.59% | 97.06% | 92.65% | 96.47% | 3.221 | 90.88% |
-| Test | 93.53% | 95.59% | 89.12% | 94.12% | 3.194 | 88.53% |
+| Train | 96.96% | 97.94% | 95.00% | 97.06% | 3.154 | 90.88% |
+| Validation | 95.59% | 97.35% | 92.94% | 97.06% | 3.221 | 90.29% |
+| Test | 93.53% | 95.59% | 89.12% | 94.12% | 3.212 | 88.24% |
 
-On test, always asking all five questions produced 94.71% diagnosis accuracy,
-95.88% escalation accuracy, 90.59% joint accuracy, and 94.71% urgent recall.
-The learned policy therefore saved 1.806 patient answers on average while losing
-1.47 percentage points of joint accuracy and 0.59 percentage points of urgent
+On test, always asking all five questions produced 94.41% diagnosis accuracy,
+95.88% escalation accuracy, 90.29% joint accuracy, and 94.71% urgent recall.
+The learned policy therefore saved 1.788 patient answers on average while losing
+1.17 percentage points of joint accuracy and 0.59 percentage points of urgent
 recall. This is a real trade-off and should not be described as a free efficiency
 gain.
 
-Turn-level test joint accuracy was 41.76%, 62.94%, 87.65%, 88.53%, and 90.59%
+Turn-level test joint accuracy was 41.76%, 62.94%, 87.65%, 88.53%, and 90.29%
 after answers 1 through 5. Most diagnostic information arrives with the third
 answer (associated symptoms); question 5 still adds measurable value.
 
@@ -55,25 +55,50 @@ as Bayesian posteriors; their bands are explicitly labelled Gaussian 95%
 intervals for the sample mean. This distinction prevents the model's class
 probability from being misrepresented as epistemic clinical certainty.
 
-## Laya status
+## Laya server result
 
-The v2 Laya data are exported as 5,100 train states, 1,700 validation states,
-and 1,700 test states. The fine-tune entry point now uses these partial states by
-default, evaluates all three splits, fits a Laya-specific stopping controller,
-and writes the same metrics and decision-map schema as EBM.
+The v2 Laya data contain 5,100 train states, 1,700 validation states, and 1,700
+test states. A 10-epoch head fine-tune was run on the authenticated NVIDIA T4
+server at revision `9871157`. The selected stopping threshold was 0.75.
 
-A new Laya checkpoint must be trained on the existing CUDA server. The local
-Codex executor does not hold an SSH key or AWS profile for that server; the two
-known NUS hosts currently reject it with `Permission denied (publickey)`. The
-repository's existing Laya artifact contains final-answer decisions only, not
-the five confidence states needed to fit or audit a stop policy. It would be
-methodologically invalid to fabricate those missing states or relabel the old
-holdout as a new train/validation/test run.
+| Split | Diagnosis accuracy | Escalation accuracy | Joint accuracy | Urgent recall | Mean answers | Stopped before answer 5 |
+|---|---:|---:|---:|---:|---:|---:|
+| Train | 80.78% | 90.78% | 73.43% | 92.55% | 3.913 | 53.43% |
+| Validation | 78.53% | 89.41% | 69.71% | 92.35% | 3.924 | 53.53% |
+| Test | 78.24% | 84.41% | 66.18% | 82.35% | 3.938 | 54.12% |
 
-On the authenticated GPU server, run `scripts/run_laya_v2_server.sh`. It trains
-the v2 Laya head, evaluates all splits, fits the stop controller, and creates the
-matching Laya overview and individual maps under
-`/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-v2/`.
+On test, always asking all five questions produced 78.82% diagnosis accuracy,
+83.53% escalation accuracy, 65.88% joint accuracy, and 84.71% urgent recall.
+The learned Laya policy saved 1.062 answers and improved joint accuracy by 0.30
+percentage points, but lost 2.36 percentage points of urgent recall. That urgent
+recall loss is safety-relevant and means the current policy is not suitable for
+clinical deployment.
+
+Laya's test mean probability on the true diagnosis rose from 49.15% after the
+first answer to 71.34% after the third, then slipped to 70.47% after the fifth.
+The mean effective number of plausible diagnoses narrowed from 3.223 to 2.342
+and ended at 2.393. This non-monotonic result is visible in the confidence plots
+and shows that later answers do not automatically make this fitted head more
+certain or more correct.
+
+## Matched comparison and artifacts
+
+The server reran EBM from the same revision and split before training Laya. On
+test, EBM exceeded Laya by 15.29 percentage points of diagnosis accuracy, 11.18
+points of escalation accuracy, 22.94 points of joint accuracy, and 11.77 points
+of urgent recall, while using 0.726 fewer answers on average. The result is a
+model comparison on synthetic data, not evidence of clinical performance.
+
+Compact reproducibility artifacts are committed under `server_results_v2/`:
+per-split metrics, validation threshold sweeps, the Laya fine-tune summary, the
+run log, the matched comparison, and both models' aggregate and individual-case
+figures. The 808 MB Laya checkpoint and large raw decision logs remain in the
+persistent server paths documented by the run log and are deliberately not
+stored in Git.
+
+Rerunning `scripts/run_laya_v2_server.sh` reproduces the full workflow under
+`/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-v2/` and keeps the
+checkpoint under `/home/ubuntu/dsa2111-persistent/models/laya-head-v0.3-v2/`.
 
 All figures and results use rule-generated synthetic data. They validate the
 pipeline and its audit trail, not clinical safety, calibration, or effectiveness.

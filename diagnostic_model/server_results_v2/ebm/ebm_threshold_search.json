@@ -1,0 +1,500 @@
+[
+  {
+    "threshold": 0.2,
+    "utility": 0.58361,
+    "rows": 340,
+    "condition_accuracy": 0.7118,
+    "escalation_accuracy": 0.9059,
+    "joint_accuracy": 0.6353,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.012,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 336,
+      "3": 4
+    }
+  },
+  {
+    "threshold": 0.225,
+    "utility": 0.5835650000000001,
+    "rows": 340,
+    "condition_accuracy": 0.7118,
+    "escalation_accuracy": 0.9088,
+    "joint_accuracy": 0.6353,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.018,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 334,
+      "3": 6
+    }
+  },
+  {
+    "threshold": 0.25,
+    "utility": 0.601065,
+    "rows": 340,
+    "condition_accuracy": 0.7206,
+    "escalation_accuracy": 0.9176,
+    "joint_accuracy": 0.6471,
+    "urgent_recall": 0.9235,
+    "mean_patient_answers": 2.038,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 327,
+      "3": 13
+    }
+  },
+  {
+    "threshold": 0.275,
+    "utility": 0.5980925,
+    "rows": 340,
+    "condition_accuracy": 0.7235,
+    "escalation_accuracy": 0.9147,
+    "joint_accuracy": 0.6471,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.041,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 327,
+      "3": 12,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.3,
+    "utility": 0.59807,
+    "rows": 340,
+    "condition_accuracy": 0.7235,
+    "escalation_accuracy": 0.9147,
+    "joint_accuracy": 0.6471,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.044,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 326,
+      "3": 13,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.325,
+    "utility": 0.59807,
+    "rows": 340,
+    "condition_accuracy": 0.7235,
+    "escalation_accuracy": 0.9147,
+    "joint_accuracy": 0.6471,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.044,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 326,
+      "3": 13,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.35,
+    "utility": 0.600925,
+    "rows": 340,
+    "condition_accuracy": 0.7265,
+    "escalation_accuracy": 0.9147,
+    "joint_accuracy": 0.65,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.05,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 324,
+      "3": 15,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.375,
+    "utility": 0.6009025,
+    "rows": 340,
+    "condition_accuracy": 0.7265,
+    "escalation_accuracy": 0.9147,
+    "joint_accuracy": 0.65,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.053,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 323,
+      "3": 16,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.4,
+    "utility": 0.60379,
+    "rows": 340,
+    "condition_accuracy": 0.7265,
+    "escalation_accuracy": 0.9206,
+    "joint_accuracy": 0.6559,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.068,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 318,
+      "3": 21,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.425,
+    "utility": 0.6123725,
+    "rows": 340,
+    "condition_accuracy": 0.7353,
+    "escalation_accuracy": 0.9206,
+    "joint_accuracy": 0.6647,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.097,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 308,
+      "3": 31,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.45,
+    "utility": 0.6269374999999999,
+    "rows": 340,
+    "condition_accuracy": 0.75,
+    "escalation_accuracy": 0.9206,
+    "joint_accuracy": 0.6794,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.115,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 302,
+      "3": 37,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.475,
+    "utility": 0.6444425,
+    "rows": 340,
+    "condition_accuracy": 0.7676,
+    "escalation_accuracy": 0.9206,
+    "joint_accuracy": 0.6971,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.141,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 293,
+      "3": 46,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.5,
+    "utility": 0.6646575000000001,
+    "rows": 340,
+    "condition_accuracy": 0.7853,
+    "escalation_accuracy": 0.9265,
+    "joint_accuracy": 0.7176,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.179,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 280,
+      "3": 59,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.525,
+    "utility": 0.6704000000000001,
+    "rows": 340,
+    "condition_accuracy": 0.7882,
+    "escalation_accuracy": 0.9294,
+    "joint_accuracy": 0.7235,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.2,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 273,
+      "3": 66,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.55,
+    "utility": 0.6791200000000002,
+    "rows": 340,
+    "condition_accuracy": 0.7971,
+    "escalation_accuracy": 0.9294,
+    "joint_accuracy": 0.7324,
+    "urgent_recall": 0.9118,
+    "mean_patient_answers": 2.224,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 265,
+      "3": 74,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.575,
+    "utility": 0.696345,
+    "rows": 340,
+    "condition_accuracy": 0.8029,
+    "escalation_accuracy": 0.9382,
+    "joint_accuracy": 0.7471,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.274,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 248,
+      "3": 91,
+      "4": 1
+    }
+  },
+  {
+    "threshold": 0.6,
+    "utility": 0.710605,
+    "rows": 340,
+    "condition_accuracy": 0.8088,
+    "escalation_accuracy": 0.9441,
+    "joint_accuracy": 0.7588,
+    "urgent_recall": 0.9235,
+    "mean_patient_answers": 2.326,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 232,
+      "3": 105,
+      "4": 3
+    }
+  },
+  {
+    "threshold": 0.625,
+    "utility": 0.7251749999999999,
+    "rows": 340,
+    "condition_accuracy": 0.8147,
+    "escalation_accuracy": 0.95,
+    "joint_accuracy": 0.7706,
+    "urgent_recall": 0.9294,
+    "mean_patient_answers": 2.35,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 225,
+      "3": 111,
+      "4": 4
+    }
+  },
+  {
+    "threshold": 0.65,
+    "utility": 0.7335375,
+    "rows": 340,
+    "condition_accuracy": 0.8324,
+    "escalation_accuracy": 0.9471,
+    "joint_accuracy": 0.7824,
+    "urgent_recall": 0.9235,
+    "mean_patient_answers": 2.415,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 205,
+      "3": 129,
+      "4": 6
+    }
+  },
+  {
+    "threshold": 0.675,
+    "utility": 0.73608,
+    "rows": 340,
+    "condition_accuracy": 0.8412,
+    "escalation_accuracy": 0.9441,
+    "joint_accuracy": 0.7882,
+    "urgent_recall": 0.9176,
+    "mean_patient_answers": 2.456,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 195,
+      "3": 135,
+      "4": 10
+    }
+  },
+  {
+    "threshold": 0.7,
+    "utility": 0.7504775,
+    "rows": 340,
+    "condition_accuracy": 0.85,
+    "escalation_accuracy": 0.9471,
+    "joint_accuracy": 0.8,
+    "urgent_recall": 0.9235,
+    "mean_patient_answers": 2.503,
+    "median_patient_answers": 2.0,
+    "stopped_before_final": 1.0,
+    "stop_distribution": {
+      "2": 181,
+      "3": 147,
+      "4": 12
+    }
+  },
+  {
+    "threshold": 0.725,
+    "utility": 0.7765575,
+    "rows": 340,
+    "condition_accuracy": 0.8618,
+    "escalation_accuracy": 0.9559,
+    "joint_accuracy": 0.8206,
+    "urgent_recall": 0.9353,
+    "mean_patient_answers": 2.559,
+    "median_patient_answers": 2.5,
+    "stopped_before_final": 0.9912,
+    "stop_distribution": {
+      "2": 170,
+      "3": 153,
+      "4": 14,
+      "5": 3
+    }
+  },
+  {
+    "threshold": 0.75,
+    "utility": 0.787865,
+    "rows": 340,
+    "condition_accuracy": 0.8676,
+    "escalation_accuracy": 0.9588,
+    "joint_accuracy": 0.8294,
+    "urgent_recall": 0.9412,
+    "mean_patient_answers": 2.618,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9794,
+    "stop_distribution": {
+      "2": 159,
+      "3": 159,
+      "4": 15,
+      "5": 7
+    }
+  },
+  {
+    "threshold": 0.775,
+    "utility": 0.8106825,
+    "rows": 340,
+    "condition_accuracy": 0.8912,
+    "escalation_accuracy": 0.9588,
+    "joint_accuracy": 0.8529,
+    "urgent_recall": 0.9412,
+    "mean_patient_answers": 2.709,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9735,
+    "stop_distribution": {
+      "2": 136,
+      "3": 176,
+      "4": 19,
+      "5": 9
+    }
+  },
+  {
+    "threshold": 0.8,
+    "utility": 0.8309125,
+    "rows": 340,
+    "condition_accuracy": 0.9059,
+    "escalation_accuracy": 0.9647,
+    "joint_accuracy": 0.8706,
+    "urgent_recall": 0.9471,
+    "mean_patient_answers": 2.765,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9676,
+    "stop_distribution": {
+      "2": 125,
+      "3": 181,
+      "4": 23,
+      "5": 11
+    }
+  },
+  {
+    "threshold": 0.825,
+    "utility": 0.8564675,
+    "rows": 340,
+    "condition_accuracy": 0.9324,
+    "escalation_accuracy": 0.9647,
+    "joint_accuracy": 0.8971,
+    "urgent_recall": 0.9471,
+    "mean_patient_answers": 2.891,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9618,
+    "stop_distribution": {
+      "2": 95,
+      "3": 200,
+      "4": 32,
+      "5": 13
+    }
+  },
+  {
+    "threshold": 0.85,
+    "utility": 0.8647475,
+    "rows": 340,
+    "condition_accuracy": 0.9382,
+    "escalation_accuracy": 0.9647,
+    "joint_accuracy": 0.9029,
+    "urgent_recall": 0.9529,
+    "mean_patient_answers": 2.947,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9529,
+    "stop_distribution": {
+      "2": 84,
+      "3": 206,
+      "4": 34,
+      "5": 16
+    }
+  },
+  {
+    "threshold": 0.875,
+    "utility": 0.8728925000000001,
+    "rows": 340,
+    "condition_accuracy": 0.9412,
+    "escalation_accuracy": 0.9676,
+    "joint_accuracy": 0.9088,
+    "urgent_recall": 0.9588,
+    "mean_patient_answers": 3.041,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9382,
+    "stop_distribution": {
+      "2": 67,
+      "3": 213,
+      "4": 39,
+      "5": 21
+    }
+  },
+  {
+    "threshold": 0.9,
+    "utility": 0.8980425000000001,
+    "rows": 340,
+    "condition_accuracy": 0.9559,
+    "escalation_accuracy": 0.9735,
+    "joint_accuracy": 0.9294,
+    "urgent_recall": 0.9706,
+    "mean_patient_answers": 3.221,
+    "median_patient_answers": 3.0,
+    "stopped_before_final": 0.9029,
+    "stop_distribution": {
+      "2": 45,
+      "3": 208,
+      "4": 54,
+      "5": 33
+    }
+  }
+]
