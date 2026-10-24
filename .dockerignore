@@ -1,0 +1,7 @@
+.git
+.venv*
+.tmp*
+__pycache__
+*.pyc
+diagnostic_model/server_results_v2
+diagnostic_model/visualizations*
