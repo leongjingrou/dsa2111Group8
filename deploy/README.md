@@ -62,12 +62,17 @@ patient, waits 0.6-2.4 seconds between answers, follows the learned stopping
 response, and then starts a new consultation. Device mix is 70% mobile, 20%
 desktop, and 10% tablet.
 
+The default run uses one Locust master and four worker pods spread across the
+available K3d agent nodes. The 1,024 virtual users are distributed across those
+workers; they are not 1,024 physical hosts. The inference deployment scales
+independently to at most 12 replicas.
+
 The script saves Locust's full time-series CSV, HTML report, failures and
 exceptions, a compact JSON/PNG summary, pod logs, node placement, and final HPA
 state. A 1,024-user run is intentionally a stress/saturation experiment:
 success is not assumed, and timeout/error growth is part of the result. The
 load generator runs inside the same K3d cluster and therefore consumes
-resources on the same physical server; that limitation must remain attached to
+resources on the same single physical server; that limitation must remain attached to
 the results.
 
 ## Laya: GPU overlay
