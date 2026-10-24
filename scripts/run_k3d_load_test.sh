@@ -35,9 +35,10 @@ if ! "${KUBECTL_BIN}" -n diagnosis-sim wait \
   "${KUBECTL_BIN}" -n diagnosis-sim logs load-driver || true
   exit 1
 fi
-"${KUBECTL_BIN}" -n diagnosis-sim logs load-driver >"${RESULTS_DIR}/load-driver.log"
-"${KUBECTL_BIN}" cp \
-  diagnosis-sim/load-driver:/tmp/results/. "${RESULTS_DIR}"
+"${KUBECTL_BIN}" -n diagnosis-sim logs load-driver >"${RESULTS_DIR}/load-test.json"
+"${PYTHON_BIN}" -c \
+  'import json, sys; from pathlib import Path; from serving.load_test import draw_report; source = Path(sys.argv[1]); draw_report(json.loads(source.read_text()), Path(sys.argv[2]))' \
+  "${RESULTS_DIR}/load-test.json" "${RESULTS_DIR}/load-test.png"
 
 "${KUBECTL_BIN}" -n diagnosis-sim get pods -o wide >"${RESULTS_DIR}/pods.txt"
 "${KUBECTL_BIN}" -n diagnosis-sim get hpa >"${RESULTS_DIR}/hpa.txt"
