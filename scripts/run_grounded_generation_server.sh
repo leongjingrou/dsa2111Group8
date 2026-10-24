@@ -18,7 +18,7 @@ for split in train validate test; do
     test) sample_size=1000; variants=1 ;;
   esac
   "${PYTHON_BIN}" -m diagnostic_model.grounding convert-ddxplus \
-    "${DDX_ROOT}/release_${split}_patients.csv" \
+    "${DDX_ROOT}/release_${split}_patients" \
     "${EVIDENCES}" "${RESULTS_DIR}/ddxplus-${split}-seeds.jsonl" \
     --split "${split}" --sample-size "${sample_size}" --seed 2111
   "${PYTHON_BIN}" -m diagnostic_model.grounded_generation \
