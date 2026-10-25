@@ -1,0 +1,31 @@
+{
+  "backend": "laya",
+  "device": "NVIDIA Tesla T4",
+  "deployment": {
+    "inference_replicas": 1,
+    "locust_workers": 4,
+    "load_generator": "k3d/k3s distributed Locust",
+    "device_mix": {"mobile": 0.7, "desktop": 0.2, "tablet": 0.1}
+  },
+  "stages": [
+    {"end_seconds": 10, "users": 32, "spawn_rate": 16},
+    {"end_seconds": 20, "users": 128, "spawn_rate": 64},
+    {"end_seconds": 35, "users": 256, "spawn_rate": 128},
+    {"end_seconds": 50, "users": 512, "spawn_rate": 256},
+    {"end_seconds": 80, "users": 1024, "spawn_rate": 512}
+  ],
+  "final": {
+    "requests": 674,
+    "failures": 558,
+    "failure_rate": 0.8279,
+    "mean_latency_ms": 27653,
+    "median_latency_ms": 30000,
+    "requests_per_second": 8.50,
+    "successful_requests": 116,
+    "timeout_or_transport_errors": 493,
+    "http_500_errors": 65
+  },
+  "peak_gpu": {"utilization_percent": 100, "memory_used_mib": 9327},
+  "observed_bottleneck": "A single synchronous Laya/T4 replica saturated before 512 users and exhausted the process file-descriptor limit at 1024 users.",
+  "warning": "Synthetic workload and source-label evaluation; not clinical validation."
+}

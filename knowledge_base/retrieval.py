@@ -1,10 +1,13 @@
 import json
+from functools import lru_cache
 from pathlib import Path
 
 DATA_DIR = Path(__file__).parent / "data"
 
 
+@lru_cache(maxsize=None)
 def load_json(filename):
+    """Load immutable knowledge-base documents once per serving process."""
     with open(DATA_DIR / filename, encoding="utf-8") as f:
         return json.load(f)
 
