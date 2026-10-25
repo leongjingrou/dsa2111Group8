@@ -1,0 +1,897 @@
+{
+  "schema": "orchestrated-server-evaluation/v1",
+  "method": "labelled synthetic patient replies; deterministic local LLM adapter; EBM diagnosis",
+  "summary": {
+    "consultations": 100,
+    "turn_requests": 321,
+    "diagnosis_accuracy": 0.94,
+    "escalation_accuracy": 0.96,
+    "turn_latency_ms": {
+      "mean": 25.932059190031154,
+      "p50": 25.434,
+      "p95": 29.89,
+      "p99": 35.91
+    }
+  },
+  "correct_examples": [
+    {
+      "scenario_id": "SYN-01361",
+      "actual": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "diagnosis_correct": true,
+      "escalation_correct": true,
+      "consultation_ms_client": 97.534,
+      "trace": [
+        {
+          "session_id": "543397c8-6050-4c13-bf05-adec76fa3a5a",
+          "backend": "ebm",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fever",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 8.087850626821818e-05,
+              "common_cold": 0.0003871540294125716,
+              "gastroenteritis": 0.10663854393605365,
+              "influenza": 0.004330972545933502,
+              "migraine": 0.027730080633984317,
+              "out_of_scope": 0.7176491068034163,
+              "urinary_tract_infection": 0.1431832635449315
+            },
+            "answer_confidence": 0.7176491068034163
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.25101149358319974,
+              "urgent": 0.7489885064168003
+            },
+            "answer_confidence": 0.7489885064168003
+          },
+          "stop_probability": 0.4557,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 35.91
+        },
+        {
+          "session_id": "543397c8-6050-4c13-bf05-adec76fa3a5a",
+          "backend": "ebm",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 1.155188715092192e-05,
+              "common_cold": 0.0008175918136845173,
+              "gastroenteritis": 0.2649231042554945,
+              "influenza": 0.0026455931453724744,
+              "migraine": 5.683627999240517e-08,
+              "out_of_scope": 0.7270399199569099,
+              "urinary_tract_infection": 0.004562182105107802
+            },
+            "answer_confidence": 0.7270399199569099
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.026181432760529977,
+              "urgent": 0.97381856723947
+            },
+            "answer_confidence": 0.97381856723947
+          },
+          "stop_probability": 0.7696,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 25.871
+        },
+        {
+          "session_id": "543397c8-6050-4c13-bf05-adec76fa3a5a",
+          "backend": "ebm",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fatigue",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "rash",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "skin rash"
+              },
+              {
+                "symptom_id": "blisters_hands_feet",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "spots/blisters on palms and soles"
+              },
+              {
+                "symptom_id": "skin_infection_signs",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "weeping, crusting or pus on skin"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 1.3668321698213626e-10,
+              "common_cold": 7.643702316193854e-07,
+              "gastroenteritis": 4.029390969513925e-05,
+              "influenza": 2.581877855457876e-08,
+              "migraine": 7.660421670799767e-13,
+              "out_of_scope": 0.9999589132937126,
+              "urinary_tract_infection": 2.470132874587759e-09
+            },
+            "answer_confidence": 0.9999589132937126
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.001164454946430582,
+              "urgent": 0.9988355450535694
+            },
+            "answer_confidence": 0.9988355450535694
+          },
+          "stop_probability": 0.9884,
+          "stop_threshold": 0.9,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "Your symptoms need urgent medical review. Please seek care now. If you feel severely unwell, call 995. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 26.162
+        }
+      ]
+    },
+    {
+      "scenario_id": "SYN-01362",
+      "actual": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "routine"
+      },
+      "diagnosis_correct": true,
+      "escalation_correct": false,
+      "consultation_ms_client": 111.037,
+      "trace": [
+        {
+          "session_id": "d6e32e48-ef4d-4f4a-8355-0495da380d81",
+          "backend": "ebm",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fever",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 8.087850626821818e-05,
+              "common_cold": 0.0003871540294125716,
+              "gastroenteritis": 0.10663854393605365,
+              "influenza": 0.004330972545933502,
+              "migraine": 0.027730080633984317,
+              "out_of_scope": 0.7176491068034163,
+              "urinary_tract_infection": 0.1431832635449315
+            },
+            "answer_confidence": 0.7176491068034163
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.25101149358319974,
+              "urgent": 0.7489885064168003
+            },
+            "answer_confidence": 0.7489885064168003
+          },
+          "stop_probability": 0.4557,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 25.486
+        },
+        {
+          "session_id": "d6e32e48-ef4d-4f4a-8355-0495da380d81",
+          "backend": "ebm",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 1.0911487921677495e-07,
+              "common_cold": 0.00010480305327808186,
+              "gastroenteritis": 0.06097060434081172,
+              "influenza": 0.0014125960204807633,
+              "migraine": 0.03599304111392061,
+              "out_of_scope": 0.737741044201925,
+              "urinary_tract_infection": 0.1637778021547047
+            },
+            "answer_confidence": 0.737741044201925
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.09511653228045136,
+              "urgent": 0.9048834677195486
+            },
+            "answer_confidence": 0.9048834677195486
+          },
+          "stop_probability": 0.7551,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 25.091
+        },
+        {
+          "session_id": "d6e32e48-ef4d-4f4a-8355-0495da380d81",
+          "backend": "ebm",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fatigue",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "itchy_blisters",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "itchy fluid-filled blisters"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 2.674169778777331e-07,
+              "common_cold": 5.2479908870791524e-05,
+              "gastroenteritis": 0.06926401141693767,
+              "influenza": 0.0002157600906560824,
+              "migraine": 5.254707455720501e-05,
+              "out_of_scope": 0.930276441438989,
+              "urinary_tract_infection": 0.00013849265301137998
+            },
+            "answer_confidence": 0.930276441438989
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.5247326680473294,
+              "urgent": 0.4752673319526705
+            },
+            "answer_confidence": 0.5247326680473294
+          },
+          "stop_probability": 0.4672,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fatigue",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fatigue?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 29.581
+        },
+        {
+          "session_id": "d6e32e48-ef4d-4f4a-8355-0495da380d81",
+          "backend": "ebm",
+          "patient_answer": 4,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "sore_throat",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "sore throat"
+              },
+              {
+                "symptom_id": "chest_pain",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chest pain"
+              },
+              {
+                "symptom_id": "chills",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chills"
+              },
+              {
+                "symptom_id": "loss_of_appetite",
+                "presence": "present",
+                "severity": "severe",
+                "duration_days": null,
+                "progression": null,
+                "evidence": "loss of appetite"
+              },
+              {
+                "symptom_id": "joint_muscle_pain",
+                "presence": "present",
+                "severity": "severe",
+                "duration_days": null,
+                "progression": null,
+                "evidence": "severe joint or muscle pain"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 7.557157795065976e-08,
+              "common_cold": 0.00012553079873063128,
+              "gastroenteritis": 5.2553032640157744e-05,
+              "influenza": 0.00510478602118232,
+              "migraine": 1.69666809750239e-06,
+              "out_of_scope": 0.9946629508634873,
+              "urinary_tract_infection": 5.2407044284112145e-05
+            },
+            "answer_confidence": 0.9946629508634873
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.6877754570704101,
+              "urgent": 0.3122245429295899
+            },
+            "answer_confidence": 0.6877754570704101
+          },
+          "stop_probability": 0.9396,
+          "stop_threshold": 0.9,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "We recommend a routine teleconsultation with a doctor. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 25.779
+        }
+      ]
+    }
+  ],
+  "wrong_examples": [
+    {
+      "scenario_id": "SYN-01363",
+      "actual": {
+        "condition": "influenza",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "diagnosis_correct": false,
+      "escalation_correct": true,
+      "consultation_ms_client": 54.92,
+      "trace": [
+        {
+          "session_id": "b12ddf7c-83df-4f0b-8157-e228c8754c27",
+          "backend": "ebm",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "sore_throat",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "sore throat"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 0.0010244587966692956,
+              "common_cold": 0.0028961450507572722,
+              "gastroenteritis": 0.0001932497057430361,
+              "influenza": 0.153683468761626,
+              "migraine": 0.0003717544287862716,
+              "out_of_scope": 0.8270602922554275,
+              "urinary_tract_infection": 0.014770631000990585
+            },
+            "answer_confidence": 0.8270602922554275
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.4839060287887206,
+              "urgent": 0.5160939712112794
+            },
+            "answer_confidence": 0.5160939712112794
+          },
+          "stop_probability": 0.4486,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "sore_throat",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your sore throat?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 24.976
+        },
+        {
+          "session_id": "b12ddf7c-83df-4f0b-8157-e228c8754c27",
+          "backend": "ebm",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 3.820732976264016e-06,
+              "common_cold": 0.0010954363297244946,
+              "gastroenteritis": 0.0001681131142081745,
+              "influenza": 0.14095224886896235,
+              "migraine": 2.9957167720722506e-08,
+              "out_of_scope": 0.8518677968972904,
+              "urinary_tract_infection": 0.0059125540996706
+            },
+            "answer_confidence": 0.8518677968972904
+          },
+          "escalation": {
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.006640297525212224,
+              "urgent": 0.9933597024747878
+            },
+            "answer_confidence": 0.9933597024747878
+          },
+          "stop_probability": 0.9017,
+          "stop_threshold": 0.9,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "Your symptoms need urgent medical review. Please seek care now. If you feel severely unwell, call 995. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 25.033
+        }
+      ]
+    },
+    {
+      "scenario_id": "SYN-01372",
+      "actual": {
+        "condition": "urinary_tract_infection",
+        "escalation": "routine"
+      },
+      "predicted": {
+        "condition": "gastroenteritis",
+        "escalation": "routine"
+      },
+      "diagnosis_correct": false,
+      "escalation_correct": true,
+      "consultation_ms_client": 138.873,
+      "trace": [
+        {
+          "session_id": "645b581b-afb2-4b96-96d9-21bbca6a1e9f",
+          "backend": "ebm",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "cough",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "cough"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 0.0003030778351759103,
+              "common_cold": 0.006372706435336598,
+              "gastroenteritis": 0.01697183776235428,
+              "influenza": 0.337513338164983,
+              "migraine": 0.04841466877266486,
+              "out_of_scope": 0.589720165510542,
+              "urinary_tract_infection": 0.0007042055189433351
+            },
+            "answer_confidence": 0.589720165510542
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.6936783360792943,
+              "urgent": 0.3063216639207057
+            },
+            "answer_confidence": 0.6936783360792943
+          },
+          "stop_probability": 0.3661,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "cough",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your cough?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 24.926
+        },
+        {
+          "session_id": "645b581b-afb2-4b96-96d9-21bbca6a1e9f",
+          "backend": "ebm",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "out_of_scope",
+            "probabilities": {
+              "allergic_rhinitis": 1.8080750801585013e-05,
+              "common_cold": 0.005317719176789524,
+              "gastroenteritis": 0.01060972880989942,
+              "influenza": 0.4061536811177885,
+              "migraine": 0.009727398615931951,
+              "out_of_scope": 0.5671804658013727,
+              "urinary_tract_infection": 0.0009929257274162832
+            },
+            "answer_confidence": 0.5671804658013727
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.9945685663948893,
+              "urgent": 0.005431433605110645
+            },
+            "answer_confidence": 0.9945685663948893
+          },
+          "stop_probability": 0.6719,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "cough",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your cough?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 24.858
+        },
+        {
+          "session_id": "645b581b-afb2-4b96-96d9-21bbca6a1e9f",
+          "backend": "ebm",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "frequent_urination",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "frequent urination"
+              },
+              {
+                "symptom_id": "urinary_urgency",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "urinary urgency"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "urinary_tract_infection",
+            "probabilities": {
+              "allergic_rhinitis": 0.0001528394972477453,
+              "common_cold": 0.009566496749649656,
+              "gastroenteritis": 0.006818322681075322,
+              "influenza": 0.3232966204918994,
+              "migraine": 0.00027141407920292036,
+              "out_of_scope": 0.1867528916800214,
+              "urinary_tract_infection": 0.47314141482090355
+            },
+            "answer_confidence": 0.47314141482090355
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.9986138107818401,
+              "urgent": 0.0013861892181599143
+            },
+            "answer_confidence": 0.9986138107818401
+          },
+          "stop_probability": 0.4992,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "cough",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your cough?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 24.78
+        },
+        {
+          "session_id": "645b581b-afb2-4b96-96d9-21bbca6a1e9f",
+          "backend": "ebm",
+          "patient_answer": 4,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fever",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              },
+              {
+                "symptom_id": "fatigue",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "nausea",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "nausea"
+              },
+              {
+                "symptom_id": "vomiting",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "vomiting"
+              },
+              {
+                "symptom_id": "straining",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "straining"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "gastroenteritis",
+            "probabilities": {
+              "allergic_rhinitis": 0.00017491084591091157,
+              "common_cold": 0.025524896491905067,
+              "gastroenteritis": 0.3020592164602343,
+              "influenza": 0.28433752982492166,
+              "migraine": 0.0031845930575583365,
+              "out_of_scope": 0.11106709792015701,
+              "urinary_tract_infection": 0.27365175539931275
+            },
+            "answer_confidence": 0.3020592164602343
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.9996894876682431,
+              "urgent": 0.00031051233175692893
+            },
+            "answer_confidence": 0.9996894876682431
+          },
+          "stop_probability": 0.5616,
+          "stop_threshold": 0.9,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "cough",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your cough?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 32.715
+        },
+        {
+          "session_id": "645b581b-afb2-4b96-96d9-21bbca6a1e9f",
+          "backend": "ebm",
+          "patient_answer": 5,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "choice": "gastroenteritis",
+            "probabilities": {
+              "allergic_rhinitis": 0.00022040543372249814,
+              "common_cold": 0.026430872615844828,
+              "gastroenteritis": 0.32376748217108414,
+              "influenza": 0.2360376331185819,
+              "migraine": 0.002221530162076897,
+              "out_of_scope": 0.13902115122596503,
+              "urinary_tract_infection": 0.2723009252727247
+            },
+            "answer_confidence": 0.32376748217108414
+          },
+          "escalation": {
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.9997880428734138,
+              "urgent": 0.00021195712658611982
+            },
+            "answer_confidence": 0.9997880428734138
+          },
+          "stop_probability": 0.8462,
+          "stop_threshold": 0.9,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "We recommend a routine teleconsultation with a doctor. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 26.69
+        }
+      ]
+    }
+  ]
+}

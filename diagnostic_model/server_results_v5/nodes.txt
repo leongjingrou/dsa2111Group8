@@ -1,0 +1,4 @@
+NAME                         STATUS   ROLES           AGE   VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE           KERNEL-VERSION   CONTAINER-RUNTIME
+k3d-diagnosis-sim-agent-0    Ready    <none>          18h   v1.35.5+k3s1   172.18.0.3    <none>        K3s v1.35.5+k3s1   6.8.0-1066-aws   containerd://2.2.3-k3s1
+k3d-diagnosis-sim-agent-1    Ready    <none>          18h   v1.35.5+k3s1   172.18.0.2    <none>        K3s v1.35.5+k3s1   6.8.0-1066-aws   containerd://2.2.3-k3s1
+k3d-diagnosis-sim-server-0   Ready    control-plane   18h   v1.35.5+k3s1   172.18.0.4    <none>        K3s v1.35.5+k3s1   6.8.0-1066-aws   containerd://2.2.3-k3s1
