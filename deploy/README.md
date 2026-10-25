@@ -1,5 +1,20 @@
 # Multi-user Kubernetes simulation
 
+## NVIDIA runtime for Laya
+
+On an Ubuntu GPU host with a working NVIDIA driver, run:
+
+```bash
+./deploy/install_nvidia_container_toolkit_ubuntu.sh
+docker build -f deploy/Dockerfile.laya -t diagnosis-laya-api:local .
+```
+
+The installer adds NVIDIA's official stable apt repository, installs the
+pinned container toolkit, registers the `nvidia` Docker runtime, restarts
+Docker, and verifies GPU access with `nvidia-smi` inside a CUDA container.
+Docker restart briefly interrupts running containers. Official reference:
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+
 This branch turns the fixed five-answer diagnostic experiment into a stateless
 HTTP workload that can be replicated across K3s, K3d, MicroK8s, or a managed
 Kubernetes service. It is a synthetic systems experiment, not a clinical API.
