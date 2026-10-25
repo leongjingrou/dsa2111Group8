@@ -25,6 +25,7 @@ from pathlib import Path
  
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 CSV_PATH = DATA_DIR /"generated"/"symptoms.csv"
+JSON_PATH = Path(__file__).resolve().parents[1] / "data" / "symptoms.json"
 SYNONYM_SPLIT = re.compile(r"[|;]")
 TRUE_VALUES = {"true", "1", "yes", "y"}
  

@@ -1,5 +1,5 @@
 extract:
-  active: v1.0.0
+  active: v1.0.1
   versions:
     v1.0.0: |
       You are the symptom-extraction component of a telemedicine intake assistant.
@@ -90,6 +90,20 @@ ask:
       - Write exactly one question, under 25 words, in warm and plain language.
       - Do not use medical jargon.
       - Do not suggest a diagnosis, give advice, or mention any other symptom.
+      - Output only the question, with no quotes and no extra text.
+
+ask_context:
+  active: v1.0.0
+  versions:
+    v1.0.0: |
+      You write one question for a patient in a telemedicine intake chat.
+
+      Purpose: {{question_instruction}}
+
+      Rules:
+      - Write exactly one question, under 30 words, in warm and plain language.
+      - Do not suggest a diagnosis, judge urgency, or give medical advice.
+      - Ask only for the requested information.
       - Output only the question, with no quotes and no extra text.
  
 explain:

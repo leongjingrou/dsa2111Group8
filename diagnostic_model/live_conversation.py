@@ -140,6 +140,8 @@ def _answer(choice, labels, probabilities):
 
 
 class EBMLivePredictor:
+    name = "ebm"
+
     def __init__(self, model_path):
         self.bundle = joblib.load(model_path)
 
@@ -194,6 +196,8 @@ class EBMLivePredictor:
 
 
 class LayaLivePredictor:
+    name = "laya"
+
     def __init__(self, model_dir, device="cuda"):
         import laya
         self.agent = laya.load(model_dir, device=device)

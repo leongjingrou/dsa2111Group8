@@ -1,4 +1,4 @@
-from helpers import ext, real_ids, sym
+from llm_service.tests.helpers import ext, real_ids, sym
 
 from llm_service.app.merge import merge_profile
 from llm_service.app.schema import Profile

@@ -22,6 +22,18 @@ FALLBACK_TEMPLATES: dict[str, str] = {
     "progression": "Is your {name} getting better, staying the same or getting worse?",
 }
 
+CONTEXT_INSTRUCTIONS: dict[str, str] = {
+    "presenting_symptoms": "Ask the patient to describe the main problem or symptoms in their own words.",
+    "demographics": "Ask for age, temperature, sex, and pregnancy status when relevant.",
+    "medical_history": "Ask briefly about relevant medical history, medicines, and allergies.",
+}
+
+CONTEXT_FALLBACKS: dict[str, str] = {
+    "presenting_symptoms": "Could you describe the main problem or symptoms you are experiencing?",
+    "demographics": "What is your age and temperature, and, if relevant, are you pregnant?",
+    "medical_history": "Do you have relevant medical conditions, medicines, or allergies?",
+}
+
 
 def _acceptable(text: str) -> bool:
     text = text.strip()
@@ -42,4 +54,22 @@ async def phrase_question(llm: LLM, symptom_id: str, focus: Focus = "presence") 
     text = text.strip().strip('"')
     if not _acceptable(text):
         return FALLBACK_TEMPLATES[focus].format(name=name), True
+    return text, False
+
+
+async def phrase_context_question(llm: LLM, topic: str) -> tuple[str, bool]:
+    """Ask a non-symptom intake question without giving the LLM diagnostic control."""
+    if topic not in CONTEXT_INSTRUCTIONS:
+        raise ValueError(f"Unknown context question topic: {topic}")
+    try:
+        text = await llm.complete_text(
+            "ask_context",
+            {"question_instruction": CONTEXT_INSTRUCTIONS[topic]},
+            temperature=0.3,
+        )
+    except LLMError:
+        return CONTEXT_FALLBACKS[topic], True
+    text = text.strip().strip('"')
+    if not _acceptable(text):
+        return CONTEXT_FALLBACKS[topic], True
     return text, False
