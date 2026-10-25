@@ -73,7 +73,7 @@ def main():
     wrong = [record for record in records if not record["diagnosis_correct"]]
     output = {
         "schema": "orchestrated-server-evaluation/v1",
-        "method": "labelled synthetic patient replies; deterministic local LLM adapter; EBM diagnosis",
+        "method": "labelled synthetic patient replies; deterministic local LLM adapter; configured diagnosis backend",
         "summary": {
             "consultations": len(records),
             "turn_requests": len(latencies),
