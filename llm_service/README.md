@@ -28,6 +28,11 @@ Start a session with `POST /api/conversations`, then send each patient reply to
 
 The service keeps session state in one process. A multi-replica deployment must
 use sticky routing or replace the in-memory session store with shared storage.
+`LLM_BACKEND=keyword` selects the deterministic language adapter used by server
+integration and Kubernetes load tests. It removes external provider latency,
+cost, and rate limits; it is not a clinical model or evidence of real-LLM
+quality. Production defaults to `LLM_BACKEND=remote`. The `deploy/k8s-llm`
+overlay enables client-IP affinity while sessions remain process-local.
 The Singapore safety profile remains disabled by default. Setting
 `safety_profile` to `sg_moh` enables the separately logged jurisdictional
 emergency-phrase override; it does not alter model confidence.

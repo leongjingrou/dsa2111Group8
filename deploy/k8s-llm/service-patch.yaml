@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: diagnosis-api
+  namespace: diagnosis-sim
+spec:
+  # Required while conversation state is process-local. Replace the store with
+  # Redis before removing affinity in a horizontally scaled deployment.
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800

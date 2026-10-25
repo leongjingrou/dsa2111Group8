@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diagnosis-api
+  namespace: diagnosis-sim
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: api
+          image: diagnosis-api:llm-orchestrated
+          command: ["uvicorn"]
+          args: ["llm_service.orchestrated_main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+          env:
+            - name: MODEL_BACKEND
+              value: ebm
+            - name: EBM_LIVE_MODEL
+              value: /models/ebm_sequential_models.joblib
+            - name: STOPPING_MODEL
+              value: /models/ebm_stopping_controller.joblib
+            - name: LLM_BACKEND
+              value: keyword
+            - name: MAX_ACTIVE_SESSIONS
+              value: "4096"

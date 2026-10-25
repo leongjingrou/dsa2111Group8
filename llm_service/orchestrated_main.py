@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from diagnostic_model.live_conversation import EBMLivePredictor, GREETING, LayaLivePredictor
 from diagnostic_model.llm_live_conversation import LLMDrivenConsultation
 from llm_service.app.llm_client import LLMClient
+from llm_service.app.keyword_llm import KeywordLLM
 from llm_service.app.router import router as llm_router
 
 
@@ -33,12 +34,21 @@ def _predictor_from_environment():
     raise ValueError(f"Unsupported MODEL_BACKEND: {backend}")
 
 
+def _llm_from_environment():
+    backend = os.getenv("LLM_BACKEND", "remote").lower()
+    if backend == "remote":
+        return LLMClient()
+    if backend == "keyword":
+        return KeywordLLM()
+    raise ValueError(f"Unsupported LLM_BACKEND: {backend}")
+
+
 def create_orchestrated_app(predictor=None, stopping=None, llm=None):
     @asynccontextmanager
     async def lifespan(app):
         app.state.predictor = predictor or _predictor_from_environment()
         app.state.stopping = stopping or os.environ["STOPPING_MODEL"]
-        app.state.llm = llm or LLMClient()
+        app.state.llm = llm or _llm_from_environment()
         yield
 
     app = FastAPI(
@@ -52,6 +62,14 @@ def create_orchestrated_app(predictor=None, stopping=None, llm=None):
     @app.get("/healthz")
     async def healthz():
         return {"status": "ok"}
+
+    @app.get("/readyz")
+    async def readyz():
+        return {
+            "status": "ready",
+            "backend": app.state.predictor.name,
+            "llm_backend": os.getenv("LLM_BACKEND", "remote"),
+        }
 
     @app.post("/api/conversations")
     async def start(request: StartRequest):
