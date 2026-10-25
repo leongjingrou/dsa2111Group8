@@ -12,7 +12,12 @@ from PIL import Image, ImageDraw, ImageFont
 def _number(row, *names, default=0.0):
     for name in names:
         if row.get(name) not in (None, ""):
-            return float(row[name])
+            try:
+                return float(row[name])
+            except ValueError:
+                # Locust reports percentile fields as N/A before the first
+                # request. Those warm-up rows are valid zero-valued samples.
+                continue
     return default
 
 
