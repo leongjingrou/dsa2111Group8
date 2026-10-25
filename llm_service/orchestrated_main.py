@@ -100,6 +100,11 @@ def create_orchestrated_app(predictor=None, stopping=None, llm=None):
             if session.finished:
                 raise HTTPException(status_code=409, detail="conversation already finalised")
             checkpoint = await session.receive(request.patient_message)
+        if checkpoint["stop"]:
+            # The response owns the final checkpoint; process memory need not
+            # retain finished consultations during sustained load.
+            app.state.sessions.pop(session_id, None)
+            app.state.session_locks.pop(session_id, None)
         return {
             "session_id": session_id,
             "backend": checkpoint["diagnostic_backend"],
@@ -116,6 +121,12 @@ def create_orchestrated_app(predictor=None, stopping=None, llm=None):
             "safety_profile": checkpoint["safety_profile"],
             "safety_override_applied": checkpoint["safety_override_applied"],
         }
+
+    @app.delete("/api/conversations/{session_id}", status_code=204)
+    async def discard(session_id: str):
+        if app.state.sessions.pop(session_id, None) is None:
+            raise HTTPException(status_code=404, detail="unknown conversation")
+        app.state.session_locks.pop(session_id, None)
 
     return app
 
