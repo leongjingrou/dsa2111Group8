@@ -13,11 +13,14 @@ from serving.locustfile import DEFAULT_STAGES, DEVICES, parse_stages
 def load_replies():
     path = Path(os.getenv("SCENARIO_DATA", "data/generated/synthetic_scenarios.csv"))
     import csv
+
     rows = []
     with path.open(newline="", encoding="utf-8") as source:
         for row in csv.DictReader(source):
             conversation = json.loads(row["conversation"])
-            replies = [turn["content"] for turn in conversation if turn["role"] == "patient"]
+            replies = [
+                turn["content"] for turn in conversation if turn["role"] == "patient"
+            ]
             rows.append(replies)
     return rows
 
@@ -33,10 +36,18 @@ class LLMConsultationUser(HttpUser):
         self._start()
 
     def _start(self):
+        if getattr(self, "session_id", None):
+            self.client.delete(
+                f"/api/conversations/{self.session_id}", name="discard conversation"
+            )
         self.replies = random.choice(REPLIES)
         self.reply_index = 0
-        with self.client.post("/api/conversations", json={"safety_profile": "none"},
-                              name="start conversation", catch_response=True) as response:
+        with self.client.post(
+            "/api/conversations",
+            json={},
+            name="start conversation",
+            catch_response=True,
+        ) as response:
             if response.status_code != 200:
                 response.failure(f"HTTP {response.status_code}")
                 self.session_id = None
@@ -51,8 +62,10 @@ class LLMConsultationUser(HttpUser):
         reply = self.replies[min(self.reply_index, len(self.replies) - 1)]
         with self.client.post(
             f"/api/conversations/{self.session_id}/turn",
-            json={"patient_message": reply}, name="conversation turn",
-            timeout=float(os.getenv("REQUEST_TIMEOUT_SECONDS", "30")), catch_response=True,
+            json={"patient_message": reply},
+            name="conversation turn",
+            timeout=float(os.getenv("REQUEST_TIMEOUT_SECONDS", "30")),
+            catch_response=True,
         ) as response:
             if response.status_code != 200:
                 response.failure(f"HTTP {response.status_code}")

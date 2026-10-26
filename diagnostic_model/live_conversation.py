@@ -18,7 +18,7 @@ import pandas as pd
 from data.generate import SYMPTOMS
 from diagnostic_model.laya_model import consultation_state, questions
 from diagnostic_model.stopping import stopping_probabilities
-
+from llm_service.app.negation import is_negated
 
 GREETING = "Hello, what seems to be the problem today?"
 MAX_PATIENT_ANSWERS = 5
@@ -47,13 +47,21 @@ SG_MOH_EMERGENCY_PATTERNS = {
 }
 
 ALIASES = {
-    "shortness_of_breath": ("shortness of breath", "trouble breathing", "difficulty breathing"),
+    "shortness_of_breath": (
+        "shortness of breath",
+        "trouble breathing",
+        "difficulty breathing",
+    ),
     "painful_urination": ("painful urination", "burning urination", "burns when i pee"),
     "frequent_urination": ("frequent urination", "peeing often", "urinating often"),
     "throbbing_headache": ("throbbing headache", "pulsing headache"),
     "band_like_headache": ("band-like headache", "tight headache"),
     "confusion_drowsiness": ("confusion", "confused", "very drowsy"),
-    "persistent_vomiting": ("persistent vomiting", "continuous vomiting", "keep vomiting"),
+    "persistent_vomiting": (
+        "persistent vomiting",
+        "continuous vomiting",
+        "keep vomiting",
+    ),
 }
 
 
@@ -62,21 +70,18 @@ def _normalise(text):
 
 
 def _is_negated(text, start):
-    prefix = text[:start]
-    # A leading "no" normally scopes over a comma-separated clinical list
-    # ("no chest pain, confusion, or fainting").  A full stop, semicolon, or
-    # contrastive "but" starts a new assertion.
-    segment = re.split(r"[.;]|\bbut\b", prefix)[-1]
-    return bool(re.search(
-        r"\b(no|not|never|without|deny|denied|don'?t|do not|haven'?t|have not)\b",
-        segment,
-    ))
+    return is_negated(text, start)
 
 
 def emergency_findings(text):
     text = _normalise(text)
-    return [name for name, pattern in SG_MOH_EMERGENCY_PATTERNS.items()
-            if (match := re.search(pattern, text)) and not _is_negated(text, match.start())]
+    return [
+        name
+        for name, pattern in SG_MOH_EMERGENCY_PATTERNS.items()
+        if any(
+            not _is_negated(text, match.start()) for match in re.finditer(pattern, text)
+        )
+    ]
 
 
 @dataclass
@@ -92,14 +97,20 @@ class EvidenceState:
 
     def update(self, message):
         text = _normalise(message)
-        symptom_names = {symptom_id: name.lower() for symptom_id, name, _, _ in SYMPTOMS}
+        symptom_names = {
+            symptom_id: name.lower() for symptom_id, name, _, _ in SYMPTOMS
+        }
         for symptom_id, name in symptom_names.items():
             phrases = ALIASES.get(symptom_id, ()) + (name,)
-            for phrase in phrases:
-                match = re.search(rf"\b{re.escape(phrase)}\b", text)
-                if match:
-                    self.symptoms[symptom_id] = not _is_negated(text, match.start())
-                    break
+            matches = [
+                match
+                for phrase in phrases
+                for match in re.finditer(rf"\b{re.escape(phrase)}\b", text)
+            ]
+            if matches:
+                self.symptoms[symptom_id] = any(
+                    not _is_negated(text, match.start()) for match in matches
+                )
 
         duration = re.search(r"\b(\d+(?:\.\d+)?)\s*(day|week|month)s?\b", text)
         if duration:
@@ -115,10 +126,21 @@ class EvidenceState:
         elif re.search(r"\b(stable|same|unchanged)\b", text):
             self.progression = "stable"
 
-        temperature = re.search(r"\b(?:temperature(?: is| of)?\s*)?(3[5-9]|4[0-2])(?:\.(\d))?\s*(?:°?c|degrees)?\b", text)
-        if temperature and ("temperature" in temperature.group(0) or "c" in temperature.group(0) or "degree" in temperature.group(0)):
-            self.temperature_c = float(f"{temperature.group(1)}.{temperature.group(2) or 0}")
-        age = re.search(r"\b(?:i am|i'm|age(?: is)?|aged)\s+(\d{1,3})(?:\s+years? old)?\b", text)
+        temperature = re.search(
+            r"\b(?:temperature(?: is| of)?\s*)?(3[5-9]|4[0-2])(?:\.(\d))?\s*(?:°?c|degrees)?\b",
+            text,
+        )
+        if temperature and (
+            "temperature" in temperature.group(0)
+            or "c" in temperature.group(0)
+            or "degree" in temperature.group(0)
+        ):
+            self.temperature_c = float(
+                f"{temperature.group(1)}.{temperature.group(2) or 0}"
+            )
+        age = re.search(
+            r"\b(?:i am|i'm|age(?: is)?|aged)\s+(\d{1,3})(?:\s+years? old)?\b", text
+        )
         if age:
             candidate = int(age.group(1))
             if 0 < candidate < 120:
@@ -135,8 +157,11 @@ class EvidenceState:
 
 def _answer(choice, labels, probabilities):
     mapped = {str(label): float(value) for label, value in zip(labels, probabilities)}
-    return {"choice": str(choice), "probabilities": mapped,
-            "answer_confidence": max(mapped.values(), default=0.0)}
+    return {
+        "choice": str(choice),
+        "probabilities": mapped,
+        "answer_confidence": max(mapped.values(), default=0.0),
+    }
 
 
 class EBMLivePredictor:
@@ -188,10 +213,16 @@ class EBMLivePredictor:
         for index, label in enumerate(diagnosis_model.classes_):
             combined[labels.index(label)] = scope * diagnosis[index]
         escalation = escalation_model.predict_proba(frame)[0]
-        escalation_labels = ["urgent" if int(label) else "routine" for label in escalation_model.classes_]
+        escalation_labels = [
+            "urgent" if int(label) else "routine" for label in escalation_model.classes_
+        ]
         return {
             "condition": _answer(labels[int(combined.argmax())], labels, combined),
-            "escalation": _answer(escalation_labels[int(escalation.argmax())], escalation_labels, escalation),
+            "escalation": _answer(
+                escalation_labels[int(escalation.argmax())],
+                escalation_labels,
+                escalation,
+            ),
         }
 
 
@@ -200,15 +231,20 @@ class LayaLivePredictor:
 
     def __init__(self, model_dir, device="cuda"):
         import laya
+
         self.agent = laya.load(model_dir, device=device)
 
     def predict(self, turns, evidence, answer_number):
         state = consultation_state({}, turns=turns, evidence_mode="conversation")
-        return self.agent.predict_batch([state], questions(), batch_size=1)[0]["answers"]
+        return self.agent.predict_batch([state], questions(), batch_size=1)[0][
+            "answers"
+        ]
 
 
 class LiveConsultation:
-    def __init__(self, predictor, stopping_path, minimum_answers=2, safety_profile="none"):
+    def __init__(
+        self, predictor, stopping_path, minimum_answers=2, safety_profile="none"
+    ):
         if safety_profile not in {"none", "sg_moh"}:
             raise ValueError(f"Unknown safety profile: {safety_profile}")
         stopping = joblib.load(stopping_path)
@@ -229,29 +265,47 @@ class LiveConsultation:
         self.evidence.update(patient_message)
         answer_number = sum(turn["role"] == "patient" for turn in self.turns)
         answers = self.predictor.predict(self.turns, self.evidence, answer_number)
-        checkpoint = {"patient_answer": answer_number, "latest_response": patient_message,
-                      "answers": answers}
+        checkpoint = {
+            "patient_answer": answer_number,
+            "latest_response": patient_message,
+            "answers": answers,
+        }
         self.trace.append(checkpoint)
         stop_probability = stopping_probabilities(self.stop_model, [self.trace])[0][-1]
         model_stop = answer_number >= MAX_PATIENT_ANSWERS or (
-            answer_number >= self.minimum_answers and stop_probability >= self.stop_threshold
+            answer_number >= self.minimum_answers
+            and stop_probability >= self.stop_threshold
         )
         safety_findings = (
-            emergency_findings(patient_message) if self.safety_profile == "sg_moh" else []
+            emergency_findings(patient_message)
+            if self.safety_profile == "sg_moh"
+            else []
         )
         safety_override = bool(safety_findings)
         stop = safety_override or model_stop
-        reason = "safety_profile_sg_moh" if safety_override else (
-            "maximum_questions" if answer_number >= MAX_PATIENT_ANSWERS else
-            "learned_stop_threshold" if stop else "more_information_needed"
+        reason = (
+            "safety_profile_sg_moh"
+            if safety_override
+            else (
+                "maximum_questions"
+                if answer_number >= MAX_PATIENT_ANSWERS
+                else "learned_stop_threshold"
+                if stop
+                else "more_information_needed"
+            )
         )
-        checkpoint.update({"stop_probability": round(float(stop_probability), 4),
-                           "stop_threshold": self.stop_threshold,
-                           "model_stop": bool(model_stop),
-                           "safety_profile": self.safety_profile,
-                           "safety_override_applied": safety_override,
-                           "safety_findings": safety_findings,
-                           "stop": stop, "stop_reason": reason})
+        checkpoint.update(
+            {
+                "stop_probability": round(float(stop_probability), 4),
+                "stop_threshold": self.stop_threshold,
+                "model_stop": bool(model_stop),
+                "safety_profile": self.safety_profile,
+                "safety_override_applied": safety_override,
+                "safety_findings": safety_findings,
+                "stop": stop,
+                "stop_reason": reason,
+            }
+        )
         if stop:
             self.finished = True
             next_message = self._summary(checkpoint)
@@ -265,51 +319,73 @@ class LiveConsultation:
     def _summary(checkpoint):
         condition = checkpoint["answers"]["condition"]
         escalation = checkpoint["answers"]["escalation"]
-        ranked = sorted(condition["probabilities"].items(), key=lambda item: item[1], reverse=True)[:3]
+        ranked = sorted(
+            condition["probabilities"].items(), key=lambda item: item[1], reverse=True
+        )[:3]
         differential = ", ".join(f"{name} {value:.0%}" for name, value in ranked)
         if checkpoint["safety_override_applied"]:
             action = "The safety screen indicates urgent emergency assessment in Singapore; call 995 if this is happening now."
         else:
             action = f"The model's current escalation category is {escalation['choice']} ({escalation['answer_confidence']:.0%})."
-        return (f"I have enough information for the prototype to stop asking questions. "
-                f"Current differential: {differential}. {action} This is research output, not a diagnosis.")
+        return (
+            f"I have enough information for the prototype to stop asking questions. "
+            f"Current differential: {differential}. {action} This is research output, not a diagnosis."
+        )
 
 
 def _print_checkpoint(checkpoint):
     condition = checkpoint["answers"]["condition"]
     escalation = checkpoint["answers"]["escalation"]
-    print(json.dumps({
-        "patient_answer": checkpoint["patient_answer"],
-        "condition": condition["choice"],
-        "condition_confidence": round(condition["answer_confidence"], 4),
-        "escalation": escalation["choice"],
-        "escalation_confidence": round(escalation["answer_confidence"], 4),
-        "stop_probability": checkpoint["stop_probability"],
-        "stop": checkpoint["stop"],
-        "stop_reason": checkpoint["stop_reason"],
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "patient_answer": checkpoint["patient_answer"],
+                "condition": condition["choice"],
+                "condition_confidence": round(condition["answer_confidence"], 4),
+                "escalation": escalation["choice"],
+                "escalation_confidence": round(escalation["answer_confidence"], 4),
+                "stop_probability": checkpoint["stop_probability"],
+                "stop": checkpoint["stop"],
+                "stop_reason": checkpoint["stop_reason"],
+            },
+            indent=2,
+        )
+    )
     print(f"Doctor: {checkpoint['doctor_response']}")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--backend", choices=("ebm", "laya"), default="ebm")
-    parser.add_argument("--model", required=True, help="EBM joblib file or Laya model directory")
+    parser.add_argument(
+        "--model", required=True, help="EBM joblib file or Laya model directory"
+    )
     parser.add_argument("--stopping", required=True, type=Path)
     parser.add_argument("--device", default="cuda")
     parser.add_argument(
-        "--safety-profile", choices=("none", "sg_moh"), default="none",
+        "--safety-profile",
+        choices=("none", "sg_moh"),
+        default="none",
         help="Optional jurisdictional safety guard; always logged separately from model stopping",
     )
-    parser.add_argument("--script", type=Path, help="JSON list of patient replies; omit for interactive input")
+    parser.add_argument(
+        "--script",
+        type=Path,
+        help="JSON list of patient replies; omit for interactive input",
+    )
     parser.add_argument("--log", type=Path)
     args = parser.parse_args()
-    predictor = (EBMLivePredictor(args.model) if args.backend == "ebm"
-                 else LayaLivePredictor(args.model, args.device))
+    predictor = (
+        EBMLivePredictor(args.model)
+        if args.backend == "ebm"
+        else LayaLivePredictor(args.model, args.device)
+    )
     session = LiveConsultation(
         predictor, args.stopping, safety_profile=args.safety_profile
     )
-    scripted = json.loads(args.script.read_text(encoding="utf-8")) if args.script else None
+    scripted = (
+        json.loads(args.script.read_text(encoding="utf-8")) if args.script else None
+    )
     print(f"Doctor: {GREETING}")
     events = []
     while not session.finished:
@@ -325,11 +401,17 @@ def main():
         _print_checkpoint(checkpoint)
     if args.log:
         args.log.parent.mkdir(parents=True, exist_ok=True)
-        args.log.write_text(json.dumps({
-            "safety_profile": session.safety_profile,
-            "turns": session.turns,
-            "checkpoints": events,
-        }, indent=2), encoding="utf-8")
+        args.log.write_text(
+            json.dumps(
+                {
+                    "safety_profile": session.safety_profile,
+                    "turns": session.turns,
+                    "checkpoints": events,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
 
 
 if __name__ == "__main__":

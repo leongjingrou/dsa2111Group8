@@ -1,26 +1,46 @@
-"""FastAPI service joining LLM conversation with EBM/Laya decision layers."""
+"""Consultation HTTP API with mandatory versioned safety and replica-safe state."""
 
-import asyncio
 import os
-import uuid
+import socket
 from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Literal
 
+import joblib
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from diagnostic_model.live_conversation import EBMLivePredictor, GREETING, LayaLivePredictor
-from diagnostic_model.llm_live_conversation import LLMDrivenConsultation
-from llm_service.app.llm_client import LLMClient
+from diagnostic_model.live_conversation import (
+    GREETING,
+    EBMLivePredictor,
+    LayaLivePredictor,
+)
+from llm_service.api_schema import ConsultationResponse
 from llm_service.app.keyword_llm import KeywordLLM
-from llm_service.app.router import router as llm_router
+from llm_service.app.llm_client import LLMClient, LLMError
+from llm_service.consultation_service import (
+    ConsultationFinished,
+    ConsultationService,
+    RequestReplayConflict,
+)
+from llm_service.session_store import (
+    SessionCapacity,
+    SessionConflict,
+    SessionMissing,
+    SessionStore,
+)
+from safety_layer import AuditLogError, SafetyEngine
 
 
 class StartRequest(BaseModel):
-    safety_profile: str = Field(default="none", pattern="^(none|sg_moh)$")
+    model_config = ConfigDict(extra="forbid")
+    safety_profile: Literal["rules_v1", "sg_moh"] = "rules_v1"
 
 
 class TurnRequest(BaseModel):
-    patient_message: str = Field(min_length=1, max_length=2000)
+    model_config = ConfigDict(extra="forbid")
+    patient_message: str = Field(min_length=1, max_length=2000, pattern=r"\S")
+    request_id: str | None = Field(default=None, min_length=1, max_length=64)
 
 
 def _predictor_from_environment():
@@ -43,21 +63,84 @@ def _llm_from_environment():
     raise ValueError(f"Unsupported LLM_BACKEND: {backend}")
 
 
-def create_orchestrated_app(predictor=None, stopping=None, llm=None):
+async def receive_turn(service, session_id, message, request_id=None):
+    try:
+        return await service.turn(session_id, message, request_id)
+    except SessionMissing:
+        raise HTTPException(404, "Unknown or expired consultation") from None
+    except (ConsultationFinished, SessionConflict, RequestReplayConflict) as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except LLMError as exc:
+        raise HTTPException(
+            503,
+            {
+                "message": "The language provider is unavailable; assessment has not completed.",
+                "session_id": session_id,
+            },
+        ) from exc
+    except AuditLogError as exc:
+        raise HTTPException(
+            503,
+            {
+                "message": "Safety audit storage is unavailable.",
+                "safety": exc.decision.to_dict(),
+                "reply": exc.decision.patient_message,
+            },
+        ) from exc
+
+
+def create_orchestrated_app(
+    predictor=None, stopping=None, llm=None, *, safety_engine=None, session_store=None
+):
     @asynccontextmanager
     async def lifespan(app):
-        app.state.predictor = predictor or _predictor_from_environment()
-        app.state.stopping = stopping or os.environ["STOPPING_MODEL"]
-        app.state.llm = llm or _llm_from_environment()
+        audit_path = Path(
+            os.getenv(
+                "SAFETY_AUDIT_LOG",
+                f"runtime/audit-{socket.gethostname()}-{os.getpid()}.jsonl",
+            )
+        )
+        engine = (
+            safety_engine
+            if safety_engine is not None
+            else SafetyEngine(audit_log=audit_path)
+        )
+        if engine.audit_log is not None:
+            engine.audit_log.parent.mkdir(parents=True, exist_ok=True)
+            with engine.audit_log.open("a", encoding="utf-8"):
+                pass
+        app.state.predictor = (
+            predictor if predictor is not None else _predictor_from_environment()
+        )
+        stop_bundle = stopping if stopping is not None else os.environ["STOPPING_MODEL"]
+        app.state.stopping = (
+            joblib.load(stop_bundle)
+            if isinstance(stop_bundle, (str, Path))
+            else stop_bundle
+        )
+        app.state.llm = llm if llm is not None else _llm_from_environment()
+        app.state.safety_engine = engine
+        app.state.store = (
+            session_store
+            if session_store is not None
+            else SessionStore(
+                os.getenv("CONSULTATION_DB", "runtime/consultations.sqlite3"),
+                ttl_seconds=int(os.getenv("CONSULTATION_TTL_SECONDS", "3600")),
+                maximum=int(os.getenv("MAX_ACTIVE_SESSIONS", "4096")),
+            )
+        )
+        app.state.consultations = ConsultationService(
+            app.state.predictor,
+            app.state.stopping,
+            app.state.llm,
+            engine,
+            app.state.store,
+        )
         yield
 
     app = FastAPI(
-        title="LLM-mediated EBM/Laya consultation API",
-        lifespan=lifespan,
+        title="Safety-screened telemedicine consultation API", lifespan=lifespan
     )
-    app.state.sessions = {}
-    app.state.session_locks = {}
-    app.include_router(llm_router, prefix="/api")
 
     @app.get("/healthz")
     async def healthz():
@@ -68,65 +151,41 @@ def create_orchestrated_app(predictor=None, stopping=None, llm=None):
         return {
             "status": "ready",
             "backend": app.state.predictor.name,
-            "llm_backend": os.getenv("LLM_BACKEND", "remote"),
+            "safety_profile": "rules_v1",
+            "policy_version": app.state.safety_engine.version,
+            "policy_sha256": app.state.safety_engine.policy_sha256,
         }
 
     @app.post("/api/conversations")
-    async def start(request: StartRequest):
-        maximum = int(os.getenv("MAX_ACTIVE_SESSIONS", "4096"))
-        if len(app.state.sessions) >= maximum:
-            raise HTTPException(status_code=503, detail="active session capacity reached")
-        session_id = str(uuid.uuid4())
-        app.state.sessions[session_id] = LLMDrivenConsultation(
-            app.state.predictor,
-            app.state.stopping,
-            app.state.llm,
-            safety_profile=request.safety_profile,
-        )
-        app.state.session_locks[session_id] = asyncio.Lock()
+    async def start(request: StartRequest = StartRequest()):
+        try:
+            session_id = app.state.consultations.start()
+        except SessionCapacity as exc:
+            raise HTTPException(503, str(exc)) from exc
         return {
             "session_id": session_id,
+            "conversation_id": session_id,
             "backend": app.state.predictor.name,
             "doctor_response": GREETING,
-            "safety_profile": request.safety_profile,
+            "safety_profile": "rules_v1",
+            "policy_version": app.state.safety_engine.version,
         }
 
-    @app.post("/api/conversations/{session_id}/turn")
+    @app.post(
+        "/api/conversations/{session_id}/turn", response_model=ConsultationResponse
+    )
     async def turn(session_id: str, request: TurnRequest):
-        session = app.state.sessions.get(session_id)
-        if session is None:
-            raise HTTPException(status_code=404, detail="unknown conversation")
-        async with app.state.session_locks[session_id]:
-            if session.finished:
-                raise HTTPException(status_code=409, detail="conversation already finalised")
-            checkpoint = await session.receive(request.patient_message)
-        if checkpoint["stop"]:
-            # The response owns the final checkpoint; process memory need not
-            # retain finished consultations during sustained load.
-            app.state.sessions.pop(session_id, None)
-            app.state.session_locks.pop(session_id, None)
-        return {
-            "session_id": session_id,
-            "backend": checkpoint["diagnostic_backend"],
-            "patient_answer": checkpoint["patient_answer"],
-            "extraction": checkpoint["extraction"],
-            "diagnosis": checkpoint["answers"]["condition"],
-            "escalation": checkpoint["answers"]["escalation"],
-            "stop_probability": checkpoint["stop_probability"],
-            "stop_threshold": checkpoint["stop_threshold"],
-            "stop": checkpoint["stop"],
-            "question_target": checkpoint["question_target"],
-            "question_fallback_used": checkpoint["question_fallback_used"],
-            "doctor_response": checkpoint["doctor_response"],
-            "safety_profile": checkpoint["safety_profile"],
-            "safety_override_applied": checkpoint["safety_override_applied"],
-        }
+        return await receive_turn(
+            app.state.consultations,
+            session_id,
+            request.patient_message,
+            request.request_id,
+        )
 
     @app.delete("/api/conversations/{session_id}", status_code=204)
     async def discard(session_id: str):
-        if app.state.sessions.pop(session_id, None) is None:
-            raise HTTPException(status_code=404, detail="unknown conversation")
-        app.state.session_locks.pop(session_id, None)
+        if not app.state.store.delete(session_id):
+            raise HTTPException(404, "Unknown consultation")
 
     return app
 

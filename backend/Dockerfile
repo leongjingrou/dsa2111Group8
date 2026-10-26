@@ -1,14 +1,13 @@
 FROM python:3.13-slim
 
-COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /usr/local/bin/uv
-
 WORKDIR /app
 
-COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
-
-COPY app ./app
+COPY . .
+RUN pip install --no-cache-dir ".[serve,speech]"
+ENV EBM_LIVE_MODEL=/models/ebm_sequential_models.joblib \
+    STOPPING_MODEL=/models/ebm_stopping_controller.joblib \
+    CONSULTATION_DB=/app/runtime/consultations.sqlite3
 
 EXPOSE 8000
 
-CMD ["uv", "run", "--no-sync", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

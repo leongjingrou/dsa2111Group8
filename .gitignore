@@ -12,3 +12,10 @@ __pycache__/
 diagnostic_model/artifacts/
 diagnostic_model/artifacts_*/
 diagnostic_model/demo_data.csv
+.DS_Store
+safety_layer/output/
+runtime/
+*.egg-info/
+test-results/
+frontend/node_modules/
+frontend/dist/

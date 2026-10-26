@@ -6,6 +6,7 @@ Design rule: nothing the LLM returns can express a diagnosis or an urgency
 level. ExtractionResult only has symptom facts, and the explainer only
 receives a recommended_action decided elsewhere (Role 3's safety layer).
 """
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -63,6 +64,11 @@ class Contradiction(BaseModel):
 
 
 class Profile(BaseModel):
+    age: float | None = None
+    pregnancy_status: (
+        Literal["pregnant", "not_pregnant", "not_applicable", "unknown", "uncertain"]
+        | None
+    ) = None
     symptoms: dict[str, SymptomState] = Field(default_factory=dict)
     medical_history: list[str] = Field(default_factory=list)
     allergies: list[str] = Field(default_factory=list)
@@ -124,7 +130,7 @@ class ExplainRequest(BaseModel):
 
 
 class ExplainResponse(BaseModel):
-    headline: str       # fixed text chosen by code from recommended_action
-    explanation: str    # LLM-written (or fallback) body
-    disclaimer: str     # fixed text
+    headline: str  # fixed text chosen by code from recommended_action
+    explanation: str  # LLM-written (or fallback) body
+    disclaimer: str  # fixed text
     fallback_used: bool

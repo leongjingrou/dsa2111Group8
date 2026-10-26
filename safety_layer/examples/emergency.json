@@ -1,0 +1,5 @@
+{
+  "symptoms": {
+    "chest_pain": {"symptom_id": "chest_pain", "presence": "present"}
+  }
+}

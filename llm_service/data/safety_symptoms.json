@@ -1,0 +1,70 @@
+{
+  "symptoms": [
+    {
+      "id": "loss_of_consciousness",
+      "name": "Loss of consciousness",
+      "category": "neurological",
+      "is_red_flag": true,
+      "synonyms": [
+        "passed out",
+        "unconscious",
+        "fainted"
+      ]
+    },
+    {
+      "id": "uncontrolled_bleeding",
+      "name": "Uncontrolled bleeding",
+      "category": "systemic",
+      "is_red_flag": true,
+      "synonyms": [
+        "bleeding that will not stop"
+      ]
+    },
+    {
+      "id": "facial_droop",
+      "name": "New facial droop",
+      "category": "neurological",
+      "is_red_flag": true,
+      "synonyms": [
+        "face drooping"
+      ]
+    },
+    {
+      "id": "speech_difficulty",
+      "name": "New difficulty speaking",
+      "category": "neurological",
+      "is_red_flag": true,
+      "synonyms": [
+        "slurred speech"
+      ]
+    },
+    {
+      "id": "sudden_one_sided_weakness",
+      "name": "Sudden one-sided weakness",
+      "category": "neurological",
+      "is_red_flag": true,
+      "synonyms": [
+        "sudden weakness on one side"
+      ]
+    },
+    {
+      "id": "swollen_tongue_or_throat",
+      "name": "Swollen tongue or throat",
+      "category": "respiratory",
+      "is_red_flag": true,
+      "synonyms": [
+        "swollen tongue",
+        "throat swelling"
+      ]
+    },
+    {
+      "id": "seizure",
+      "name": "Seizure",
+      "category": "neurological",
+      "is_red_flag": true,
+      "synonyms": [
+        "having a fit"
+      ]
+    }
+  ]
+}

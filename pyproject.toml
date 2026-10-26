@@ -29,16 +29,25 @@ serve = [
   "fastapi>=0.115,<1",
   "httpx>=0.28,<1",
   "uvicorn>=0.34,<1",
+  "python-multipart>=0.0.20,<1",
 ]
+speech = ["groq>=0.30,<2"]
 load = ["locust>=2.40,<3"]
 
 [tool.pytest.ini_options]
-testpaths = ["knowledge_base", "diagnostic_model/tests", "llm_service/tests", "serving/tests"]
+testpaths = ["knowledge_base", "diagnostic_model/tests", "llm_service/tests", "serving/tests", "safety_layer/tests", "backend/tests"]
 addopts = "-q -p no:cacheprovider"
 
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+
 [tool.setuptools.packages.find]
-include = ["data*", "diagnostic_model*", "knowledge_base*", "llm_service*", "serving*"]
+include = ["data*", "diagnostic_model*", "knowledge_base*", "llm_service*", "serving*", "safety_layer*", "backend*"]
 
 [tool.setuptools.package-data]
 diagnostic_model = ["dataset_sources.json"]
 llm_service = ["prompts/*.yaml", "data/*.json"]
+safety_layer = ["config/*.json", "tests/vignettes.json", "examples/*.json"]
+knowledge_base = ["data/*.json"]
+data = ["generated/*.csv"]

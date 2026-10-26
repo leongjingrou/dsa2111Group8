@@ -1,7 +1,17 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     env_file: ./backend/.env
+    environment:
+      MODEL_BACKEND: ebm
+      EBM_LIVE_MODEL: /models/ebm_sequential_models.joblib
+      STOPPING_MODEL: /models/ebm_stopping_controller.joblib
+      CONSULTATION_DB: /app/runtime/consultations.sqlite3
+    volumes:
+      - ./runtime/models:/models:ro
+      - consultation-state:/app/runtime
     deploy:
       replicas: 3
     restart: unless-stopped
@@ -13,3 +23,6 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+volumes:
+  consultation-state:

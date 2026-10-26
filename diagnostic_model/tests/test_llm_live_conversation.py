@@ -4,6 +4,7 @@ import numpy as np
 
 from diagnostic_model.llm_live_conversation import LLMDrivenConsultation
 from llm_service.app.schema import ExtractedSymptom, ExtractionResult
+from safety_layer import SafetyEngine
 
 
 class ConstantStopModel:
@@ -35,23 +36,43 @@ class SequenceLLM:
     def __init__(self):
         self.extractions = [
             ExtractionResult(
-                symptoms=[ExtractedSymptom(
-                    symptom_id="fever", presence="present", severity=None,
-                    duration_days=None, progression=None, evidence="fever",
-                )],
-                unmapped_mentions=[], medical_history=[], allergies=[], medications=[],
+                symptoms=[
+                    ExtractedSymptom(
+                        symptom_id="fever",
+                        presence="present",
+                        severity=None,
+                        duration_days=None,
+                        progression=None,
+                        evidence="fever",
+                    )
+                ],
+                unmapped_mentions=[],
+                medical_history=[],
+                allergies=[],
+                medications=[],
             ),
             ExtractionResult(
-                symptoms=[ExtractedSymptom(
-                    symptom_id="fever", presence="present", severity=None,
-                    duration_days=2, progression=None, evidence="two days",
-                )],
-                unmapped_mentions=[], medical_history=[], allergies=[], medications=[],
+                symptoms=[
+                    ExtractedSymptom(
+                        symptom_id="fever",
+                        presence="present",
+                        severity=None,
+                        duration_days=2,
+                        progression=None,
+                        evidence="two days",
+                    )
+                ],
+                unmapped_mentions=[],
+                medical_history=[],
+                allergies=[],
+                medications=[],
             ),
         ]
         self.calls = []
 
-    async def complete_structured(self, prompt_name, variables, output_model, temperature=0):
+    async def complete_structured(
+        self, prompt_name, variables, output_model, temperature=0
+    ):
         self.calls.append(prompt_name)
         return self.extractions.pop(0)
 
@@ -70,11 +91,24 @@ def test_llm_phrases_questions_but_predictor_owns_decisions():
         session = LLMDrivenConsultation(
             StubPredictor(), {"model": ConstantStopModel(), "threshold": 0.9}, llm
         )
+        # This unit isolates the post-screen language/model contract. HTTP
+        # acceptance tests exercise collection of these answers from scratch.
+        from llm_service.app.schema import SymptomState
+
+        session.profile.age = session.evidence.age = 30
+        session.profile.pregnancy_status = "not_pregnant"
+        session.evidence.pregnant = False
+        session.profile.symptoms = {
+            sid: SymptomState(symptom_id=sid, presence="absent")
+            for sid in SafetyEngine().required_screening
+        }
         first = await session.receive("I have a fever")
         assert first["stop"] is False
         assert first["doctor_response"] == "How long have you had the fever?"
         assert first["question_target"] == {
-            "kind": "symptom", "target": "fever", "focus": "duration"
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration",
         }
         assert first["answers"]["condition"]["choice"] == "influenza"
 

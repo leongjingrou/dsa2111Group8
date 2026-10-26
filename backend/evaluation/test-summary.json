@@ -1,0 +1,25 @@
+{
+  "schema": "backend-validation/v1",
+  "validated_at": "2026-10-26T17:36:12.250853+08:00",
+  "python": "3.13.7",
+  "tests": 214,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 18.522,
+  "tests_by_component": {
+    "backend": 35,
+    "diagnostic_model": 29,
+    "knowledge_base": 18,
+    "llm_service": 9,
+    "safety_layer": 118,
+    "serving": 5
+  },
+  "api_flows_passed": 4,
+  "api_flows_total": 4,
+  "policy_version": "1.0.0",
+  "policy_sha256": "4c6a8334fc3f420f1b1640608fee5d2d2ce7978bd9a6a58ff7ef0afc01cd24fa",
+  "test_mode": "Actual HTTP backend with fitted EBM/stopping artifacts and KeywordLLM language adapter; controlled predictors separately verify precise routine routing.",
+  "frontend_source_changed": false,
+  "clinical_validation": false
+}

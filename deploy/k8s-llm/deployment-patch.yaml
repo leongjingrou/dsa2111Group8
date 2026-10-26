@@ -7,8 +7,17 @@ spec:
   replicas: 2
   template:
     spec:
+      securityContext:
+        fsGroup: 10001
+      volumes:
+        - name: consultation-state
+          persistentVolumeClaim:
+            claimName: consultation-state
       containers:
         - name: api
+          volumeMounts:
+            - name: consultation-state
+              mountPath: /app/runtime
           image: diagnosis-api:llm-orchestrated
           command: ["uvicorn"]
           args: ["llm_service.orchestrated_main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
@@ -23,3 +32,5 @@ spec:
               value: keyword
             - name: MAX_ACTIVE_SESSIONS
               value: "4096"
+            - name: CONSULTATION_DB
+              value: /app/runtime/consultations.sqlite3

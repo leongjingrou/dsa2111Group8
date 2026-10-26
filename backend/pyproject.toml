@@ -1,9 +1,10 @@
 [project]
 name = "backend"
 version = "0.1.0"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.15"
 dependencies = [
-    "fastapi[standard]>=0.159.1",
-    "groq>=1.7.0",
-    "python-dotenv>=1.2.4",
+    "dsa2111-group8-telemedicine[serve,speech]",
 ]
+
+[tool.uv.sources]
+dsa2111-group8-telemedicine = { path = "..", editable = true }

@@ -1,0 +1,954 @@
+{
+  "policy_version": "1.0.0",
+  "policy_sha256": "4c6a8334fc3f420f1b1640608fee5d2d2ce7978bd9a6a58ff7ef0afc01cd24fa",
+  "cases": 64,
+  "passed": 64,
+  "clinical_rules_exercised": 22,
+  "clinical_rules_total": 22,
+  "rule_hit_counts": {
+    "DATA_CONTRADICTION": 4,
+    "INPUT_INVALID": 6,
+    "MODEL_ACTION_INVALID": 1,
+    "MODEL_URGENT": 1,
+    "RF_AIRWAY": 2,
+    "RF_ALTERED_CONSCIOUSNESS": 3,
+    "RF_BLOOD_STOOL": 1,
+    "RF_BREATHING": 1,
+    "RF_CHEST_PAIN": 4,
+    "RF_DEHYDRATION": 1,
+    "RF_DENGUE_WARNING": 1,
+    "RF_EYE_REVIEW": 4,
+    "RF_EYE_VISION": 1,
+    "RF_FLANK_PAIN": 1,
+    "RF_HEADACHE_NECK": 1,
+    "RF_HEADACHE_NEURO": 1,
+    "RF_MAJOR_BLEEDING": 3,
+    "RF_MUCOSAL_BLEEDING": 2,
+    "RF_NEUROLOGICAL": 4,
+    "RF_PERSISTENT_VOMITING": 1,
+    "RF_SEVERE_ABDOMINAL_PAIN": 1,
+    "RF_SKIN_INFECTION": 1,
+    "RF_STROKE_SIGNS": 3,
+    "RF_SUDDEN_HEADACHE": 1,
+    "RF_WEIGHT_LOSS": 1,
+    "RF_WHEEZING": 2,
+    "SCOPE_AGE": 4,
+    "SCOPE_CONDITION": 2,
+    "SCOPE_PREGNANCY": 3,
+    "SCOPE_UNMAPPED": 2,
+    "SCREEN_INCOMPLETE": 13
+  },
+  "limitation": "Agreement with software acceptance expectations, not clinical validation.",
+  "results": [
+    {
+      "case_id": "V001",
+      "vignette": "Adult with mild runny nose and an explicitly negative complete screen.",
+      "expected": "continue_assessment",
+      "actual": "continue_assessment",
+      "expected_rules": [],
+      "triggered_rules": [],
+      "passed": true,
+      "event_id": "4ee53939-2b05-488e-ac7b-8102331c19af"
+    },
+    {
+      "case_id": "V002",
+      "vignette": "Patient is exactly 18 years old.",
+      "expected": "continue_assessment",
+      "actual": "continue_assessment",
+      "expected_rules": [],
+      "triggered_rules": [],
+      "passed": true,
+      "event_id": "e3e984ae-a623-464a-8094-d1b403214143"
+    },
+    {
+      "case_id": "V003",
+      "vignette": "Patient is 64 years old.",
+      "expected": "continue_assessment",
+      "actual": "continue_assessment",
+      "expected_rules": [],
+      "triggered_rules": [],
+      "passed": true,
+      "event_id": "a03bd818-b34a-475d-a933-b02e462704c4"
+    },
+    {
+      "case_id": "V004",
+      "vignette": "Patient is 17 years old, outside configured adult scope.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_AGE"
+      ],
+      "triggered_rules": [
+        "SCOPE_AGE"
+      ],
+      "passed": true,
+      "event_id": "cf451b9f-d6ba-407f-b008-27f6fd1aab7f"
+    },
+    {
+      "case_id": "V005",
+      "vignette": "Patient is exactly 65, outside the configured upper boundary.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_AGE"
+      ],
+      "triggered_rules": [
+        "SCOPE_AGE"
+      ],
+      "passed": true,
+      "event_id": "33f7003c-5942-43f5-9deb-2c992aa5b2e7"
+    },
+    {
+      "case_id": "V006",
+      "vignette": "Pregnant adult with otherwise minor symptoms.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_PREGNANCY"
+      ],
+      "triggered_rules": [
+        "SCOPE_PREGNANCY"
+      ],
+      "passed": true,
+      "event_id": "4133b79e-6b6a-4379-a6e4-ee4a5679cfbc"
+    },
+    {
+      "case_id": "V007",
+      "vignette": "Adult does not know their pregnancy status.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "629afbd5-9e1a-4464-bcfc-e10123544967"
+    },
+    {
+      "case_id": "V008",
+      "vignette": "Age has not been collected.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "8fbfbc78-c0ea-40c9-8c5c-ea25f5f8a573"
+    },
+    {
+      "case_id": "V009",
+      "vignette": "Chest pain is reported before age or any screening negatives are collected.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_CHEST_PAIN",
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "RF_CHEST_PAIN",
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "4a6a3f7a-b181-4a1e-a8fa-92c35fcc313c"
+    },
+    {
+      "case_id": "V010",
+      "vignette": "Adult reports chest pain despite an otherwise negative screen.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_CHEST_PAIN"
+      ],
+      "triggered_rules": [
+        "RF_CHEST_PAIN"
+      ],
+      "passed": true,
+      "event_id": "0a8b990d-7821-4070-97e8-3640a62cef58"
+    },
+    {
+      "case_id": "V011",
+      "vignette": "Adult reports breathing difficulty.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_BREATHING"
+      ],
+      "triggered_rules": [
+        "RF_BREATHING"
+      ],
+      "passed": true,
+      "event_id": "64d6b8c5-6194-4d99-888a-e3ae5c22fb7f"
+    },
+    {
+      "case_id": "V012",
+      "vignette": "Unusual confusion or drowsiness is reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_ALTERED_CONSCIOUSNESS"
+      ],
+      "triggered_rules": [
+        "RF_ALTERED_CONSCIOUSNESS"
+      ],
+      "passed": true,
+      "event_id": "3593cfcf-b0f1-46c0-b87e-36b024f708cb"
+    },
+    {
+      "case_id": "V013",
+      "vignette": "Patient has vomited blood.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_MAJOR_BLEEDING"
+      ],
+      "triggered_rules": [
+        "RF_MAJOR_BLEEDING"
+      ],
+      "passed": true,
+      "event_id": "b184d043-aab6-4661-be4f-a1b959388c71"
+    },
+    {
+      "case_id": "V014",
+      "vignette": "Patient reports black tarry stools.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_MAJOR_BLEEDING"
+      ],
+      "triggered_rules": [
+        "RF_MAJOR_BLEEDING"
+      ],
+      "passed": true,
+      "event_id": "b9e32048-bb37-47ce-abae-3538c3acba51"
+    },
+    {
+      "case_id": "V015",
+      "vignette": "Patient reports severe abdominal pain.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_SEVERE_ABDOMINAL_PAIN"
+      ],
+      "triggered_rules": [
+        "RF_SEVERE_ABDOMINAL_PAIN"
+      ],
+      "passed": true,
+      "event_id": "740b70b2-bbea-402b-af85-5c0cc6ce6434"
+    },
+    {
+      "case_id": "V016",
+      "vignette": "Patient describes a sudden worst-ever headache.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_SUDDEN_HEADACHE"
+      ],
+      "triggered_rules": [
+        "RF_SUDDEN_HEADACHE"
+      ],
+      "passed": true,
+      "event_id": "b888bbb7-4dd2-46b8-9bbb-dbe01fbaf7ec"
+    },
+    {
+      "case_id": "V017",
+      "vignette": "Patient reports the bundled mouth-opening difficulty or drooling finding.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_AIRWAY"
+      ],
+      "triggered_rules": [
+        "RF_AIRWAY"
+      ],
+      "passed": true,
+      "event_id": "27c35f84-9ecc-4b43-a3aa-f119f99ded75"
+    },
+    {
+      "case_id": "V018",
+      "vignette": "Loss of consciousness has been reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_ALTERED_CONSCIOUSNESS"
+      ],
+      "triggered_rules": [
+        "RF_ALTERED_CONSCIOUSNESS"
+      ],
+      "passed": true,
+      "event_id": "d39b34e7-4582-437d-8d74-784db40a0c9a"
+    },
+    {
+      "case_id": "V019",
+      "vignette": "Patient reports uncontrolled bleeding.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_MAJOR_BLEEDING"
+      ],
+      "triggered_rules": [
+        "RF_MAJOR_BLEEDING"
+      ],
+      "passed": true,
+      "event_id": "40eebf02-fdb0-4e4d-a167-9fd1758378cf"
+    },
+    {
+      "case_id": "V020",
+      "vignette": "A seizure is reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_ALTERED_CONSCIOUSNESS"
+      ],
+      "triggered_rules": [
+        "RF_ALTERED_CONSCIOUSNESS"
+      ],
+      "passed": true,
+      "event_id": "c30cbb57-ec82-48e7-a886-3853c54bf8c5"
+    },
+    {
+      "case_id": "V021",
+      "vignette": "A new facial droop is reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_STROKE_SIGNS"
+      ],
+      "triggered_rules": [
+        "RF_STROKE_SIGNS"
+      ],
+      "passed": true,
+      "event_id": "c797f586-ea38-406e-a2c4-e5dc4ebbe3fc"
+    },
+    {
+      "case_id": "V022",
+      "vignette": "New speech difficulty is reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_STROKE_SIGNS"
+      ],
+      "triggered_rules": [
+        "RF_STROKE_SIGNS"
+      ],
+      "passed": true,
+      "event_id": "7aa40774-d94f-401b-ad34-369784fbd93c"
+    },
+    {
+      "case_id": "V023",
+      "vignette": "Sudden weakness on one side is reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_STROKE_SIGNS"
+      ],
+      "triggered_rules": [
+        "RF_STROKE_SIGNS"
+      ],
+      "passed": true,
+      "event_id": "ab63987c-b410-471e-a178-9ae33300a8d7"
+    },
+    {
+      "case_id": "V024",
+      "vignette": "Headache occurs with neck stiffness.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_HEADACHE_NECK",
+        "RF_NEUROLOGICAL"
+      ],
+      "triggered_rules": [
+        "RF_HEADACHE_NECK",
+        "RF_NEUROLOGICAL"
+      ],
+      "passed": true,
+      "event_id": "a3dfa738-bc5d-4753-8554-089dca27504e"
+    },
+    {
+      "case_id": "V025",
+      "vignette": "Headache occurs with weakness or numbness.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_HEADACHE_NEURO",
+        "RF_NEUROLOGICAL"
+      ],
+      "triggered_rules": [
+        "RF_HEADACHE_NEURO",
+        "RF_NEUROLOGICAL"
+      ],
+      "passed": true,
+      "event_id": "428ed622-b070-42cf-b00d-6f7edd99a295"
+    },
+    {
+      "case_id": "V026",
+      "vignette": "A red eye occurs with blurred vision.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_EYE_VISION",
+        "RF_EYE_REVIEW"
+      ],
+      "triggered_rules": [
+        "RF_EYE_VISION",
+        "RF_EYE_REVIEW"
+      ],
+      "passed": true,
+      "event_id": "95118077-8cc9-4580-b3f1-a7f2aa23d1ad"
+    },
+    {
+      "case_id": "V027",
+      "vignette": "Fever occurs with bleeding gums or nose; a benign model label must not reassure.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_DENGUE_WARNING",
+        "RF_MUCOSAL_BLEEDING"
+      ],
+      "triggered_rules": [
+        "RF_DENGUE_WARNING",
+        "RF_MUCOSAL_BLEEDING"
+      ],
+      "passed": true,
+      "event_id": "6c539ecd-5911-48ce-9d4e-b12b9f11a0e7"
+    },
+    {
+      "case_id": "V028",
+      "vignette": "Patient reports persistent vomiting.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_PERSISTENT_VOMITING"
+      ],
+      "triggered_rules": [
+        "RF_PERSISTENT_VOMITING"
+      ],
+      "passed": true,
+      "event_id": "75fcf98f-655b-40ab-acb6-93049114ab68"
+    },
+    {
+      "case_id": "V029",
+      "vignette": "Patient reports the vocabulary's bundled dehydration signs.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_DEHYDRATION"
+      ],
+      "triggered_rules": [
+        "RF_DEHYDRATION"
+      ],
+      "passed": true,
+      "event_id": "0e58a9cf-e323-4d03-971e-c0f91e9a3205"
+    },
+    {
+      "case_id": "V030",
+      "vignette": "Patient reports blood in stool, with no major-bleeding finding.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_BLOOD_STOOL"
+      ],
+      "triggered_rules": [
+        "RF_BLOOD_STOOL"
+      ],
+      "passed": true,
+      "event_id": "c23c492a-a0e2-4eb3-9ea5-459c9e36642c"
+    },
+    {
+      "case_id": "V031",
+      "vignette": "Gum or nose bleeding is reported without fever or uncontrolled bleeding.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_MUCOSAL_BLEEDING"
+      ],
+      "triggered_rules": [
+        "RF_MUCOSAL_BLEEDING"
+      ],
+      "passed": true,
+      "event_id": "d4dffa26-8bd9-4653-bcb4-df19002fd61b"
+    },
+    {
+      "case_id": "V032",
+      "vignette": "Wheezing is reported without breathlessness or throat swelling.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_WHEEZING"
+      ],
+      "triggered_rules": [
+        "RF_WHEEZING"
+      ],
+      "passed": true,
+      "event_id": "ed3feba9-9280-4169-8560-2e1b04187ac0"
+    },
+    {
+      "case_id": "V033",
+      "vignette": "Weakness or numbness has not been described as sudden or focal.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_NEUROLOGICAL"
+      ],
+      "triggered_rules": [
+        "RF_NEUROLOGICAL"
+      ],
+      "passed": true,
+      "event_id": "7483afe3-1bf3-467e-b2fd-ea21a033cf2d"
+    },
+    {
+      "case_id": "V034",
+      "vignette": "Neck stiffness is reported without headache.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_NEUROLOGICAL"
+      ],
+      "triggered_rules": [
+        "RF_NEUROLOGICAL"
+      ],
+      "passed": true,
+      "event_id": "9e8c2765-537c-4dad-8202-3faa5db6dd2c"
+    },
+    {
+      "case_id": "V035",
+      "vignette": "Eye pain is reported.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_EYE_REVIEW"
+      ],
+      "triggered_rules": [
+        "RF_EYE_REVIEW"
+      ],
+      "passed": true,
+      "event_id": "04696e24-fd62-4033-bdd2-d8290cf0b7a6"
+    },
+    {
+      "case_id": "V036",
+      "vignette": "Blurred vision is reported without the red-eye combination.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_EYE_REVIEW"
+      ],
+      "triggered_rules": [
+        "RF_EYE_REVIEW"
+      ],
+      "passed": true,
+      "event_id": "ff6dd09d-cfbc-484e-8e9a-bc332669ee79"
+    },
+    {
+      "case_id": "V037",
+      "vignette": "Swelling around the eye is reported.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_EYE_REVIEW"
+      ],
+      "triggered_rules": [
+        "RF_EYE_REVIEW"
+      ],
+      "passed": true,
+      "event_id": "11100e9c-1f82-4542-b7bb-85049d8c1ad0"
+    },
+    {
+      "case_id": "V038",
+      "vignette": "Flank pain occurs with painful urination.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_FLANK_PAIN"
+      ],
+      "triggered_rules": [
+        "RF_FLANK_PAIN"
+      ],
+      "passed": true,
+      "event_id": "fe4ec697-772a-439a-abd0-9dd3c743dbdf"
+    },
+    {
+      "case_id": "V039",
+      "vignette": "Weeping or purulent skin changes are reported.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "RF_SKIN_INFECTION"
+      ],
+      "triggered_rules": [
+        "RF_SKIN_INFECTION"
+      ],
+      "passed": true,
+      "event_id": "b0e3a162-39d6-4e74-82d2-56abb8a516c6"
+    },
+    {
+      "case_id": "V040",
+      "vignette": "Patient reports unexplained weight loss.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "RF_WEIGHT_LOSS"
+      ],
+      "triggered_rules": [
+        "RF_WEIGHT_LOSS"
+      ],
+      "passed": true,
+      "event_id": "5d20373e-9222-49cd-8504-a1df41758070"
+    },
+    {
+      "case_id": "V041",
+      "vignette": "Model proposes dengue, which is outside the six-condition knowledge base.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_CONDITION"
+      ],
+      "triggered_rules": [
+        "SCOPE_CONDITION"
+      ],
+      "passed": true,
+      "event_id": "6e126487-ba3a-4233-b0ea-067243b439fc"
+    },
+    {
+      "case_id": "V042",
+      "vignette": "Model returns an unrecognised diagnosis label.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_CONDITION"
+      ],
+      "triggered_rules": [
+        "SCOPE_CONDITION"
+      ],
+      "passed": true,
+      "event_id": "fa011fee-7193-4d31-b013-77947eb56a4f"
+    },
+    {
+      "case_id": "V043",
+      "vignette": "Model proposes the recognised human-readable Common Cold label.",
+      "expected": "continue_assessment",
+      "actual": "continue_assessment",
+      "expected_rules": [],
+      "triggered_rules": [],
+      "passed": true,
+      "event_id": "67124461-c3b4-4d3d-aab8-a407c159c7bc"
+    },
+    {
+      "case_id": "V044",
+      "vignette": "Patient first reported a cough, then denied it; conflict needs clarification.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "DATA_CONTRADICTION"
+      ],
+      "triggered_rules": [
+        "DATA_CONTRADICTION"
+      ],
+      "passed": true,
+      "event_id": "f973bafa-38d4-4029-83f4-676ed7ed319c"
+    },
+    {
+      "case_id": "V045",
+      "vignette": "Earlier chest pain is later denied; positive history must remain active.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_CHEST_PAIN",
+        "DATA_CONTRADICTION"
+      ],
+      "triggered_rules": [
+        "RF_CHEST_PAIN",
+        "DATA_CONTRADICTION"
+      ],
+      "passed": true,
+      "event_id": "37ae372c-63ec-46d0-a3b8-6fb16e07f9a0"
+    },
+    {
+      "case_id": "V046",
+      "vignette": "Patient is unsure whether chest pain is present.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "670f646d-1c59-4c3f-8405-59eb92bc65ba"
+    },
+    {
+      "case_id": "V047",
+      "vignette": "Extractor returns an unmapped symptom mention.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_UNMAPPED"
+      ],
+      "triggered_rules": [
+        "SCOPE_UNMAPPED"
+      ],
+      "passed": true,
+      "event_id": "52eab6aa-6a8d-4dbc-80b4-ab52f3bfb5cc"
+    },
+    {
+      "case_id": "V048",
+      "vignette": "Unknown symptom ID is supplied, rather than being ignored.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_UNMAPPED"
+      ],
+      "triggered_rules": [
+        "SCOPE_UNMAPPED"
+      ],
+      "passed": true,
+      "event_id": "815ab174-6066-43fc-9b8c-e6a68813a368"
+    },
+    {
+      "case_id": "V049",
+      "vignette": "Age is mistakenly a numeric string.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "ddfd34e6-90ee-4556-b119-a072ed111de5"
+    },
+    {
+      "case_id": "V050",
+      "vignette": "Age is mistakenly a boolean.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "6933f2a8-f9f9-4a59-8672-3c6df648a90d"
+    },
+    {
+      "case_id": "V051",
+      "vignette": "Pregnancy is supplied as the ambiguous string false instead of a boolean.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "c222e302-aca4-4c74-ba48-c6afb5b88118"
+    },
+    {
+      "case_id": "V052",
+      "vignette": "Chest-pain presence is the invalid string false; it cannot become a negative.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "9f2bf2f2-ce77-4b1b-b7b6-36740682f3e7"
+    },
+    {
+      "case_id": "V053",
+      "vignette": "Chest pain has not been asked about.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "dd470b2d-ac7a-4fc2-b1fc-37024065f0c9"
+    },
+    {
+      "case_id": "V054",
+      "vignette": "No presenting symptom is supplied, despite a complete negative checklist.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "89cea9e5-df15-4e6c-ac0a-6443843f89a6"
+    },
+    {
+      "case_id": "V055",
+      "vignette": "Child is pregnant and reports both chest pain and wheezing; emergency priority wins.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_CHEST_PAIN",
+        "RF_WHEEZING",
+        "SCOPE_AGE",
+        "SCOPE_PREGNANCY"
+      ],
+      "triggered_rules": [
+        "RF_CHEST_PAIN",
+        "RF_WHEEZING",
+        "SCOPE_AGE",
+        "SCOPE_PREGNANCY"
+      ],
+      "passed": true,
+      "event_id": "0e373bdd-7dab-4f40-bd9d-fe327b081735"
+    },
+    {
+      "case_id": "V056",
+      "vignette": "Model's urgent recommendation is retained even with an unanswered chest-pain screen.",
+      "expected": "urgent_review",
+      "actual": "urgent_review",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE",
+        "MODEL_URGENT"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE",
+        "MODEL_URGENT"
+      ],
+      "passed": true,
+      "event_id": "3c4ffa2d-f9b7-406d-b5e2-57e124fecd34"
+    },
+    {
+      "case_id": "V057",
+      "vignette": "Symptoms are malformed as a list.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "INPUT_INVALID",
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "87e705d2-5659-42b0-9ddc-98043b07445d"
+    },
+    {
+      "case_id": "V058",
+      "vignette": "Contradictions are malformed as a dictionary.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "INPUT_INVALID"
+      ],
+      "triggered_rules": [
+        "INPUT_INVALID"
+      ],
+      "passed": true,
+      "event_id": "3a3bc3ea-1c5c-4bf5-a7ea-cfd87256e1d6"
+    },
+    {
+      "case_id": "V059",
+      "vignette": "Patient explicitly confirms pregnancy is not applicable; no inference from sex is used.",
+      "expected": "continue_assessment",
+      "actual": "continue_assessment",
+      "expected_rules": [],
+      "triggered_rules": [],
+      "passed": true,
+      "event_id": "cc43dc14-775a-42b5-b2f5-67f69efa5c3e"
+    },
+    {
+      "case_id": "V060",
+      "vignette": "Pregnancy fields disagree; positive pregnancy excludes routine care.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_PREGNANCY",
+        "DATA_CONTRADICTION"
+      ],
+      "triggered_rules": [
+        "SCOPE_PREGNANCY",
+        "DATA_CONTRADICTION"
+      ],
+      "passed": true,
+      "event_id": "b430fc7f-a536-4400-8a07-880c669e2bcf"
+    },
+    {
+      "case_id": "V061",
+      "vignette": "EvidenceState and Profile ages conflict, including an out-of-scope age.",
+      "expected": "clinician_review",
+      "actual": "clinician_review",
+      "expected_rules": [
+        "SCOPE_AGE",
+        "DATA_CONTRADICTION"
+      ],
+      "triggered_rules": [
+        "SCOPE_AGE",
+        "DATA_CONTRADICTION"
+      ],
+      "passed": true,
+      "event_id": "966e63a9-c980-4a23-b81b-5d9ed2ceb3eb"
+    },
+    {
+      "case_id": "V062",
+      "vignette": "A swollen tongue or throat is reported.",
+      "expected": "emergency",
+      "actual": "emergency",
+      "expected_rules": [
+        "RF_AIRWAY"
+      ],
+      "triggered_rules": [
+        "RF_AIRWAY"
+      ],
+      "passed": true,
+      "event_id": "f5162589-5862-4cbe-9efe-f555fe9afece"
+    },
+    {
+      "case_id": "V063",
+      "vignette": "Post-model output omits its proposed condition.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "triggered_rules": [
+        "SCREEN_INCOMPLETE"
+      ],
+      "passed": true,
+      "event_id": "9658e554-ff83-441e-8fdb-800d58ab8387"
+    },
+    {
+      "case_id": "V064",
+      "vignette": "Model proposes an unsupported action value.",
+      "expected": "needs_clarification",
+      "actual": "needs_clarification",
+      "expected_rules": [
+        "MODEL_ACTION_INVALID"
+      ],
+      "triggered_rules": [
+        "MODEL_ACTION_INVALID"
+      ],
+      "passed": true,
+      "event_id": "da01dfa2-0ebf-4546-90e1-ce9cdb7f8316"
+    }
+  ]
+}

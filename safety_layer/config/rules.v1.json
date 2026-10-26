@@ -1,0 +1,487 @@
+{
+  "schema_version": 1,
+  "version": "1.0.0",
+  "released_date": "2026-10-26",
+  "clinical_review_status": "pending",
+  "scope": {
+    "min_age": 18,
+    "max_age_exclusive": 65,
+    "condition_ids": [
+      "common_cold",
+      "influenza",
+      "gastroenteritis",
+      "migraine",
+      "allergic_rhinitis",
+      "urinary_tract_infection"
+    ],
+    "rationale": "Conservative project policy: adults aged 18 to 64 with known negative or explicitly not-applicable pregnancy status. These limits are implementation assumptions, not MOH age cutoffs. Six conditions match knowledge_base/data/conditions.json version 1.2.0."
+  },
+  "messages": {
+    "continue_assessment": "The configured safety screen is complete. Continue the clinical assessment; this screen does not establish a diagnosis or rule out serious illness.",
+    "needs_clarification": "More information is needed before this assessment can continue. Please clarify the unanswered or conflicting screening questions. If you have severe or rapidly worsening symptoms, seek medical help immediately.",
+    "clinician_review": "This concern needs a clinician's assessment outside the prototype's routine pathway. Arrange a medical review. If you have severe or rapidly worsening symptoms, seek medical help immediately.",
+    "urgent_review": "Please seek urgent medical assessment today. If symptoms are severe, rapidly worsening, or you cannot obtain prompt care, go to an Emergency Department. For a life-threatening emergency in Singapore, call 995.",
+    "emergency": "Please seek emergency medical assessment now. Call 995 in Singapore if you are having difficulty breathing, chest pain, stroke symptoms, uncontrolled bleeding, a seizure or loss of consciousness, or cannot travel safely. Do not wait for more chatbot questions."
+  },
+  "sources": {
+    "sg_moh_emergencies": {
+      "title": "Getting medical help",
+      "publisher": "Ministry of Health Singapore",
+      "url": "https://www.moh.gov.sg/seeking-healthcare/getting-medical-help/",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_scdf_ems": {
+      "title": "Emergency Medical Services",
+      "publisher": "Singapore Civil Defence Force",
+      "url": "https://www.scdf.gov.sg/home/about-scdf/emergency-medical-services",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_skh_emergency": {
+      "title": "Emergency Visit",
+      "publisher": "Sengkang General Hospital",
+      "url": "https://www.skh.com.sg/clinic-visit/emergency-visit",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_cda_dengue": {
+      "title": "Dengue fever and dengue haemorrhagic fever",
+      "publisher": "Communicable Diseases Agency Singapore",
+      "url": "https://www.cda.gov.sg/public/diseases/dengue-fever-and-dengue-haemorrhagic-fever/",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_cda_gastro": {
+      "title": "Food poisoning or gastroenteritis",
+      "publisher": "Communicable Diseases Agency Singapore",
+      "url": "https://www.cda.gov.sg/public/diseases/food-poisoning-or-gastroenteritis-/",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_moh_eyes": {
+      "title": "Sore Eyes",
+      "publisher": "Ministry of Health Singapore",
+      "url": "https://www.moh.gov.sg/seeking-healthcare/getting-medical-help/conditions/sore-eyes/",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_healthhub_headache": {
+      "title": "Headache",
+      "publisher": "HealthHub Singapore",
+      "url": "https://www.healthhub.sg/health-conditions/headache",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_healthhub_selfmedication": {
+      "title": "Principles of Self Medication",
+      "publisher": "HealthHub Singapore",
+      "url": "https://www.healthhub.sg/health-conditions/self-medication",
+      "accessed_date": "2026-10-26"
+    },
+    "sg_nhg_anaphylaxis": {
+      "title": "Anaphylaxis",
+      "publisher": "NHG Health",
+      "url": "https://www.nhghealth.com.sg/find-care/Condition/anaphylaxis",
+      "accessed_date": "2026-10-26"
+    },
+    "nhs_headaches": {
+      "title": "Headaches",
+      "publisher": "NHS",
+      "url": "https://www.nhs.uk/symptoms/headaches/",
+      "accessed_date": "2026-10-26"
+    },
+    "nhs_tonsillitis": {
+      "title": "Tonsillitis",
+      "publisher": "NHS",
+      "url": "https://www.nhs.uk/conditions/tonsillitis/",
+      "accessed_date": "2026-10-26"
+    },
+    "nhs_uti": {
+      "title": "Urinary tract infections",
+      "publisher": "NHS",
+      "url": "https://www.nhs.uk/conditions/urinary-tract-infections-utis/",
+      "accessed_date": "2026-10-26"
+    },
+    "nhs_weight_loss": {
+      "title": "Unintentional weight loss",
+      "publisher": "NHS",
+      "url": "https://www.nhs.uk/symptoms/unintentional-weight-loss/",
+      "accessed_date": "2026-10-26"
+    }
+  },
+  "symptom_ids": [
+    "band_like_headache",
+    "black_stools",
+    "bleeding_gums_nose",
+    "blisters_hands_feet",
+    "bloating",
+    "blood_in_stool",
+    "blood_in_urine",
+    "blurred_vision",
+    "body_aches",
+    "chest_pain",
+    "chills",
+    "cloudy_urine",
+    "confusion_drowsiness",
+    "cough",
+    "dehydration_signs",
+    "diarrhoea",
+    "difficulty_opening_mouth",
+    "difficulty_swallowing",
+    "dry_itchy_skin",
+    "eye_discharge",
+    "eye_pain",
+    "facial_droop",
+    "facial_pain_pressure",
+    "fatigue",
+    "fever",
+    "flank_pain",
+    "frequent_urination",
+    "hard_stools",
+    "headache",
+    "heartburn",
+    "infrequent_bowel_movements",
+    "itchy_blisters",
+    "itchy_eyes",
+    "itchy_nose",
+    "joint_muscle_pain",
+    "light_sensitivity",
+    "loss_of_appetite",
+    "loss_of_consciousness",
+    "loss_of_smell_taste",
+    "lower_abdominal_pain",
+    "mouth_ulcers",
+    "nasal_congestion",
+    "nausea",
+    "neck_shoulder_tension",
+    "neck_stiffness",
+    "pain_behind_eyes",
+    "painful_urination",
+    "periorbital_swelling",
+    "persistent_vomiting",
+    "rash",
+    "red_eyes",
+    "red_inflamed_patches",
+    "runny_nose",
+    "seizure",
+    "severe_abdominal_pain",
+    "shortness_of_breath",
+    "skin_infection_signs",
+    "sneezing",
+    "sore_throat",
+    "sound_sensitivity",
+    "speech_difficulty",
+    "straining",
+    "sudden_one_sided_weakness",
+    "sudden_severe_headache",
+    "swollen_neck_glands",
+    "swollen_tongue_or_throat",
+    "swollen_tonsils",
+    "thick_nasal_discharge",
+    "throbbing_headache",
+    "uncontrolled_bleeding",
+    "unintentional_weight_loss",
+    "upper_abdominal_pain",
+    "urinary_urgency",
+    "visual_aura",
+    "vomiting",
+    "vomiting_blood",
+    "watery_eyes",
+    "weakness_numbness",
+    "wheezing"
+  ],
+  "required_screening": [
+    "shortness_of_breath",
+    "chest_pain",
+    "confusion_drowsiness",
+    "vomiting_blood",
+    "black_stools",
+    "severe_abdominal_pain",
+    "sudden_severe_headache",
+    "difficulty_opening_mouth",
+    "persistent_vomiting",
+    "dehydration_signs",
+    "blood_in_stool",
+    "bleeding_gums_nose",
+    "wheezing",
+    "weakness_numbness",
+    "neck_stiffness",
+    "eye_pain",
+    "blurred_vision",
+    "periorbital_swelling",
+    "flank_pain",
+    "skin_infection_signs",
+    "unintentional_weight_loss",
+    "loss_of_consciousness",
+    "uncontrolled_bleeding",
+    "facial_droop",
+    "speech_difficulty",
+    "sudden_one_sided_weakness",
+    "swollen_tongue_or_throat",
+    "seizure"
+  ],
+  "rules": [
+    {
+      "id": "RF_CHEST_PAIN",
+      "disposition": "emergency",
+      "any_of": [
+        "chest_pain"
+      ],
+      "reason": "Chest pain requires emergency assessment.",
+      "source_ids": [
+        "sg_moh_emergencies"
+      ]
+    },
+    {
+      "id": "RF_BREATHING",
+      "disposition": "emergency",
+      "any_of": [
+        "shortness_of_breath"
+      ],
+      "reason": "Breathing difficulty requires emergency assessment.",
+      "source_ids": [
+        "sg_moh_emergencies",
+        "sg_scdf_ems"
+      ]
+    },
+    {
+      "id": "RF_ALTERED_CONSCIOUSNESS",
+      "disposition": "emergency",
+      "any_of": [
+        "confusion_drowsiness",
+        "loss_of_consciousness",
+        "seizure"
+      ],
+      "reason": "Altered consciousness or a seizure needs emergency assessment; the bundled confusion/drowsiness field is handled conservatively.",
+      "source_ids": [
+        "sg_moh_emergencies",
+        "sg_scdf_ems"
+      ]
+    },
+    {
+      "id": "RF_MAJOR_BLEEDING",
+      "disposition": "emergency",
+      "any_of": [
+        "uncontrolled_bleeding",
+        "vomiting_blood",
+        "black_stools"
+      ],
+      "reason": "Uncontrolled bleeding or possible significant gastrointestinal bleeding needs emergency assessment.",
+      "source_ids": [
+        "sg_moh_emergencies",
+        "sg_skh_emergency",
+        "sg_cda_dengue"
+      ]
+    },
+    {
+      "id": "RF_SEVERE_ABDOMINAL_PAIN",
+      "disposition": "emergency",
+      "any_of": [
+        "severe_abdominal_pain"
+      ],
+      "reason": "Severe abdominal pain needs emergency assessment regardless of the model's diagnosis.",
+      "source_ids": [
+        "sg_moh_emergencies"
+      ]
+    },
+    {
+      "id": "RF_SUDDEN_HEADACHE",
+      "disposition": "emergency",
+      "any_of": [
+        "sudden_severe_headache"
+      ],
+      "reason": "A sudden worst-ever headache must not follow the routine migraine pathway.",
+      "source_ids": [
+        "sg_healthhub_headache",
+        "nhs_headaches"
+      ]
+    },
+    {
+      "id": "RF_STROKE_SIGNS",
+      "disposition": "emergency",
+      "any_of": [
+        "facial_droop",
+        "speech_difficulty",
+        "sudden_one_sided_weakness"
+      ],
+      "reason": "Possible acute stroke signs need emergency assessment.",
+      "source_ids": [
+        "sg_skh_emergency",
+        "sg_scdf_ems"
+      ]
+    },
+    {
+      "id": "RF_AIRWAY",
+      "disposition": "emergency",
+      "any_of": [
+        "swollen_tongue_or_throat",
+        "difficulty_opening_mouth"
+      ],
+      "reason": "Tongue/throat swelling or the vocabulary's bundled mouth-opening/drooling symptom may indicate an airway threat; assess urgently in emergency care.",
+      "source_ids": [
+        "sg_nhg_anaphylaxis",
+        "nhs_tonsillitis"
+      ]
+    },
+    {
+      "id": "RF_HEADACHE_NECK",
+      "disposition": "emergency",
+      "all_of": [
+        "headache",
+        "neck_stiffness"
+      ],
+      "reason": "Headache with neck stiffness requires emergency assessment rather than a routine headache label.",
+      "source_ids": [
+        "nhs_headaches",
+        "sg_healthhub_headache"
+      ]
+    },
+    {
+      "id": "RF_HEADACHE_NEURO",
+      "disposition": "emergency",
+      "all_of": [
+        "headache",
+        "weakness_numbness"
+      ],
+      "reason": "Headache accompanied by weakness or numbness needs emergency assessment.",
+      "source_ids": [
+        "nhs_headaches"
+      ]
+    },
+    {
+      "id": "RF_EYE_VISION",
+      "disposition": "emergency",
+      "all_of": [
+        "red_eyes",
+        "blurred_vision"
+      ],
+      "reason": "A red eye with affected vision needs emergency assessment.",
+      "source_ids": [
+        "sg_moh_eyes"
+      ]
+    },
+    {
+      "id": "RF_DENGUE_WARNING",
+      "disposition": "emergency",
+      "all_of": [
+        "fever",
+        "bleeding_gums_nose"
+      ],
+      "reason": "Fever with mucosal bleeding may indicate a dangerous infection, including dengue, and needs immediate assessment.",
+      "source_ids": [
+        "sg_cda_dengue"
+      ]
+    },
+    {
+      "id": "RF_PERSISTENT_VOMITING",
+      "disposition": "urgent_review",
+      "any_of": [
+        "persistent_vomiting"
+      ],
+      "reason": "Persistent vomiting needs prompt assessment; the field does not distinguish continuous vomiting or ability to retain fluids.",
+      "source_ids": [
+        "sg_cda_gastro",
+        "sg_moh_emergencies"
+      ]
+    },
+    {
+      "id": "RF_DEHYDRATION",
+      "disposition": "urgent_review",
+      "any_of": [
+        "dehydration_signs"
+      ],
+      "reason": "Reported dehydration requires prompt assessment; the bundled field does not establish severity.",
+      "source_ids": [
+        "sg_cda_gastro"
+      ]
+    },
+    {
+      "id": "RF_BLOOD_STOOL",
+      "disposition": "urgent_review",
+      "any_of": [
+        "blood_in_stool"
+      ],
+      "reason": "Blood in the stool needs prompt clinical assessment.",
+      "source_ids": [
+        "sg_cda_gastro"
+      ]
+    },
+    {
+      "id": "RF_MUCOSAL_BLEEDING",
+      "disposition": "urgent_review",
+      "any_of": [
+        "bleeding_gums_nose"
+      ],
+      "reason": "Reported gum/nose bleeding needs assessment; associated fever activates the emergency dengue-warning rule.",
+      "source_ids": [
+        "sg_cda_dengue"
+      ]
+    },
+    {
+      "id": "RF_WHEEZING",
+      "disposition": "urgent_review",
+      "any_of": [
+        "wheezing"
+      ],
+      "reason": "Wheezing requires prompt assessment; associated breathing difficulty or airway swelling activates emergency rules.",
+      "source_ids": [
+        "sg_nhg_anaphylaxis",
+        "sg_healthhub_selfmedication"
+      ]
+    },
+    {
+      "id": "RF_NEUROLOGICAL",
+      "disposition": "urgent_review",
+      "any_of": [
+        "weakness_numbness",
+        "neck_stiffness"
+      ],
+      "reason": "Neurological complaints need prompt assessment; sudden focal findings and associated headache have separate emergency rules.",
+      "source_ids": [
+        "sg_healthhub_headache",
+        "sg_moh_emergencies"
+      ]
+    },
+    {
+      "id": "RF_EYE_REVIEW",
+      "disposition": "urgent_review",
+      "any_of": [
+        "eye_pain",
+        "blurred_vision",
+        "periorbital_swelling"
+      ],
+      "reason": "Eye pain, affected vision or swelling needs direct clinical assessment; red eye with blurred vision activates an emergency rule.",
+      "source_ids": [
+        "sg_moh_eyes",
+        "sg_healthhub_selfmedication"
+      ]
+    },
+    {
+      "id": "RF_FLANK_PAIN",
+      "disposition": "urgent_review",
+      "any_of": [
+        "flank_pain"
+      ],
+      "reason": "Flank/back pain can require assessment for kidney involvement rather than a routine lower-UTI pathway.",
+      "source_ids": [
+        "nhs_uti"
+      ]
+    },
+    {
+      "id": "RF_SKIN_INFECTION",
+      "disposition": "urgent_review",
+      "any_of": [
+        "skin_infection_signs"
+      ],
+      "reason": "Possible skin infection needs clinical assessment rather than routine self-treatment.",
+      "source_ids": [
+        "sg_healthhub_selfmedication"
+      ]
+    },
+    {
+      "id": "RF_WEIGHT_LOSS",
+      "disposition": "clinician_review",
+      "any_of": [
+        "unintentional_weight_loss"
+      ],
+      "reason": "Unexplained weight loss needs clinician review outside the routine minor-illness pathway.",
+      "source_ids": [
+        "nhs_weight_loss"
+      ]
+    }
+  ]
+}

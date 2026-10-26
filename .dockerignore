@@ -1,4 +1,10 @@
 .git
+**/.env*
+runtime
+safety_layer/output
+references
+frontend/node_modules
+frontend/dist
 .venv*
 .tmp*
 __pycache__
