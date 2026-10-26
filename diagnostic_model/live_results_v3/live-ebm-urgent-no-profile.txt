@@ -1,0 +1,61 @@
+Doctor: Hello, what seems to be the problem today?
+Patient: I have a cough and chest pain and I am having trouble breathing.
+{
+  "patient_answer": 1,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.6589,
+  "escalation": "urgent",
+  "escalation_confidence": 0.9634,
+  "stop_probability": 0.5699,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: How long has this been going on, how severe is it, and is it getting better or worse?
+Patient: It started today. It is severe and getting worse.
+{
+  "patient_answer": 2,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.5552,
+  "escalation": "urgent",
+  "escalation_confidence": 0.9965,
+  "stop_probability": 0.6388,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: What other symptoms have you noticed?
+Patient: I also feel weak and dizzy.
+{
+  "patient_answer": 3,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.6757,
+  "escalation": "urgent",
+  "escalation_confidence": 0.9816,
+  "stop_probability": 0.8441,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: I need to check for warning signs. Do you have severe or chest pain, trouble breathing, uncontrolled bleeding, confusion, fainting, weakness or numbness, vision changes, vomiting blood, or continuous vomiting or diarrhoea?
+Patient: I have not fainted and I have not vomited blood.
+{
+  "patient_answer": 4,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.6812,
+  "escalation": "urgent",
+  "escalation_confidence": 0.9774,
+  "stop_probability": 0.8471,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: Lastly, what is your age and temperature? If relevant, are you pregnant?
+Patient: I am 58, male, and my temperature is 38.2 C.
+{
+  "patient_answer": 5,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.8076,
+  "escalation": "urgent",
+  "escalation_confidence": 0.972,
+  "stop_probability": 0.9344,
+  "stop": true,
+  "stop_reason": "maximum_questions"
+}
+Doctor: I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 81%, influenza 19%, common_cold 0%. The model's current escalation category is urgent (97%). This is research output, not a diagnosis.

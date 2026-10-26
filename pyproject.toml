@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dsa2111-group8-telemedicine"
+version = "0.1.0"
+description = "Prototype knowledge-base and explainable diagnostic model components"
+requires-python = ">=3.13,<3.15"
+dependencies = [
+  "interpret-core>=0.7.8,<0.8",
+  "joblib>=1.4,<2",
+  "matplotlib>=3.9,<4",
+  "openai>=1.0,<3",
+  "pandas>=2.2,<4",
+  "pillow>=11,<13",
+  "pydantic>=2,<3",
+  "pydantic-settings>=2,<3",
+  "python-dotenv>=1,<2",
+  "pyyaml>=6,<7",
+  "scikit-learn>=1.6,<2",
+  "scipy>=1.10,<2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.3,<9"]
+laya = ["laya==0.4.12"]
+serve = [
+  "fastapi>=0.115,<1",
+  "httpx>=0.28,<1",
+  "uvicorn>=0.34,<1",
+]
+load = ["locust>=2.40,<3"]
+
+[tool.pytest.ini_options]
+testpaths = ["knowledge_base", "diagnostic_model/tests", "llm_service/tests", "serving/tests"]
+addopts = "-q -p no:cacheprovider"
+
+[tool.setuptools.packages.find]
+include = ["data*", "diagnostic_model*", "knowledge_base*", "llm_service*", "serving*"]
+
+[tool.setuptools.package-data]
+diagnostic_model = ["dataset_sources.json"]
+llm_service = ["prompts/*.yaml", "data/*.json"]

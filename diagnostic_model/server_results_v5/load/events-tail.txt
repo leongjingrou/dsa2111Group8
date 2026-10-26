@@ -1,0 +1,40 @@
+55s         Normal    Created                        pod/diagnosis-api-6b9f8fb954-8ns7f      Container created
+55s         Normal    Pulled                         pod/diagnosis-api-6b9f8fb954-8ns7f      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+55s         Normal    Created                        pod/diagnosis-api-6b9f8fb954-mj5xm      Container created
+54s         Normal    Started                        pod/diagnosis-api-6b9f8fb954-8ns7f      Container started
+54s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-mb77r      Liveness probe failed: Get "http://10.42.2.18:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+54s         Normal    Killing                        pod/diagnosis-api-6b9f8fb954-mb77r      Container api failed liveness probe, will be restarted
+49s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-vvbkz      Readiness probe failed: Get "http://10.42.0.37:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+48s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-mj5xm      Readiness probe failed: Get "http://10.42.0.42:8080/readyz": dial tcp 10.42.0.42:8080: connect: connection refused
+47s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-mb77r      Readiness probe failed: Get "http://10.42.2.18:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+46s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-27dwd      Liveness probe failed: Get "http://10.42.2.19:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+42s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-27dwd      Readiness probe failed: Get "http://10.42.2.19:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+41s         Normal    Pulled                         pod/diagnosis-api-6b9f8fb954-vvbkz      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+41s         Normal    Created                        pod/diagnosis-api-6b9f8fb954-vvbkz      Container created
+40s         Normal    Started                        pod/diagnosis-api-6b9f8fb954-vvbkz      Container started
+36s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-l89cj      Liveness probe failed: Get "http://10.42.2.21:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+36s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-crj67      Liveness probe failed: Get "http://10.42.0.41:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+35s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-mj5xm      Liveness probe failed: Get "http://10.42.0.42:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+33s         Normal    Started                        pod/diagnosis-api-6b9f8fb954-mb77r      Container started
+33s         Normal    Created                        pod/diagnosis-api-6b9f8fb954-mb77r      Container created
+33s         Normal    Pulled                         pod/diagnosis-api-6b9f8fb954-mb77r      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+32s         Normal    Created                        pod/locust-worker-66f5dd89c4-t87wh      Container created
+32s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-t87wh      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+31s         Normal    Started                        pod/locust-worker-66f5dd89c4-t87wh      Container started
+30s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-crj67      Readiness probe failed: Get "http://10.42.0.41:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+29s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-l89cj      Readiness probe failed: Get "http://10.42.2.21:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+28s         Normal    Started                        pod/locust-worker-66f5dd89c4-88zkx      Container started
+28s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-88zkx      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+28s         Normal    Created                        pod/locust-worker-66f5dd89c4-88zkx      Container created
+27s         Warning   Unhealthy                      pod/diagnosis-api-6b9f8fb954-mj5xm      Readiness probe failed: Get "http://10.42.0.42:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+26s         Normal    Killing                        pod/diagnosis-api-6b9f8fb954-27dwd      Container api failed liveness probe, will be restarted
+25s         Normal    Started                        pod/locust-worker-66f5dd89c4-fgm6c      Container started
+25s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-fgm6c      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+25s         Normal    Created                        pod/locust-worker-66f5dd89c4-fgm6c      Container created
+24s         Normal    Killing                        pod/locust-master                       Stopping container locust-master
+22s         Normal    Created                        pod/locust-worker-66f5dd89c4-bg5hn      Container created
+22s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-bg5hn      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+22s         Normal    Created                        pod/diagnosis-api-6b9f8fb954-27dwd      Container created
+22s         Normal    Started                        pod/diagnosis-api-6b9f8fb954-27dwd      Container started
+22s         Normal    Started                        pod/locust-worker-66f5dd89c4-bg5hn      Container started
+22s         Normal    Pulled                         pod/diagnosis-api-6b9f8fb954-27dwd      Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod

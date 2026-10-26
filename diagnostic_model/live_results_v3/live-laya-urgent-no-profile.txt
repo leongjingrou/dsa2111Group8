@@ -1,0 +1,25 @@
+Doctor: Hello, what seems to be the problem today?
+Patient: I have a cough and chest pain and I am having trouble breathing.
+{
+  "patient_answer": 1,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.7914,
+  "escalation": "urgent",
+  "escalation_confidence": 0.9672,
+  "stop_probability": 0.7544,
+  "stop": false,
+  "stop_reason": "more_information_needed"
+}
+Doctor: How long has this been going on, how severe is it, and is it getting better or worse?
+Patient: It started today. It is severe and getting worse.
+{
+  "patient_answer": 2,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.7398,
+  "escalation": "urgent",
+  "escalation_confidence": 0.989,
+  "stop_probability": 0.7815,
+  "stop": true,
+  "stop_reason": "learned_stop_threshold"
+}
+Doctor: I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 74%, influenza 7%, common_cold 7%. The model's current escalation category is urgent (99%). This is research output, not a diagnosis.

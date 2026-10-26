@@ -1,0 +1,13 @@
+Doctor: Hello, what seems to be the problem today?
+Patient: I have a cough and chest pain and I am having trouble breathing.
+{
+  "patient_answer": 1,
+  "condition": "out_of_scope",
+  "condition_confidence": 0.6589,
+  "escalation": "urgent",
+  "escalation_confidence": 0.9634,
+  "stop_probability": 0.5699,
+  "stop": true,
+  "stop_reason": "safety_profile_sg_moh"
+}
+Doctor: I have enough information for the prototype to stop asking questions. Current differential: out_of_scope 66%, influenza 34%, common_cold 0%. The safety screen indicates urgent emergency assessment in Singapore; call 995 if this is happening now. This is research output, not a diagnosis.

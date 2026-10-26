@@ -1,0 +1,273 @@
+{
+  "schema": "selected-final-decisions/v1",
+  "note": "Source labels are evaluation targets, not clinician-confirmed diagnoses.",
+  "samples": [
+    {
+      "approach": "EBM",
+      "scenario_id": "SYN-00001",
+      "split": "train",
+      "actual": {
+        "condition": "out_of_scope",
+        "escalation": "routine"
+      },
+      "final": {
+        "patient_answers": 5,
+        "diagnosis": "out_of_scope",
+        "diagnosis_confidence": 0.6784506165550434,
+        "diagnosis_probabilities": {
+          "allergic_rhinitis": 2.733212663247353e-08,
+          "common_cold": 1.4366121751170472e-05,
+          "gastroenteritis": 0.01075711148993424,
+          "influenza": 0.3060724524481972,
+          "migraine": 0.004631773033043439,
+          "out_of_scope": 0.6784506165550434,
+          "urinary_tract_infection": 7.365301990398953e-05
+        },
+        "escalation": "routine",
+        "escalation_confidence": 0.9974014530266547,
+        "escalation_probabilities": {
+          "routine": 0.9974014530266547,
+          "urgent": 0.0025985469733453047
+        },
+        "diagnosis_correct": true,
+        "escalation_correct": true
+      },
+      "confidence_over_time": [
+        {
+          "patient_answer": 1,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.7974255646163206,
+          "escalation": "routine",
+          "escalation_confidence": 0.5618483385043799,
+          "stop_probability": 0.4377,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 2,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.782080012686732,
+          "escalation": "routine",
+          "escalation_confidence": 0.9904479369883709,
+          "stop_probability": 0.7883,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 3,
+          "diagnosis": "migraine",
+          "diagnosis_confidence": 0.5804369930548737,
+          "escalation": "routine",
+          "escalation_confidence": 0.9950434350252967,
+          "stop_probability": 0.565,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 4,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.6933007395564228,
+          "escalation": "routine",
+          "escalation_confidence": 0.9977739870169386,
+          "stop_probability": 0.8251,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 5,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.6784506165550434,
+          "escalation": "routine",
+          "escalation_confidence": 0.9974014530266547,
+          "stop_probability": 0.8774,
+          "policy_stop": true
+        }
+      ]
+    },
+    {
+      "approach": "EBM",
+      "scenario_id": "SYN-00093",
+      "split": "train",
+      "actual": {
+        "condition": "common_cold",
+        "escalation": "routine"
+      },
+      "final": {
+        "patient_answers": 5,
+        "diagnosis": "out_of_scope",
+        "diagnosis_confidence": 0.7230216177276965,
+        "diagnosis_probabilities": {
+          "allergic_rhinitis": 0.0007195114258072913,
+          "common_cold": 0.27617072556611283,
+          "gastroenteritis": 7.429397204506633e-13,
+          "influenza": 8.814460105452936e-05,
+          "migraine": 4.076104651177078e-15,
+          "out_of_scope": 0.7230216177276965,
+          "urinary_tract_infection": 6.785819339969202e-10
+        },
+        "escalation": "routine",
+        "escalation_confidence": 0.9968130694846362,
+        "escalation_probabilities": {
+          "routine": 0.9968130694846362,
+          "urgent": 0.003186930515363772
+        },
+        "diagnosis_correct": false,
+        "escalation_correct": true
+      },
+      "confidence_over_time": [
+        {
+          "patient_answer": 1,
+          "diagnosis": "allergic_rhinitis",
+          "diagnosis_confidence": 0.29210249738604943,
+          "escalation": "routine",
+          "escalation_confidence": 0.5460628361562038,
+          "stop_probability": 0.1644,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 2,
+          "diagnosis": "common_cold",
+          "diagnosis_confidence": 0.5457516075881286,
+          "escalation": "routine",
+          "escalation_confidence": 0.8113478012803539,
+          "stop_probability": 0.4482,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 3,
+          "diagnosis": "common_cold",
+          "diagnosis_confidence": 0.6675043941651057,
+          "escalation": "routine",
+          "escalation_confidence": 0.9908566607302074,
+          "stop_probability": 0.837,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 4,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.7254267619001407,
+          "escalation": "routine",
+          "escalation_confidence": 0.9945525874003232,
+          "stop_probability": 0.8129,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 5,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.7230216177276965,
+          "escalation": "routine",
+          "escalation_confidence": 0.9968130694846362,
+          "stop_probability": 0.8877,
+          "policy_stop": true
+        }
+      ]
+    },
+    {
+      "approach": "Laya",
+      "scenario_id": "SYN-00001",
+      "split": "train",
+      "actual": {
+        "condition": "out_of_scope",
+        "escalation": "routine"
+      },
+      "final": {
+        "patient_answers": 3,
+        "diagnosis": "out_of_scope",
+        "diagnosis_confidence": 0.8303,
+        "diagnosis_probabilities": {
+          "common_cold": 0.0164,
+          "influenza": 0.0362,
+          "gastroenteritis": 0.0687,
+          "migraine": 0.0248,
+          "allergic_rhinitis": 0.0118,
+          "urinary_tract_infection": 0.0118,
+          "out_of_scope": 0.8303
+        },
+        "escalation": "routine",
+        "escalation_confidence": 0.9878,
+        "escalation_probabilities": {
+          "routine": 0.9878,
+          "urgent": 0.0122
+        },
+        "diagnosis_correct": true,
+        "escalation_correct": true
+      },
+      "confidence_over_time": [
+        {
+          "patient_answer": 1,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.8541,
+          "escalation": "urgent",
+          "escalation_confidence": 0.5879,
+          "stop_probability": 0.4081,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 2,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.7825,
+          "escalation": "routine",
+          "escalation_confidence": 0.9893,
+          "stop_probability": 0.6073,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 3,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.8303,
+          "escalation": "routine",
+          "escalation_confidence": 0.9878,
+          "stop_probability": 0.8396,
+          "policy_stop": true
+        }
+      ]
+    },
+    {
+      "approach": "Laya",
+      "scenario_id": "SYN-00016",
+      "split": "train",
+      "actual": {
+        "condition": "migraine",
+        "escalation": "urgent"
+      },
+      "final": {
+        "patient_answers": 2,
+        "diagnosis": "out_of_scope",
+        "diagnosis_confidence": 0.8621,
+        "diagnosis_probabilities": {
+          "common_cold": 0.0343,
+          "influenza": 0.0229,
+          "gastroenteritis": 0.0243,
+          "migraine": 0.0196,
+          "allergic_rhinitis": 0.0185,
+          "urinary_tract_infection": 0.0183,
+          "out_of_scope": 0.8621
+        },
+        "escalation": "urgent",
+        "escalation_confidence": 0.9773,
+        "escalation_probabilities": {
+          "routine": 0.0227,
+          "urgent": 0.9773
+        },
+        "diagnosis_correct": false,
+        "escalation_correct": true
+      },
+      "confidence_over_time": [
+        {
+          "patient_answer": 1,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.806,
+          "escalation": "urgent",
+          "escalation_confidence": 0.5062,
+          "stop_probability": 0.2804,
+          "policy_stop": false
+        },
+        {
+          "patient_answer": 2,
+          "diagnosis": "out_of_scope",
+          "diagnosis_confidence": 0.8621,
+          "escalation": "urgent",
+          "escalation_confidence": 0.9773,
+          "stop_probability": 0.7604,
+          "policy_stop": true
+        }
+      ]
+    }
+  ]
+}

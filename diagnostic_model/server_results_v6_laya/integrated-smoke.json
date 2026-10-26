@@ -1,0 +1,122 @@
+{
+  "backend": "laya",
+  "device": "Tesla T4",
+  "model_load_ms": 5812.016,
+  "peak_gpu_memory_mib": 2339.756,
+  "turns": [
+    {
+      "processing_ms": 1092.82,
+      "patient_message": "I have fever and cough.",
+      "diagnosis": {
+        "type": "choice",
+        "choice": "out_of_scope",
+        "probabilities": {
+          "common_cold": 0.0495,
+          "influenza": 0.062,
+          "gastroenteritis": 0.0587,
+          "migraine": 0.0385,
+          "allergic_rhinitis": 0.0394,
+          "urinary_tract_infection": 0.0407,
+          "out_of_scope": 0.7112
+        },
+        "confidence": 0.428,
+        "answer_confidence": 0.7112,
+        "action": {
+          "act_probability": 1.0
+        }
+      },
+      "escalation": {
+        "type": "choice",
+        "choice": "routine",
+        "probabilities": {
+          "routine": 0.5055,
+          "urgent": 0.4945
+        },
+        "confidence": 0.0001,
+        "answer_confidence": 0.5055,
+        "action": {
+          "act_probability": 1.0
+        }
+      },
+      "stop_probability": 0.2145,
+      "stop": false,
+      "doctor_response": "Could you tell me how long they have had it for your cough?"
+    },
+    {
+      "processing_ms": 61.306,
+      "patient_message": "It has been 2 days. It is severe and worsening.",
+      "diagnosis": {
+        "type": "choice",
+        "choice": "out_of_scope",
+        "probabilities": {
+          "common_cold": 0.0707,
+          "influenza": 0.0901,
+          "gastroenteritis": 0.0728,
+          "migraine": 0.023,
+          "allergic_rhinitis": 0.0534,
+          "urinary_tract_infection": 0.0651,
+          "out_of_scope": 0.625
+        },
+        "confidence": 0.327,
+        "answer_confidence": 0.625,
+        "action": {
+          "act_probability": 1.0
+        }
+      },
+      "escalation": {
+        "type": "choice",
+        "choice": "urgent",
+        "probabilities": {
+          "routine": 0.0095,
+          "urgent": 0.9905
+        },
+        "confidence": 0.9228,
+        "answer_confidence": 0.9905,
+        "action": {
+          "act_probability": 1.0
+        }
+      },
+      "stop_probability": 0.4419,
+      "stop": false,
+      "doctor_response": "Could you tell me how long they have had it for your cough?"
+    },
+    {
+      "processing_ms": 69.415,
+      "patient_message": "I also have fatigue, chills and headache.",
+      "diagnosis": {
+        "type": "choice",
+        "choice": "out_of_scope",
+        "probabilities": {
+          "common_cold": 0.0499,
+          "influenza": 0.0911,
+          "gastroenteritis": 0.0476,
+          "migraine": 0.0374,
+          "allergic_rhinitis": 0.0328,
+          "urinary_tract_infection": 0.0395,
+          "out_of_scope": 0.7018
+        },
+        "confidence": 0.4225,
+        "answer_confidence": 0.7018,
+        "action": {
+          "act_probability": 1.0
+        }
+      },
+      "escalation": {
+        "type": "choice",
+        "choice": "urgent",
+        "probabilities": {
+          "routine": 0.0043,
+          "urgent": 0.9957
+        },
+        "confidence": 0.9602,
+        "answer_confidence": 0.9957,
+        "action": {
+          "act_probability": 1.0
+        }
+      },
+      "stop_probability": 0.7656,
+      "stop": true,
+      "doctor_response": "Your symptoms need urgent medical review. Please seek care now. If you feel severely unwell, call 995. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision."
+    }
+  ]
+}

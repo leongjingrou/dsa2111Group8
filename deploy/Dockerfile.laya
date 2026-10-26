@@ -1,0 +1,22 @@
+FROM python:3.13-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    MODEL_BACKEND=laya \
+    LAYA_DEVICE=cuda \
+    LLM_BACKEND=keyword
+
+WORKDIR /app
+COPY . /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir ".[serve,load,laya]"
+
+RUN useradd --uid 10001 --create-home appuser \
+    && mkdir -p /tmp/results \
+    && chown -R appuser:appuser /app /tmp/results
+
+USER 10001
+EXPOSE 8080
+CMD ["uvicorn", "llm_service.orchestrated_main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

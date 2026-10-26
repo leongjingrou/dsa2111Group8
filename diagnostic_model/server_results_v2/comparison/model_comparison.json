@@ -1,0 +1,63 @@
+{
+  "models": {
+    "EBM": {
+      "stop_threshold": 0.9,
+      "splits": {
+        "train": {
+          "condition_accuracy": 0.9696,
+          "escalation_accuracy": 0.9794,
+          "joint_accuracy": 0.95,
+          "urgent_recall": 0.9706,
+          "mean_patient_answers": 3.154,
+          "stopped_before_final": 0.9088
+        },
+        "validation": {
+          "condition_accuracy": 0.9559,
+          "escalation_accuracy": 0.9735,
+          "joint_accuracy": 0.9294,
+          "urgent_recall": 0.9706,
+          "mean_patient_answers": 3.221,
+          "stopped_before_final": 0.9029
+        },
+        "test": {
+          "condition_accuracy": 0.9353,
+          "escalation_accuracy": 0.9559,
+          "joint_accuracy": 0.8912,
+          "urgent_recall": 0.9412,
+          "mean_patient_answers": 3.212,
+          "stopped_before_final": 0.8824
+        }
+      }
+    },
+    "Laya": {
+      "stop_threshold": 0.75,
+      "splits": {
+        "train": {
+          "condition_accuracy": 0.8078,
+          "escalation_accuracy": 0.9078,
+          "joint_accuracy": 0.7343,
+          "urgent_recall": 0.9255,
+          "mean_patient_answers": 3.913,
+          "stopped_before_final": 0.5343
+        },
+        "validation": {
+          "condition_accuracy": 0.7853,
+          "escalation_accuracy": 0.8941,
+          "joint_accuracy": 0.6971,
+          "urgent_recall": 0.9235,
+          "mean_patient_answers": 3.924,
+          "stopped_before_final": 0.5353
+        },
+        "test": {
+          "condition_accuracy": 0.7824,
+          "escalation_accuracy": 0.8441,
+          "joint_accuracy": 0.6618,
+          "urgent_recall": 0.8235,
+          "mean_patient_answers": 3.938,
+          "stopped_before_final": 0.5412
+        }
+      }
+    }
+  },
+  "warning": "Synthetic generator data; not clinical validation."
+}

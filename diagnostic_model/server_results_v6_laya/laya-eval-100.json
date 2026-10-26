@@ -1,0 +1,1407 @@
+{
+  "schema": "orchestrated-server-evaluation/v1",
+  "method": "labelled synthetic patient replies; deterministic local LLM adapter; Laya diagnosis",
+  "summary": {
+    "consultations": 100,
+    "turn_requests": 429,
+    "diagnosis_accuracy": 0.77,
+    "escalation_accuracy": 0.89,
+    "turn_latency_ms": {
+      "mean": 73.71103962703963,
+      "p50": 72.483,
+      "p95": 91.872,
+      "p99": 95.794
+    }
+  },
+  "correct_examples": [
+    {
+      "scenario_id": "SYN-01361",
+      "actual": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "routine"
+      },
+      "diagnosis_correct": true,
+      "escalation_correct": false,
+      "consultation_ms_client": 929.888,
+      "trace": [
+        {
+          "session_id": "534e7d1d-50df-41a3-af76-e21633bbbcc8",
+          "backend": "laya",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fever",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0381,
+              "influenza": 0.0372,
+              "gastroenteritis": 0.0688,
+              "migraine": 0.0316,
+              "allergic_rhinitis": 0.0546,
+              "urinary_tract_infection": 0.0474,
+              "out_of_scope": 0.7223
+            },
+            "confidence": 0.4458,
+            "answer_confidence": 0.7223,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.5197,
+              "urgent": 0.4803
+            },
+            "confidence": 0.0011,
+            "answer_confidence": 0.5197,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.2306,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 530.527
+        },
+        {
+          "session_id": "534e7d1d-50df-41a3-af76-e21633bbbcc8",
+          "backend": "laya",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0366,
+              "influenza": 0.0419,
+              "gastroenteritis": 0.0684,
+              "migraine": 0.0224,
+              "allergic_rhinitis": 0.0421,
+              "urinary_tract_infection": 0.0482,
+              "out_of_scope": 0.7404
+            },
+            "confidence": 0.4734,
+            "answer_confidence": 0.7404,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.6774,
+              "urgent": 0.3226
+            },
+            "confidence": 0.0929,
+            "answer_confidence": 0.6774,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.4187,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 95.251
+        },
+        {
+          "session_id": "534e7d1d-50df-41a3-af76-e21633bbbcc8",
+          "backend": "laya",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fatigue",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "rash",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "skin rash"
+              },
+              {
+                "symptom_id": "blisters_hands_feet",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "spots/blisters on palms and soles"
+              },
+              {
+                "symptom_id": "skin_infection_signs",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "weeping, crusting or pus on skin"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0068,
+              "influenza": 0.0074,
+              "gastroenteritis": 0.0104,
+              "migraine": 0.0102,
+              "allergic_rhinitis": 0.0109,
+              "urinary_tract_infection": 0.0088,
+              "out_of_scope": 0.9455
+            },
+            "confidence": 0.8414,
+            "answer_confidence": 0.9455,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.6417,
+              "urgent": 0.3583
+            },
+            "confidence": 0.0587,
+            "answer_confidence": 0.6417,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.6404,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "blisters_hands_feet",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your spots/blisters on palms and soles?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 95.794
+        },
+        {
+          "session_id": "534e7d1d-50df-41a3-af76-e21633bbbcc8",
+          "backend": "laya",
+          "patient_answer": 4,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "shortness_of_breath",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "shortness of breath"
+              },
+              {
+                "symptom_id": "chest_pain",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chest pain"
+              },
+              {
+                "symptom_id": "chills",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chills"
+              },
+              {
+                "symptom_id": "loss_of_appetite",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "loss of appetite"
+              },
+              {
+                "symptom_id": "confusion_drowsiness",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "confusion or unusual drowsiness"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0069,
+              "influenza": 0.0214,
+              "gastroenteritis": 0.0077,
+              "migraine": 0.0113,
+              "allergic_rhinitis": 0.0076,
+              "urinary_tract_infection": 0.0063,
+              "out_of_scope": 0.9389
+            },
+            "confidence": 0.8291,
+            "answer_confidence": 0.9389,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.5585,
+              "urgent": 0.4415
+            },
+            "confidence": 0.0099,
+            "answer_confidence": 0.5585,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.5763,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "blisters_hands_feet",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your spots/blisters on palms and soles?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 102.716
+        },
+        {
+          "session_id": "534e7d1d-50df-41a3-af76-e21633bbbcc8",
+          "backend": "laya",
+          "patient_answer": 5,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0124,
+              "influenza": 0.0298,
+              "gastroenteritis": 0.0158,
+              "migraine": 0.0137,
+              "allergic_rhinitis": 0.012,
+              "urinary_tract_infection": 0.0139,
+              "out_of_scope": 0.9023
+            },
+            "confidence": 0.7488,
+            "answer_confidence": 0.9023,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.5263,
+              "urgent": 0.4737
+            },
+            "confidence": 0.002,
+            "answer_confidence": 0.5263,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.5027,
+          "stop_threshold": 0.75,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "We recommend a routine teleconsultation with a doctor. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 96.17
+        }
+      ]
+    },
+    {
+      "scenario_id": "SYN-01362",
+      "actual": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "diagnosis_correct": true,
+      "escalation_correct": true,
+      "consultation_ms_client": 357.715,
+      "trace": [
+        {
+          "session_id": "8835671f-4711-4c40-b355-42fc31d87877",
+          "backend": "laya",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fever",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0381,
+              "influenza": 0.0372,
+              "gastroenteritis": 0.0688,
+              "migraine": 0.0316,
+              "allergic_rhinitis": 0.0546,
+              "urinary_tract_infection": 0.0474,
+              "out_of_scope": 0.7223
+            },
+            "confidence": 0.4458,
+            "answer_confidence": 0.7223,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.5197,
+              "urgent": 0.4803
+            },
+            "confidence": 0.0011,
+            "answer_confidence": 0.5197,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.2306,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 59.067
+        },
+        {
+          "session_id": "8835671f-4711-4c40-b355-42fc31d87877",
+          "backend": "laya",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0455,
+              "influenza": 0.0552,
+              "gastroenteritis": 0.1071,
+              "migraine": 0.0297,
+              "allergic_rhinitis": 0.0494,
+              "urinary_tract_infection": 0.0508,
+              "out_of_scope": 0.6623
+            },
+            "confidence": 0.3746,
+            "answer_confidence": 0.6623,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.6311,
+              "urgent": 0.3689
+            },
+            "confidence": 0.0502,
+            "answer_confidence": 0.6311,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.3077,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fever",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fever?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 62.739
+        },
+        {
+          "session_id": "8835671f-4711-4c40-b355-42fc31d87877",
+          "backend": "laya",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "fatigue",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "itchy_blisters",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "itchy fluid-filled blisters"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0103,
+              "influenza": 0.012,
+              "gastroenteritis": 0.0148,
+              "migraine": 0.0057,
+              "allergic_rhinitis": 0.0105,
+              "urinary_tract_infection": 0.0125,
+              "out_of_scope": 0.9341
+            },
+            "confidence": 0.8157,
+            "answer_confidence": 0.9341,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.208,
+              "urgent": 0.792
+            },
+            "confidence": 0.2624,
+            "answer_confidence": 0.792,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.609,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fatigue",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fatigue?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 70.424
+        },
+        {
+          "session_id": "8835671f-4711-4c40-b355-42fc31d87877",
+          "backend": "laya",
+          "patient_answer": 4,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "sore_throat",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "sore throat"
+              },
+              {
+                "symptom_id": "chest_pain",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chest pain"
+              },
+              {
+                "symptom_id": "chills",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chills"
+              },
+              {
+                "symptom_id": "loss_of_appetite",
+                "presence": "present",
+                "severity": "severe",
+                "duration_days": null,
+                "progression": null,
+                "evidence": "loss of appetite"
+              },
+              {
+                "symptom_id": "joint_muscle_pain",
+                "presence": "present",
+                "severity": "severe",
+                "duration_days": null,
+                "progression": null,
+                "evidence": "severe joint or muscle pain"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0197,
+              "influenza": 0.029,
+              "gastroenteritis": 0.0238,
+              "migraine": 0.0086,
+              "allergic_rhinitis": 0.0193,
+              "urinary_tract_infection": 0.0248,
+              "out_of_scope": 0.8749
+            },
+            "confidence": 0.6944,
+            "answer_confidence": 0.8749,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.4214,
+              "urgent": 0.5786
+            },
+            "confidence": 0.0179,
+            "answer_confidence": 0.5786,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.5814,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "fatigue",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your fatigue?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 78.87
+        },
+        {
+          "session_id": "8835671f-4711-4c40-b355-42fc31d87877",
+          "backend": "laya",
+          "patient_answer": 5,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0066,
+              "influenza": 0.0071,
+              "gastroenteritis": 0.008,
+              "migraine": 0.0085,
+              "allergic_rhinitis": 0.0094,
+              "urinary_tract_infection": 0.0071,
+              "out_of_scope": 0.9533
+            },
+            "confidence": 0.8602,
+            "answer_confidence": 0.9533,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.2266,
+              "urgent": 0.7734
+            },
+            "confidence": 0.2279,
+            "answer_confidence": 0.7734,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.7435,
+          "stop_threshold": 0.75,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "Your symptoms need urgent medical review. Please seek care now. If you feel severely unwell, call 995. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 83.85
+        }
+      ]
+    }
+  ],
+  "wrong_examples": [
+    {
+      "scenario_id": "SYN-01363",
+      "actual": {
+        "condition": "influenza",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "diagnosis_correct": false,
+      "escalation_correct": true,
+      "consultation_ms_client": 201.168,
+      "trace": [
+        {
+          "session_id": "a0aec02c-3d67-4707-bc3d-e4fef9da08bc",
+          "backend": "laya",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "sore_throat",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "sore throat"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0396,
+              "influenza": 0.0372,
+              "gastroenteritis": 0.0239,
+              "migraine": 0.0229,
+              "allergic_rhinitis": 0.0239,
+              "urinary_tract_infection": 0.0255,
+              "out_of_scope": 0.8271
+            },
+            "confidence": 0.6066,
+            "answer_confidence": 0.8271,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.479,
+              "urgent": 0.521
+            },
+            "confidence": 0.0013,
+            "answer_confidence": 0.521,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.3149,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "sore_throat",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your sore throat?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 63.657
+        },
+        {
+          "session_id": "a0aec02c-3d67-4707-bc3d-e4fef9da08bc",
+          "backend": "laya",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0502,
+              "influenza": 0.0417,
+              "gastroenteritis": 0.0267,
+              "migraine": 0.02,
+              "allergic_rhinitis": 0.0213,
+              "urinary_tract_infection": 0.0221,
+              "out_of_scope": 0.818
+            },
+            "confidence": 0.5949,
+            "answer_confidence": 0.818,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.0352,
+              "urgent": 0.9648
+            },
+            "confidence": 0.7802,
+            "answer_confidence": 0.9648,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.7233,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "sore_throat",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your sore throat?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 61.904
+        },
+        {
+          "session_id": "a0aec02c-3d67-4707-bc3d-e4fef9da08bc",
+          "backend": "laya",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "cough",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "cough"
+              },
+              {
+                "symptom_id": "thick_nasal_discharge",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "thick yellow/green nasal discharge"
+              },
+              {
+                "symptom_id": "fever",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              },
+              {
+                "symptom_id": "chills",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chills"
+              },
+              {
+                "symptom_id": "body_aches",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "body aches"
+              },
+              {
+                "symptom_id": "fatigue",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "loss_of_appetite",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "loss of appetite"
+              },
+              {
+                "symptom_id": "lower_abdominal_pain",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "lower abdominal pain"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0236,
+              "influenza": 0.018,
+              "gastroenteritis": 0.0135,
+              "migraine": 0.0065,
+              "allergic_rhinitis": 0.0076,
+              "urinary_tract_infection": 0.0077,
+              "out_of_scope": 0.9233
+            },
+            "confidence": 0.7949,
+            "answer_confidence": 0.9233,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.0062,
+              "urgent": 0.9938
+            },
+            "confidence": 0.9454,
+            "answer_confidence": 0.9938,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.885,
+          "stop_threshold": 0.75,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "Your symptoms need urgent medical review. Please seek care now. If you feel severely unwell, call 995. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 72.488
+        }
+      ]
+    },
+    {
+      "scenario_id": "SYN-01364",
+      "actual": {
+        "condition": "influenza",
+        "escalation": "urgent"
+      },
+      "predicted": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "diagnosis_correct": false,
+      "escalation_correct": true,
+      "consultation_ms_client": 377.039,
+      "trace": [
+        {
+          "session_id": "e2e3d35d-55cd-4f7a-aef1-a36cf4688c85",
+          "backend": "laya",
+          "patient_answer": 1,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "sneezing",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "sneezing"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.0805,
+              "influenza": 0.0897,
+              "gastroenteritis": 0.0671,
+              "migraine": 0.0251,
+              "allergic_rhinitis": 0.1058,
+              "urinary_tract_infection": 0.0498,
+              "out_of_scope": 0.5821
+            },
+            "confidence": 0.2832,
+            "answer_confidence": 0.5821,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.4221,
+              "urgent": 0.5779
+            },
+            "confidence": 0.0176,
+            "answer_confidence": 0.5779,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.1828,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "sneezing",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your sneezing?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 59.165
+        },
+        {
+          "session_id": "e2e3d35d-55cd-4f7a-aef1-a36cf4688c85",
+          "backend": "laya",
+          "patient_answer": 2,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.1066,
+              "influenza": 0.1259,
+              "gastroenteritis": 0.0583,
+              "migraine": 0.0164,
+              "allergic_rhinitis": 0.112,
+              "urinary_tract_infection": 0.0337,
+              "out_of_scope": 0.5471
+            },
+            "confidence": 0.2693,
+            "answer_confidence": 0.5471,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.0031,
+              "urgent": 0.9969
+            },
+            "confidence": 0.97,
+            "answer_confidence": 0.9969,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.5135,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "sneezing",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your sneezing?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 67.409
+        },
+        {
+          "session_id": "e2e3d35d-55cd-4f7a-aef1-a36cf4688c85",
+          "backend": "laya",
+          "patient_answer": 3,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "cough",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "cough"
+              },
+              {
+                "symptom_id": "fever",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fever"
+              },
+              {
+                "symptom_id": "chills",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chills"
+              },
+              {
+                "symptom_id": "body_aches",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "body aches"
+              },
+              {
+                "symptom_id": "loss_of_appetite",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "loss of appetite"
+              },
+              {
+                "symptom_id": "confusion_drowsiness",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "confusion or unusual drowsiness"
+              },
+              {
+                "symptom_id": "headache",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "headache"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.1449,
+              "influenza": 0.1311,
+              "gastroenteritis": 0.0519,
+              "migraine": 0.0606,
+              "allergic_rhinitis": 0.1426,
+              "urinary_tract_infection": 0.0345,
+              "out_of_scope": 0.4344
+            },
+            "confidence": 0.1645,
+            "answer_confidence": 0.4344,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.0125,
+              "urgent": 0.9875
+            },
+            "confidence": 0.9031,
+            "answer_confidence": 0.9875,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.5409,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "body_aches",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your body aches?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 73.297
+        },
+        {
+          "session_id": "e2e3d35d-55cd-4f7a-aef1-a36cf4688c85",
+          "backend": "laya",
+          "patient_answer": 4,
+          "extraction": {
+            "symptoms": [
+              {
+                "symptom_id": "runny_nose",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "runny nose"
+              },
+              {
+                "symptom_id": "sore_throat",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "sore throat"
+              },
+              {
+                "symptom_id": "chest_pain",
+                "presence": "absent",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "chest pain"
+              },
+              {
+                "symptom_id": "fatigue",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "fatigue"
+              },
+              {
+                "symptom_id": "dehydration_signs",
+                "presence": "present",
+                "severity": null,
+                "duration_days": null,
+                "progression": null,
+                "evidence": "signs of dehydration (reduced urine, dry mouth)"
+              }
+            ],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "allergic_rhinitis",
+            "probabilities": {
+              "common_cold": 0.1354,
+              "influenza": 0.1849,
+              "gastroenteritis": 0.1059,
+              "migraine": 0.0225,
+              "allergic_rhinitis": 0.3066,
+              "urinary_tract_infection": 0.0387,
+              "out_of_scope": 0.206
+            },
+            "confidence": 0.1162,
+            "answer_confidence": 0.3066,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "routine",
+            "probabilities": {
+              "routine": 0.5294,
+              "urgent": 0.4706
+            },
+            "confidence": 0.0025,
+            "answer_confidence": 0.5294,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.1058,
+          "stop_threshold": 0.75,
+          "stop": false,
+          "question_target": {
+            "kind": "symptom",
+            "target": "body_aches",
+            "focus": "duration"
+          },
+          "question_fallback_used": false,
+          "doctor_response": "Could you tell me how long they have had it for your body aches?",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 83.165
+        },
+        {
+          "session_id": "e2e3d35d-55cd-4f7a-aef1-a36cf4688c85",
+          "backend": "laya",
+          "patient_answer": 5,
+          "extraction": {
+            "symptoms": [],
+            "unmapped_mentions": [],
+            "medical_history": [],
+            "allergies": [],
+            "medications": []
+          },
+          "diagnosis": {
+            "type": "choice",
+            "choice": "out_of_scope",
+            "probabilities": {
+              "common_cold": 0.1468,
+              "influenza": 0.1701,
+              "gastroenteritis": 0.0461,
+              "migraine": 0.0317,
+              "allergic_rhinitis": 0.2575,
+              "urinary_tract_infection": 0.028,
+              "out_of_scope": 0.3198
+            },
+            "confidence": 0.153,
+            "answer_confidence": 0.3198,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "escalation": {
+            "type": "choice",
+            "choice": "urgent",
+            "probabilities": {
+              "routine": 0.2448,
+              "urgent": 0.7552
+            },
+            "confidence": 0.197,
+            "answer_confidence": 0.7552,
+            "action": {
+              "act_probability": 1.0
+            }
+          },
+          "stop_probability": 0.1254,
+          "stop_threshold": 0.75,
+          "stop": true,
+          "question_target": null,
+          "question_fallback_used": false,
+          "doctor_response": "Your symptoms need urgent medical review. Please seek care now. If you feel severely unwell, call 995. The diagnostic model used the symptoms reported so far and its calibrated decision threshold. This is an automated pre-screening, not a diagnosis. A healthcare professional makes the final decision.",
+          "safety_profile": "none",
+          "safety_override_applied": false,
+          "processing_ms_client": 91.242
+        }
+      ]
+    }
+  ]
+}

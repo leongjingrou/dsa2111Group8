@@ -1,0 +1,100 @@
+{
+  "version": "1.2.0",
+  "conditions": [
+    {
+      "id": "common_cold",
+      "name": "Common Cold",
+      "keywords": [
+        "runny nose",
+        "sneezing",
+        "sore throat",
+        "cough",
+        "nasal congestion"
+      ],
+      "description": "A viral infection of the upper respiratory tract. Common symptoms include runny or blocked nose, sneezing, sore throat and cough.",
+      "red_flags": [],
+      "source_ids": ["healthhub_common_cold"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "influenza",
+      "name": "Influenza",
+      "keywords": [
+        "fever",
+        "cough",
+        "body aches",
+        "fatigue",
+        "chills"
+      ],
+      "description": "A contagious viral respiratory illness that can cause sudden fever, cough, sore throat, muscle aches, chills and fatigue.",
+      "red_flags": [],
+      "source_ids": ["influenza_source"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "gastroenteritis",
+      "name": "Gastroenteritis",
+      "keywords": [
+        "diarrhoea",
+        "diarrhea",
+        "vomiting",
+        "abdominal cramps",
+        "stomach pain"
+      ],
+      "description": "Inflammation of the stomach or intestines that may be caused by infections or other factors. Common symptoms include diarrhoea, vomiting, abdominal pain and fever.",
+      "red_flags": [],
+      "source_ids": ["gastroenteritis_source"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "migraine",
+      "name": "Migraine",
+      "keywords": [
+        "headache",
+        "nausea",
+        "light sensitivity",
+        "throbbing headache"
+      ],
+      "description": "A type of headache that may involve throbbing pain, nausea, vomiting and sensitivity to light or sound.",
+      "red_flags": [],
+      "source_ids": ["migraine_source"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "allergic_rhinitis",
+      "name": "Allergic Rhinitis",
+      "keywords": [
+        "sneezing",
+        "itchy nose",
+        "runny nose",
+        "watery eyes",
+        "nose is itchy",
+        "eyes are watery"
+      ],
+      "description": "An allergic reaction to airborne particles that can cause sneezing, an itchy or blocked nose, clear nasal discharge and itchy or watery eyes.",
+      "red_flags": [],
+      "source_ids": ["allergic_rhinitis_source"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    },
+    {
+      "id": "urinary_tract_infection",
+      "name": "Urinary Tract Infection",
+      "keywords": [
+        "painful urination",
+        "frequent urination",
+        "burning urination",
+        "urinary urgency"
+      ],
+      "description": "An infection involving the urinary tract, including the bladder or kidneys. Symptoms may include painful or frequent urination, urinary urgency and lower abdominal discomfort.",
+      "red_flags": [],
+      "source_ids": ["uti_source"],
+      "last_reviewed": null,
+      "review_status": "pending"
+    }
+  ]
+}

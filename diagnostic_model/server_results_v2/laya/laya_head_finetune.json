@@ -1,0 +1,168 @@
+{
+  "train_items": 9800,
+  "calibration_items": 400,
+  "eval_items": 3400,
+  "skipped": {},
+  "epoch_loss": [
+    0.93745264822123,
+    0.848023053523229,
+    0.8087075713565763,
+    0.7643745279205697,
+    0.7296796556303696,
+    0.6881773646267093,
+    0.6622917475931498,
+    0.6327325109012273,
+    0.6097913484929167,
+    0.5974219103324778
+  ],
+  "temperature": [
+    1.102990746498108,
+    1.0,
+    1.0
+  ],
+  "temperature_by_options": {},
+  "n_by_bucket": {
+    "choice:6-10": 202,
+    "choice:2": 198
+  },
+  "calibration": {
+    "choice": {
+      "items": 400,
+      "temperature": 1.102990746498108,
+      "issues": [],
+      "accuracy": 0.805,
+      "mean_confidence": 0.7765161283740467
+    },
+    "score": {
+      "items": 0,
+      "temperature": 1.0,
+      "issues": []
+    },
+    "noul": {
+      "items": 0,
+      "temperature": 1.0,
+      "issues": []
+    }
+  },
+  "abstention_thresholds": {
+    "choice:6-10": 0.7593,
+    "choice:2": 0.5619
+  },
+  "train_report": {
+    "eval_source": "/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-v2/laya/laya_sequential_validation.jsonl",
+    "eval_mode": "overlapping_eval",
+    "is_held_out": false,
+    "eval_items": 3400,
+    "note": "Evaluation set contains inputs that overlap training data (989) and calibration data (600) (total 994/3400 items); metrics do not reflect strictly independent held-out evaluation.",
+    "before": {
+      "items": 3400,
+      "loss": 1.5192,
+      "accuracy": 0.4132,
+      "mean_confidence": 0.4844,
+      "ece": 0.141,
+      "brier": 0.6744,
+      "brier_top1": 0.1509,
+      "by_type": {
+        "choice": {
+          "items": 3400,
+          "loss": 1.5192,
+          "accuracy": 0.4132,
+          "mean_confidence": 0.4844,
+          "ece": 0.141,
+          "brier": 0.6744,
+          "brier_top1": 0.1509
+        }
+      }
+    },
+    "after": {
+      "items": 3400,
+      "loss": 0.5987,
+      "accuracy": 0.7668,
+      "mean_confidence": 0.7651,
+      "ece": 0.0252,
+      "brier": 0.3064,
+      "brier_top1": 0.1297,
+      "by_type": {
+        "choice": {
+          "items": 3400,
+          "loss": 0.5987,
+          "accuracy": 0.7668,
+          "mean_confidence": 0.7651,
+          "ece": 0.0252,
+          "brier": 0.3064,
+          "brier_top1": 0.1297
+        }
+      }
+    },
+    "comparison": {
+      "delta_accuracy": 0.3536,
+      "delta_loss": -0.9205,
+      "delta_ece": -0.1158,
+      "delta_brier": -0.368,
+      "delta_brier_top1": -0.0212,
+      "delta_mean_confidence": 0.2807
+    },
+    "calibration": {
+      "choice": {
+        "items": 400,
+        "temperature": 1.102990746498108,
+        "issues": [],
+        "accuracy": 0.805,
+        "mean_confidence": 0.7765161283740467
+      },
+      "score": {
+        "items": 0,
+        "temperature": 1.0,
+        "issues": []
+      },
+      "noul": {
+        "items": 0,
+        "temperature": 1.0,
+        "issues": []
+      }
+    },
+    "abstention_thresholds": {
+      "choice:6-10": 0.7593,
+      "choice:2": 0.5619
+    },
+    "training": {
+      "epochs": 10,
+      "micro_batch": 8,
+      "grad_accum": 2,
+      "encoder_lr": 1e-05,
+      "head_lr": 0.0005,
+      "min_lr": 1e-06,
+      "weight_decay": 0.01,
+      "grad_clip": 1.0,
+      "loss": "soft-ce",
+      "rl_samples": 4,
+      "sigma_start": 0.4,
+      "sigma_end": 0.1,
+      "w_sph": 0.75,
+      "w_rps": 1.0,
+      "shuffle_options": [
+        "choice"
+      ],
+      "option_layout": null,
+      "freeze_encoder": true,
+      "calib_max": 400,
+      "calib_frac": 0.15,
+      "calib_seed": 20260922,
+      "seed": 2111,
+      "max_len": null,
+      "head_max_len": null,
+      "amp": null,
+      "gradient_checkpointing": false,
+      "log_every": 5,
+      "label_smoothing": 0.0,
+      "text_column": "text",
+      "label_column": "label",
+      "question_id": "label",
+      "instructions": null,
+      "eval_data": "/home/ubuntu/dsa2111-persistent/results/conversation-v0.3-v2/laya/laya_sequential_validation.jsonl",
+      "target_error": 0.1,
+      "min_abstain_n": 10
+    }
+  },
+  "output_dir": "/home/ubuntu/dsa2111-persistent/models/laya-head-v0.3-v2"
+}

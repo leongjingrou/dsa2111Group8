@@ -1,0 +1,1104 @@
+{
+  "schema_version": "1.0",
+  "model": "Laya",
+  "split": "test",
+  "ground_truth_semantics": "Synthetic/source label, not a clinician-confirmed diagnosis.",
+  "samples": [
+    {
+      "sample_type": "correct_learned_stop",
+      "scenario_id": "SYN-00003",
+      "conversation": [
+        {
+          "role": "doctor",
+          "content": "Hello, I am your telemedicine assistant. How are you feeling today?"
+        },
+        {
+          "role": "patient",
+          "content": "I have fever."
+        },
+        {
+          "role": "doctor",
+          "content": "How long has this been going on, how severe is it, and is it changing?"
+        },
+        {
+          "role": "patient",
+          "content": "It has been 2 days. It feels normal and is stable."
+        },
+        {
+          "role": "doctor",
+          "content": "What other symptoms have you noticed?"
+        },
+        {
+          "role": "patient",
+          "content": "I also have fatigue, loss of appetite, skin rash, and itchy fluid-filled blisters."
+        },
+        {
+          "role": "doctor",
+          "content": "To check for warning signs, have you had shortness of breath, chest pain, confusion or unusual drowsiness, dry, itchy skin, and headache?"
+        },
+        {
+          "role": "patient",
+          "content": "No, I have not had shortness of breath, chest pain, confusion or unusual drowsiness, dry, itchy skin, and headache."
+        },
+        {
+          "role": "doctor",
+          "content": "Lastly, what is your age and temperature?"
+        },
+        {
+          "role": "patient",
+          "content": "I am 7, male, and my temperature is 38.1 \u00b0C."
+        }
+      ],
+      "raw_checkpoints": [
+        {
+          "patient_turn": 2,
+          "latest_response": "I have fever.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0315,
+                "influenza": 0.0484,
+                "gastroenteritis": 0.0962,
+                "migraine": 0.0251,
+                "allergic_rhinitis": 0.0467,
+                "urinary_tract_infection": 0.0486,
+                "out_of_scope": 0.7034
+              },
+              "confidence": 0.429,
+              "answer_confidence": 0.7034,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "urgent",
+              "probabilities": {
+                "routine": 0.3785,
+                "urgent": 0.6215
+              },
+              "confidence": 0.043,
+              "answer_confidence": 0.6215,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.2995,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 4,
+          "latest_response": "It has been 2 days. It feels normal and is stable.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0396,
+                "influenza": 0.0787,
+                "gastroenteritis": 0.1229,
+                "migraine": 0.0481,
+                "allergic_rhinitis": 0.0506,
+                "urinary_tract_infection": 0.0463,
+                "out_of_scope": 0.6138
+              },
+              "confidence": 0.3195,
+              "answer_confidence": 0.6138,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.8079,
+                "urgent": 0.1921
+              },
+              "confidence": 0.2941,
+              "answer_confidence": 0.8079,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.3085,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 6,
+          "latest_response": "I also have fatigue, loss of appetite, skin rash, and itchy fluid-filled blisters.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0059,
+                "influenza": 0.013,
+                "gastroenteritis": 0.0188,
+                "migraine": 0.0071,
+                "allergic_rhinitis": 0.0073,
+                "urinary_tract_infection": 0.0093,
+                "out_of_scope": 0.9385
+              },
+              "confidence": 0.8274,
+              "answer_confidence": 0.9385,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.8079,
+                "urgent": 0.1921
+              },
+              "confidence": 0.2942,
+              "answer_confidence": 0.8079,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.7746,
+          "policy_stop": true
+        },
+        {
+          "patient_turn": 8,
+          "latest_response": "No, I have not had shortness of breath, chest pain, confusion or unusual drowsiness, dry, itchy skin, and headache.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0015,
+                "influenza": 0.0067,
+                "gastroenteritis": 0.0022,
+                "migraine": 0.0004,
+                "allergic_rhinitis": 0.0004,
+                "urinary_tract_infection": 0.0005,
+                "out_of_scope": 0.9883
+              },
+              "confidence": 0.9594,
+              "answer_confidence": 0.9883,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.9599,
+                "urgent": 0.0401
+              },
+              "confidence": 0.7571,
+              "answer_confidence": 0.9599,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.8868,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 10,
+          "latest_response": "I am 7, male, and my temperature is 38.1 \u00b0C.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0006,
+                "influenza": 0.0061,
+                "gastroenteritis": 0.0008,
+                "migraine": 0.0002,
+                "allergic_rhinitis": 0.0002,
+                "urinary_tract_infection": 0.0002,
+                "out_of_scope": 0.9919
+              },
+              "confidence": 0.9719,
+              "answer_confidence": 0.9919,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "urgent",
+              "probabilities": {
+                "routine": 0.3363,
+                "urgent": 0.6637
+              },
+              "confidence": 0.0788,
+              "answer_confidence": 0.6637,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.6868,
+          "policy_stop": false
+        }
+      ],
+      "final_model_response": {
+        "diagnosis": "out_of_scope",
+        "diagnosis_confidence": 0.9385,
+        "differential_top_3": [
+          {
+            "diagnosis": "out_of_scope",
+            "probability": 0.9385
+          },
+          {
+            "diagnosis": "gastroenteritis",
+            "probability": 0.0188
+          },
+          {
+            "diagnosis": "influenza",
+            "probability": 0.013
+          }
+        ],
+        "escalation": "routine",
+        "escalation_confidence": 0.8079,
+        "patient_answers_used": 3,
+        "disclaimer": "Research prototype output; not a clinical diagnosis."
+      },
+      "source_ground_truth": {
+        "condition": "out_of_scope",
+        "escalation": "routine"
+      },
+      "comparison": {
+        "diagnosis_correct": true,
+        "escalation_correct": true,
+        "joint_correct": true
+      }
+    },
+    {
+      "sample_type": "correct_forced_final",
+      "scenario_id": "SYN-00017",
+      "conversation": [
+        {
+          "role": "doctor",
+          "content": "Hello, I am your telemedicine assistant. How are you feeling today?"
+        },
+        {
+          "role": "patient",
+          "content": "I have fatigue."
+        },
+        {
+          "role": "doctor",
+          "content": "How long has this been going on, how severe is it, and is it changing?"
+        },
+        {
+          "role": "patient",
+          "content": "It has been 5 days. It feels mild and is stable."
+        },
+        {
+          "role": "doctor",
+          "content": "What other symptoms have you noticed?"
+        },
+        {
+          "role": "patient",
+          "content": "I also have lower abdominal pain, nausea, vomiting, and diarrhoea."
+        },
+        {
+          "role": "doctor",
+          "content": "To check for warning signs, have you had fever, persistent vomiting, blood in stool, painful / burning urination, and urinary urgency?"
+        },
+        {
+          "role": "patient",
+          "content": "No, I have not had fever, persistent vomiting, blood in stool, painful / burning urination, and urinary urgency."
+        },
+        {
+          "role": "doctor",
+          "content": "Lastly, what is your age and temperature?"
+        },
+        {
+          "role": "patient",
+          "content": "I am 38, male, and my temperature is 37.4 \u00b0C."
+        }
+      ],
+      "raw_checkpoints": [
+        {
+          "patient_turn": 2,
+          "latest_response": "I have fatigue.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0303,
+                "influenza": 0.0832,
+                "gastroenteritis": 0.0932,
+                "migraine": 0.0418,
+                "allergic_rhinitis": 0.0436,
+                "urinary_tract_infection": 0.0404,
+                "out_of_scope": 0.6675
+              },
+              "confidence": 0.3819,
+              "answer_confidence": 0.6675,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.6276,
+                "urgent": 0.3724
+              },
+              "confidence": 0.0475,
+              "answer_confidence": 0.6276,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.2801,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 4,
+          "latest_response": "It has been 5 days. It feels mild and is stable.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0348,
+                "influenza": 0.12,
+                "gastroenteritis": 0.0855,
+                "migraine": 0.0391,
+                "allergic_rhinitis": 0.0361,
+                "urinary_tract_infection": 0.0341,
+                "out_of_scope": 0.6504
+              },
+              "confidence": 0.3714,
+              "answer_confidence": 0.6504,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.9887,
+                "urgent": 0.0113
+              },
+              "confidence": 0.9108,
+              "answer_confidence": 0.9887,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.6128,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 6,
+          "latest_response": "I also have lower abdominal pain, nausea, vomiting, and diarrhoea.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "gastroenteritis",
+              "probabilities": {
+                "common_cold": 0.0561,
+                "influenza": 0.2081,
+                "gastroenteritis": 0.5514,
+                "migraine": 0.0539,
+                "allergic_rhinitis": 0.0343,
+                "urinary_tract_infection": 0.0388,
+                "out_of_scope": 0.0574
+              },
+              "confidence": 0.2909,
+              "answer_confidence": 0.5514,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.9986,
+                "urgent": 0.0014
+              },
+              "confidence": 0.9849,
+              "answer_confidence": 0.9986,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.5905,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 8,
+          "latest_response": "No, I have not had fever, persistent vomiting, blood in stool, painful / burning urination, and urinary urgency.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "gastroenteritis",
+              "probabilities": {
+                "common_cold": 0.0396,
+                "influenza": 0.1652,
+                "gastroenteritis": 0.449,
+                "migraine": 0.042,
+                "allergic_rhinitis": 0.0313,
+                "urinary_tract_infection": 0.2593,
+                "out_of_scope": 0.0136
+              },
+              "confidence": 0.2626,
+              "answer_confidence": 0.449,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.9749,
+                "urgent": 0.0251
+              },
+              "confidence": 0.831,
+              "answer_confidence": 0.9749,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.5074,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 10,
+          "latest_response": "I am 38, male, and my temperature is 37.4 \u00b0C.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "gastroenteritis",
+              "probabilities": {
+                "common_cold": 0.0521,
+                "influenza": 0.1432,
+                "gastroenteritis": 0.6513,
+                "migraine": 0.0586,
+                "allergic_rhinitis": 0.044,
+                "urinary_tract_infection": 0.0289,
+                "out_of_scope": 0.022
+              },
+              "confidence": 0.3826,
+              "answer_confidence": 0.6513,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.9782,
+                "urgent": 0.0218
+              },
+              "confidence": 0.8484,
+              "answer_confidence": 0.9782,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.7134,
+          "policy_stop": true
+        }
+      ],
+      "final_model_response": {
+        "diagnosis": "gastroenteritis",
+        "diagnosis_confidence": 0.6513,
+        "differential_top_3": [
+          {
+            "diagnosis": "gastroenteritis",
+            "probability": 0.6513
+          },
+          {
+            "diagnosis": "influenza",
+            "probability": 0.1432
+          },
+          {
+            "diagnosis": "migraine",
+            "probability": 0.0586
+          }
+        ],
+        "escalation": "routine",
+        "escalation_confidence": 0.9782,
+        "patient_answers_used": 5,
+        "disclaimer": "Research prototype output; not a clinical diagnosis."
+      },
+      "source_ground_truth": {
+        "condition": "gastroenteritis",
+        "escalation": "routine"
+      },
+      "comparison": {
+        "diagnosis_correct": true,
+        "escalation_correct": true,
+        "joint_correct": true
+      }
+    },
+    {
+      "sample_type": "diagnosis_miss",
+      "scenario_id": "SYN-00028",
+      "conversation": [
+        {
+          "role": "doctor",
+          "content": "Hello, I am your telemedicine assistant. How are you feeling today?"
+        },
+        {
+          "role": "patient",
+          "content": "I have runny nose."
+        },
+        {
+          "role": "doctor",
+          "content": "How long has this been going on, how severe is it, and is it changing?"
+        },
+        {
+          "role": "patient",
+          "content": "It has been 17 days. It feels normal and is worsening."
+        },
+        {
+          "role": "doctor",
+          "content": "What other symptoms have you noticed?"
+        },
+        {
+          "role": "patient",
+          "content": "I also have nasal congestion, sneezing, itchy nose, watery eyes, itchy eyes, and blood in urine."
+        },
+        {
+          "role": "doctor",
+          "content": "To check for warning signs, have you had wheezing, shortness of breath, chest pain, fever, and body aches?"
+        },
+        {
+          "role": "patient",
+          "content": "No, I have not had wheezing, shortness of breath, chest pain, fever, and body aches."
+        },
+        {
+          "role": "doctor",
+          "content": "Lastly, what is your age and temperature?"
+        },
+        {
+          "role": "patient",
+          "content": "I am 35, male, and my temperature is 37.2 \u00b0C."
+        }
+      ],
+      "raw_checkpoints": [
+        {
+          "patient_turn": 2,
+          "latest_response": "I have runny nose.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "gastroenteritis",
+              "probabilities": {
+                "common_cold": 0.112,
+                "influenza": 0.2413,
+                "gastroenteritis": 0.2742,
+                "migraine": 0.0315,
+                "allergic_rhinitis": 0.0856,
+                "urinary_tract_infection": 0.0428,
+                "out_of_scope": 0.2126
+              },
+              "confidence": 0.1128,
+              "answer_confidence": 0.2742,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "urgent",
+              "probabilities": {
+                "routine": 0.4728,
+                "urgent": 0.5272
+              },
+              "confidence": 0.0021,
+              "answer_confidence": 0.5272,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.0451,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 4,
+          "latest_response": "It has been 17 days. It feels normal and is worsening.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "influenza",
+              "probabilities": {
+                "common_cold": 0.2045,
+                "influenza": 0.2284,
+                "gastroenteritis": 0.1393,
+                "migraine": 0.045,
+                "allergic_rhinitis": 0.1863,
+                "urinary_tract_infection": 0.0526,
+                "out_of_scope": 0.144
+              },
+              "confidence": 0.0632,
+              "answer_confidence": 0.2284,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "urgent",
+              "probabilities": {
+                "routine": 0.0807,
+                "urgent": 0.9193
+              },
+              "confidence": 0.5955,
+              "answer_confidence": 0.9193,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.1593,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 6,
+          "latest_response": "I also have nasal congestion, sneezing, itchy nose, watery eyes, itchy eyes, and blood in urine.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "allergic_rhinitis",
+              "probabilities": {
+                "common_cold": 0.2403,
+                "influenza": 0.103,
+                "gastroenteritis": 0.0932,
+                "migraine": 0.012,
+                "allergic_rhinitis": 0.4893,
+                "urinary_tract_infection": 0.0333,
+                "out_of_scope": 0.0289
+              },
+              "confidence": 0.272,
+              "answer_confidence": 0.4893,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.5507,
+                "urgent": 0.4493
+              },
+              "confidence": 0.0074,
+              "answer_confidence": 0.5507,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.1558,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 8,
+          "latest_response": "No, I have not had wheezing, shortness of breath, chest pain, fever, and body aches.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "allergic_rhinitis",
+              "probabilities": {
+                "common_cold": 0.3394,
+                "influenza": 0.0546,
+                "gastroenteritis": 0.0707,
+                "migraine": 0.0088,
+                "allergic_rhinitis": 0.4888,
+                "urinary_tract_infection": 0.0133,
+                "out_of_scope": 0.0244
+              },
+              "confidence": 0.3563,
+              "answer_confidence": 0.4888,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.5998,
+                "urgent": 0.4002
+              },
+              "confidence": 0.0289,
+              "answer_confidence": 0.5998,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.1417,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 10,
+          "latest_response": "I am 35, male, and my temperature is 37.2 \u00b0C.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "common_cold",
+              "probabilities": {
+                "common_cold": 0.3937,
+                "influenza": 0.1181,
+                "gastroenteritis": 0.1241,
+                "migraine": 0.0231,
+                "allergic_rhinitis": 0.192,
+                "urinary_tract_infection": 0.0234,
+                "out_of_scope": 0.1255
+              },
+              "confidence": 0.1621,
+              "answer_confidence": 0.3937,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "urgent",
+              "probabilities": {
+                "routine": 0.1909,
+                "urgent": 0.8091
+              },
+              "confidence": 0.2966,
+              "answer_confidence": 0.8091,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.218,
+          "policy_stop": true
+        }
+      ],
+      "final_model_response": {
+        "diagnosis": "common_cold",
+        "diagnosis_confidence": 0.3937,
+        "differential_top_3": [
+          {
+            "diagnosis": "common_cold",
+            "probability": 0.3937
+          },
+          {
+            "diagnosis": "allergic_rhinitis",
+            "probability": 0.192
+          },
+          {
+            "diagnosis": "out_of_scope",
+            "probability": 0.1255
+          }
+        ],
+        "escalation": "urgent",
+        "escalation_confidence": 0.8091,
+        "patient_answers_used": 5,
+        "disclaimer": "Research prototype output; not a clinical diagnosis."
+      },
+      "source_ground_truth": {
+        "condition": "allergic_rhinitis",
+        "escalation": "routine"
+      },
+      "comparison": {
+        "diagnosis_correct": false,
+        "escalation_correct": false,
+        "joint_correct": false
+      }
+    },
+    {
+      "sample_type": "escalation_miss",
+      "scenario_id": "SYN-00071",
+      "conversation": [
+        {
+          "role": "doctor",
+          "content": "Hello, I am your telemedicine assistant. How are you feeling today?"
+        },
+        {
+          "role": "patient",
+          "content": "I have nasal congestion."
+        },
+        {
+          "role": "doctor",
+          "content": "How long has this been going on, how severe is it, and is it changing?"
+        },
+        {
+          "role": "patient",
+          "content": "It has been 19 days. It feels mild and is worsening."
+        },
+        {
+          "role": "doctor",
+          "content": "What other symptoms have you noticed?"
+        },
+        {
+          "role": "patient",
+          "content": "I also have thick yellow/green nasal discharge, fever, nausea, headache, and neck stiffness."
+        },
+        {
+          "role": "doctor",
+          "content": "To check for warning signs, have you had runny nose, sneezing, cough, facial pain or pressure, and loss of smell or taste?"
+        },
+        {
+          "role": "patient",
+          "content": "No, I have not had runny nose, sneezing, cough, facial pain or pressure, and loss of smell or taste."
+        },
+        {
+          "role": "doctor",
+          "content": "Lastly, what is your age and temperature?"
+        },
+        {
+          "role": "patient",
+          "content": "I am 44, male, and my temperature is 38.6 \u00b0C."
+        }
+      ],
+      "raw_checkpoints": [
+        {
+          "patient_turn": 2,
+          "latest_response": "I have nasal congestion.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0482,
+                "influenza": 0.0702,
+                "gastroenteritis": 0.0665,
+                "migraine": 0.0227,
+                "allergic_rhinitis": 0.0372,
+                "urinary_tract_infection": 0.0282,
+                "out_of_scope": 0.7269
+              },
+              "confidence": 0.4583,
+              "answer_confidence": 0.7269,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.5164,
+                "urgent": 0.4836
+              },
+              "confidence": 0.0008,
+              "answer_confidence": 0.5164,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.2304,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 4,
+          "latest_response": "It has been 19 days. It feels mild and is worsening.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0275,
+                "influenza": 0.0339,
+                "gastroenteritis": 0.0297,
+                "migraine": 0.0229,
+                "allergic_rhinitis": 0.0281,
+                "urinary_tract_infection": 0.0217,
+                "out_of_scope": 0.8363
+              },
+              "confidence": 0.6211,
+              "answer_confidence": 0.8363,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "urgent",
+              "probabilities": {
+                "routine": 0.1419,
+                "urgent": 0.8581
+              },
+              "confidence": 0.4109,
+              "answer_confidence": 0.8581,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.5333,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 6,
+          "latest_response": "I also have thick yellow/green nasal discharge, fever, nausea, headache, and neck stiffness.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0034,
+                "influenza": 0.0024,
+                "gastroenteritis": 0.0019,
+                "migraine": 0.0009,
+                "allergic_rhinitis": 0.0026,
+                "urinary_tract_infection": 0.0006,
+                "out_of_scope": 0.9882
+              },
+              "confidence": 0.957,
+              "answer_confidence": 0.9882,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.5254,
+                "urgent": 0.4746
+              },
+              "confidence": 0.0019,
+              "answer_confidence": 0.5254,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.5126,
+          "policy_stop": false
+        },
+        {
+          "patient_turn": 8,
+          "latest_response": "No, I have not had runny nose, sneezing, cough, facial pain or pressure, and loss of smell or taste.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0019,
+                "influenza": 0.0036,
+                "gastroenteritis": 0.0007,
+                "migraine": 0.0002,
+                "allergic_rhinitis": 0.003,
+                "urinary_tract_infection": 0.0002,
+                "out_of_scope": 0.9903
+              },
+              "confidence": 0.9647,
+              "answer_confidence": 0.9903,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.792,
+                "urgent": 0.208
+              },
+              "confidence": 0.2624,
+              "answer_confidence": 0.792,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.7631,
+          "policy_stop": true
+        },
+        {
+          "patient_turn": 10,
+          "latest_response": "I am 44, male, and my temperature is 38.6 \u00b0C.",
+          "answers": {
+            "condition": {
+              "type": "choice",
+              "choice": "out_of_scope",
+              "probabilities": {
+                "common_cold": 0.0021,
+                "influenza": 0.002,
+                "gastroenteritis": 0.0009,
+                "migraine": 0.0006,
+                "allergic_rhinitis": 0.0017,
+                "urinary_tract_infection": 0.0005,
+                "out_of_scope": 0.9922
+              },
+              "confidence": 0.9699,
+              "answer_confidence": 0.9922,
+              "action": {
+                "act_probability": 1.0
+              }
+            },
+            "escalation": {
+              "type": "choice",
+              "choice": "routine",
+              "probabilities": {
+                "routine": 0.9246,
+                "urgent": 0.0754
+              },
+              "confidence": 0.6141,
+              "answer_confidence": 0.9246,
+              "action": {
+                "act_probability": 1.0
+              }
+            }
+          },
+          "stop_probability": 0.881,
+          "policy_stop": false
+        }
+      ],
+      "final_model_response": {
+        "diagnosis": "out_of_scope",
+        "diagnosis_confidence": 0.9903,
+        "differential_top_3": [
+          {
+            "diagnosis": "out_of_scope",
+            "probability": 0.9903
+          },
+          {
+            "diagnosis": "influenza",
+            "probability": 0.0036
+          },
+          {
+            "diagnosis": "allergic_rhinitis",
+            "probability": 0.003
+          }
+        ],
+        "escalation": "routine",
+        "escalation_confidence": 0.792,
+        "patient_answers_used": 4,
+        "disclaimer": "Research prototype output; not a clinical diagnosis."
+      },
+      "source_ground_truth": {
+        "condition": "out_of_scope",
+        "escalation": "urgent"
+      },
+      "comparison": {
+        "diagnosis_correct": true,
+        "escalation_correct": false,
+        "joint_correct": false
+      }
+    }
+  ]
+}

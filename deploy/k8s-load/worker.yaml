@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-worker
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: locust-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: locust-worker
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: locust-worker
+      containers:
+        - name: worker
+          image: diagnosis-api:locust
+          imagePullPolicy: IfNotPresent
+          command: ["locust"]
+          args:
+            - -f
+            - /app/serving/locustfile.py
+            - --worker
+            - --master-host
+            - locust-master
+          env:
+            - name: REQUEST_TIMEOUT_SECONDS
+              value: "30"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]

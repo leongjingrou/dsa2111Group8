@@ -1,0 +1,13 @@
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                           SELECTOR
+deployment.apps/diagnosis-api   2/2     2            2           18h   api          diagnosis-api:llm-orchestrated   app.kubernetes.io/name=diagnosis-api
+deployment.apps/locust-worker   0/0     0            0           10h   worker       diagnosis-api:locust             app.kubernetes.io/name=locust-worker
+
+NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/diagnosis-api   ClusterIP   10.43.128.105   <none>        80/TCP     18h   app.kubernetes.io/name=diagnosis-api
+service/locust-master   ClusterIP   10.43.38.200    <none>        5557/TCP   10h   app.kubernetes.io/name=locust-master
+
+NAME                                                REFERENCE                  TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/diagnosis-api   Deployment/diagnosis-api   cpu: <unknown>/60%   2         12        2          18h
+
+NAME                                       MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
+poddisruptionbudget.policy/diagnosis-api   1               N/A               1                     18h

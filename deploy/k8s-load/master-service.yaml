@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-master
+spec:
+  selector:
+    app.kubernetes.io/name: locust-master
+  ports:
+    - name: worker-rpc
+      port: 5557
+      targetPort: 5557

@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,start conversation,CatchResponseError('HTTP 0'),1036,2026-10-25T03:58:01Z,2026-10-25T03:59:37Z
+POST,conversation turn,CatchResponseError('HTTP 0'),1093,2026-10-25T03:58:01Z,2026-10-25T03:59:38Z
+POST,conversation turn,CatchResponseError('HTTP 404'),122,2026-10-25T03:58:02Z,2026-10-25T03:59:40Z
