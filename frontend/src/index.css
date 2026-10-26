@@ -1,0 +1,56 @@
+:root {
+  --bg: #ffffff;
+  --teal: #0d9488;
+  --teal-dark: #0f766e;
+  --grey: #e5e7eb;
+  --text: #1f2937;
+  --on-teal: #ffffff;
+  --red: #dc2626;
+  --red-dark: #b91c1c;
+
+  font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  height: 100svh;
+}
+
+button {
+  font: inherit;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  background: var(--teal);
+  color: var(--on-teal);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--teal-dark);
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--on-teal);
+}
+
+.avatar.large {
+  width: 72px;
+  height: 72px;
+}
