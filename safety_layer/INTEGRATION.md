@@ -1,7 +1,7 @@
 # Task 4 integration
 
 The safety layer is integrated into the complete team repository on
-`codex/safety-integration`, based on `origin/main` at `9ee31c2`.
+`safety-integration`, based on the team `main` at `9ee31c2`.
 Both `/api/conversations/{session_id}/turn` and `/api/diagnose` use the same
 consultation service, persisted state, safety rules and typed response.
 See [the review guide](../backend/REVIEW_GUIDE.md) for a file-by-file reading order

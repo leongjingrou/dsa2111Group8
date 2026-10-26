@@ -3,7 +3,7 @@ name: Backend safety and end-to-end tests
 on:
   pull_request:
   push:
-    branches: [main, "codex/**"]
+    branches: [main, safety-integration, "codex/**"]
 
 permissions:
   contents: read
