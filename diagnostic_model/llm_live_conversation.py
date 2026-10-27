@@ -82,10 +82,11 @@ def select_question_target(
         _, symptom_id, focus = min(missing)
         return "symptom", symptom_id, focus
 
-    if answer_number >= 4 and (
-        evidence.age is None or evidence.temperature_c is None or evidence.sex is None
-    ):
-        return "context", "demographics", None
+    if answer_number >= 4:
+        if evidence.temperature_c is None:
+            return "context", "temperature", None
+        if evidence.sex is None:
+            return "context", "sex", None
 
     entries = get_vocab()._entries
     unasked = [
@@ -191,7 +192,7 @@ class LLMDrivenConsultation:
                 question_target=None, doctor_response=result.patient_message
             )
         else:
-            self.pending_question, question = safety_question(decision)
+            self.pending_question, question = safety_question(decision, self.profile)
             checkpoint.update(
                 question_target=self.pending_question, doctor_response=question
             )
@@ -228,10 +229,24 @@ class LLMDrivenConsultation:
 
         # Training used five partial evidence states. Checklist turns must not
         # create an out-of-range feature or force an incomplete safety screen.
-        answer_number = checkpoint["patient_answer"]
-        model_answers = self.predictor.predict(
-            self.turns, self.evidence, min(answer_number, MAX_MODEL_ANSWERS)
+        answer_number = min(
+            1 + sum(item["answers"] is not None for item in self.trace),
+            MAX_MODEL_ANSWERS,
         )
+        diagnostic_evidence = EvidenceState(**asdict(self.evidence))
+        # The compact safety screen can mark many emergency findings absent in
+        # one answer. Those facts belong to the rule engine, but presenting all
+        # of them as first-step diagnostic features is outside the sequential
+        # model's training distribution and can create false referrals.
+        diagnostic_evidence.symptoms = {
+            symptom_id: present
+            for symptom_id, present in self.evidence.symptoms.items()
+            if present or symptom_id not in self.safety_engine.required_screening
+        }
+        model_answers = self.predictor.predict(
+            self.turns, diagnostic_evidence, answer_number
+        )
+        checkpoint["model_answer"] = answer_number
         checkpoint["answers"] = model_answers
         proposed_record = self._build_model_record(checkpoint)
         guarded_decision = guard_decision(
@@ -240,6 +255,10 @@ class LLMDrivenConsultation:
             candidate_condition=model_answers["condition"]["choice"],
             evidence=self.evidence,
             engine=self.safety_engine,
+            # A preliminary model label must not end the consultation before
+            # the learned stopping policy has enough evidence. Explicit safety
+            # rules and out-of-scope predictions still take effect immediately.
+            preserve_model_referral=False,
         )
         if not guarded_decision.safety.can_continue:
             checkpoint["answers"] = None
@@ -250,6 +269,21 @@ class LLMDrivenConsultation:
             decision_record=guarded_decision.record,
         )
         self._apply_stopping_policy(checkpoint)
+
+        if (
+            checkpoint["stop"]
+            and proposed_record.recommended_action == "urgent_medical_review"
+        ):
+            final_decision = guard_decision(
+                self.profile,
+                proposed_record,
+                candidate_condition=model_answers["condition"]["choice"],
+                evidence=self.evidence,
+                engine=self.safety_engine,
+            )
+            checkpoint["answers"] = None
+            return self._respond_to_safety(checkpoint, final_decision.safety)
+
         self.trace.append(checkpoint)
         await self._explain_or_ask_followup(checkpoint)
         return checkpoint
@@ -336,7 +370,7 @@ class LLMDrivenConsultation:
         model_trace = [item for item in self.trace if item["answers"] is not None]
         model_trace.append(checkpoint)
         stop_probability = stopping_probabilities(self.stop_model, [model_trace])[0][-1]
-        answer_number = checkpoint["patient_answer"]
+        answer_number = checkpoint["model_answer"]
         model_stop = answer_number >= MAX_MODEL_ANSWERS or (
             answer_number >= self.minimum_answers
             and stop_probability >= self.stop_threshold
@@ -394,7 +428,11 @@ class LLMDrivenConsultation:
         escalation = checkpoint["answers"]["escalation"]
         ranked = sorted(
             condition["probabilities"].items(), key=lambda item: item[1], reverse=True
-        )[:3]
+        )
+        # ``out_of_scope`` is the scope classifier's sentinel, not a diagnosis.
+        # The top candidate is still passed separately to the safety guard, so a
+        # genuinely out-of-scope prediction remains blocking.
+        ranked = [item for item in ranked if item[0] != "out_of_scope"][:3]
         sources = [self.predictor.name, "LLM symptom extraction and question phrasing"]
         if self.safety_engine.condition_is_in_scope(condition["choice"]):
             query = " ".join(

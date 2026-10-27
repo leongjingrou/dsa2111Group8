@@ -38,7 +38,12 @@ def test_routine_consultation_from_start_through_screen_model_kb_and_explanation
         assert result["knowledge_base"]["version"] == "1.2.0"
         assert result["knowledge_base"]["results"]
         assert "routine teleconsultation" in result["reply"].lower()
-        assert len(predictor.calls) == 1
+        assert [call[2] for call in predictor.calls] == [1, 2]
+        for _, model_evidence, _ in predictor.calls:
+            assert not any(
+                model_evidence.symptoms.get(symptom_id) is False
+                for symptom_id in SafetyEngine().required_screening
+            )
         events = [
             json.loads(line)
             for line in (tmp_path / "audit.jsonl").read_text().splitlines()
@@ -60,6 +65,23 @@ def test_routine_consultation_from_start_through_screen_model_kb_and_explanation
             ).status_code
             == 404
         )
+
+
+def test_preliminary_urgent_model_label_waits_for_stopping_policy(app_factory):
+    predictor = RecordingPredictor(escalation="urgent")
+    with TestClient(app_factory(predictor=predictor)) as client:
+        session_id = start(client)
+        result = turn(
+            client,
+            session_id,
+            "I am 30 years old, not pregnant, and have a mild stable runny nose",
+        )
+        result, _ = finish_screen(client, session_id, result)
+
+    assert [call[2] for call in predictor.calls] == [1, 2]
+    assert result["status"] == "urgent"
+    assert result["safety"]["disposition"] == "urgent_review"
+    assert "MODEL_URGENT" in result["triggered_rules"]
 
 
 @pytest.mark.parametrize(
@@ -117,6 +139,13 @@ def test_explicit_negated_chest_pain_does_not_create_a_false_positive(client):
     assert "RF_CHEST_PAIN" not in result["triggered_rules"]
 
 
+def test_vague_opening_requests_free_form_symptom_detail_before_checklist(client):
+    result = turn(client, start(client), "feeling a bit sick ah")
+    assert result["status"] == "asking"
+    assert result["question_target"]["target"] == "presenting_symptoms"
+    assert "in your own words" in result["reply"].lower()
+
+
 def test_new_emergency_interrupts_a_demographic_question(client):
     session_id = start(client)
     result = turn(client, session_id, "I have a runny nose")
@@ -145,8 +174,14 @@ def test_screening_yes_is_bound_to_the_server_question(app_factory):
             "I am 30 years old and not pregnant. I have a runny nose",
         )
         for _ in range(30):
-            target = result["question_target"]["target"]
-            result = turn(client, session_id, "yes" if target == "chest_pain" else "no")
+            target = result["question_target"]
+            result = turn(
+                client,
+                session_id,
+                "I have chest pain"
+                if "chest_pain" in (target.get("targets") or [target["target"]])
+                else "no",
+            )
             if result["stop"]:
                 break
     assert "RF_CHEST_PAIN" in result["triggered_rules"]
@@ -201,6 +236,32 @@ def test_out_of_scope_prediction_is_referred_after_model_inference(app_factory):
     assert result["diagnosis"] is None
     assert result["decision_record"]["preliminary_estimates"] == []
     assert len(predictor.calls) == 1
+
+
+def test_scope_sentinel_alternative_is_not_exposed_as_a_diagnosis(app_factory):
+    class PredictorWithScopeSentinel(RecordingPredictor):
+        def predict(self, turns, evidence, answer_number):
+            answer = super().predict(turns, evidence, answer_number)
+            answer["condition"] = {
+                "choice": "common_cold",
+                "probabilities": {"common_cold": 0.6, "out_of_scope": 0.3},
+                "answer_confidence": 0.6,
+            }
+            return answer
+
+    predictor = PredictorWithScopeSentinel()
+    with TestClient(app_factory(predictor=predictor)) as client:
+        session_id = start(client)
+        result = turn(
+            client, session_id, "I am 30, not pregnant, and have a mild runny nose"
+        )
+        result, _ = finish_screen(client, session_id, result)
+
+    assert result["status"] == "complete"
+    assert "SCOPE_CONDITION" not in result["triggered_rules"]
+    assert "out_of_scope" not in {
+        item["condition"] for item in result["decision_record"]["preliminary_estimates"]
+    }
 
 
 def test_history_cannot_override_server_screening_state(client):

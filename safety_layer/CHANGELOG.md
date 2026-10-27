@@ -1,5 +1,19 @@
 # Safety policy changelog
 
+## 1.1.0 — 27 October 2026
+
+- Reduced the mandatory pre-model checklist to a compact set of immediately
+  life-threatening warning signs. Other red flags remain active whenever they
+  are reported and can be explored by the adaptive consultation flow.
+- Grouped the mandatory warning signs into one patient-facing question that
+  accepts either free text or an explicit "none" response.
+- Kept grouped negative screening facts in the safety record without injecting
+  them as simultaneous first-step diagnostic-model features.
+- Model-only urgent labels now wait for the learned stopping policy; explicit
+  emergency findings still stop immediately.
+- Clinical review status remains **pending**; this is a conversational prototype
+  policy change, not a validated clinical screening recommendation.
+
 ## Backend integration — 26 October 2026
 
 - Integrated mandatory pre-model and post-model checks into both consultation

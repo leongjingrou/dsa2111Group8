@@ -98,12 +98,17 @@ sudden_one_sided_weakness   swollen_tongue_or_throat
 seizure
 ```
 
-There are 28 required screening findings in total. Every one must be explicitly
-absent before the routine path can proceed. A positive rule is acted on
-immediately even if the remaining screen or demographics are incomplete. Missing
-and uncertain answers stay unknown; no checklist is prefilled with negative
-answers. The negative baseline in the fictional vignette file describes explicit
-test-patient answers and must never be used to initialize a real consultation.
+Policy 1.1.0 uses a compact mandatory screen for immediately life-threatening
+warning signs: breathing difficulty or chest pain; altered consciousness or
+seizure; uncontrolled bleeding; acute stroke signs; airway swelling; sudden
+worst-ever headache; and severe abdominal pain. The consultation groups these
+into one patient-facing question. Other configured red-flag rules remain active
+whenever the patient reports matching evidence and can be explored by the
+adaptive diagnostic conversation. A positive rule is acted on immediately even
+if the remaining screen or demographics are incomplete. Missing and uncertain
+answers stay unknown; no checklist is prefilled with negative answers. The
+negative baseline in the fictional vignette file describes explicit test-patient
+answers and must never be used to initialize a real consultation.
 
 When a Profile and an EvidenceState disagree, positive symptoms are retained.
 An uncertain finding cannot be erased by another parser's negative answer.

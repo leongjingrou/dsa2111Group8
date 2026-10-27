@@ -16,6 +16,7 @@ const greeting: Message = {
 
 const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([greeting])
+  const [conversationId, setConversationId] = useState<string>()
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState<DiagnosticStatus>('asking')
   const { recording, start, stop } = useRecorder()
@@ -46,7 +47,8 @@ const Chat = () => {
     setMessages(history)
     setLoading(true)
     try {
-      const result = await diagnose(history)
+      const result = await diagnose(text, conversationId)
+      setConversationId(result.conversation_id)
       reply(result.reply)
       setStatus(result.status)
     } catch {
@@ -82,7 +84,9 @@ const Chat = () => {
           End consultation
         </button>
       )}
-      <ChatInput onSend={send} onToggleMic={toggleMic} recording={recording} disabled={loading} />
+      {status === 'asking' && (
+        <ChatInput onSend={send} onToggleMic={toggleMic} recording={recording} disabled={loading} />
+      )}
     </main>
   )
 }

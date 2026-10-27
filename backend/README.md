@@ -54,10 +54,20 @@ submitted by the client. Age and pregnancy answers are collected explicitly.
 There are no blanket negative defaults. The seven supplemental safety symptoms
 are now in the extraction vocabulary and deterministic questionnaire.
 
-The five-answer model stopping policy cannot terminate an incomplete safety
-screen. After 64 unresolved intake answers, the backend refers to a clinician
-without producing a diagnosis. Ordinary symptom contradictions can be explicitly
-clarified; positive safety findings remain active and cause referral.
+The five-answer model stopping policy counts model-guided evidence turns rather
+than demographic or mandatory safety-intake turns, so a consultation may ask
+more than five questions. It cannot terminate an incomplete safety screen. The
+mandatory screen is a compact grouped emergency check; other red flags remain
+active when reported and may be explored adaptively. After 64 unresolved intake
+answers, the backend refers to a clinician without producing a diagnosis.
+Ordinary symptom contradictions can be explicitly clarified; positive safety
+findings remain active and cause referral.
+
+Grouped negative emergency answers remain available to the safety engine and
+audit trail but are not injected as a batch of diagnostic-model features. This
+keeps the compact checklist from distorting the sequential model's first
+checkpoint. A model-only urgent label is provisional until the stopping policy
+has enough model evidence; explicit rule-based danger signs remain immediate.
 
 ## Frontend-compatible route
 

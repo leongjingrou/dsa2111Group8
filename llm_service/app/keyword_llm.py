@@ -93,9 +93,26 @@ class KeywordLLM:
 
     async def complete_text(self, prompt_name, variables, temperature=0.3):
         if prompt_name == "ask":
-            return f"Could you tell me {variables['focus_instruction']} for your {variables['symptom_name']}?"
+            name = variables["symptom_name"]
+            focus = variables["focus_instruction"]
+            if focus.startswith("whether"):
+                return f"Have you also noticed {name}?"
+            if focus.startswith("how severe"):
+                return f"How severe is the {name}: mild, moderate, or severe?"
+            if focus.startswith("how long"):
+                return f"How long has the {name} been going on?"
+            return f"Is the {name} getting better, staying the same, or worsening?"
         if prompt_name == "ask_context":
-            return variables["question_instruction"].rstrip(".") + "?"
+            instruction = variables["question_instruction"]
+            if "main problem" in instruction:
+                return "Could you describe what feels wrong in your own words?"
+            if "current temperature" in instruction:
+                return "Have you measured your temperature? If so, what is it?"
+            if "patient's sex" in instruction:
+                return "What sex should the clinical model use, or would you prefer not to say?"
+            if "medical history" in instruction:
+                return "Do you have any relevant medical conditions, medicines, or allergies?"
+            return "Could you tell me a little more about that?"
         if prompt_name == "explain":
             return "The diagnostic model used the symptoms reported so far and its calibrated decision threshold."
         raise ValueError(f"Unsupported text prompt: {prompt_name}")

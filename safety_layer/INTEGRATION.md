@@ -56,13 +56,17 @@ remain separate from these patient API routes.
 - The integrated `Profile` has explicit age and pregnancy fields. The configured
   age scope is 18 to 64; pregnancy requires referral. These are project
   assumptions, not MOH eligibility rules.
-- `engine.required_screening` is the authoritative 28-item safety checklist.
+- `engine.required_screening` is the compact mandatory emergency screen. Other
+  red flags remain active whenever they are reported and are explored by the
+  adaptive consultation when relevant.
   All seven supplemental safety symptoms are included in the vocabulary and
   questionnaire. No negative answer is supplied by default.
 - Missing or uncertain findings block model assessment. Conflicting ordinary
   symptoms can be explicitly clarified; earlier positive red flags remain active.
-- The learned five-answer stopping policy runs only after screening permits
-  prediction. Model features retain their trained five-answer range. At 64
+- The learned five-answer stopping policy counts model-guided evidence turns,
+  not demographic or mandatory safety-intake turns. Model features retain their
+  trained five-answer range, so a consultation may legitimately contain more
+  than five patient replies. At 64
   unresolved intake answers the patient is referred without a model diagnosis.
 - A post-model check validates the actual selected condition and all displayed
   alternatives against the six-condition KB. It preserves urgent/specialist

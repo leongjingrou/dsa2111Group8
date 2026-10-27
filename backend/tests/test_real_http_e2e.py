@@ -135,7 +135,7 @@ def test_real_http_complete_screen_runs_trained_model(live_server):
     assert result["backend"] == "ebm"
     assert result["safety"]["phase"] == "post_model"
     assert result["decision_record"] is not None
-    assert result["patient_answer"] > 28
+    assert result["patient_answer"] >= 4
     # Synthetic model labels are not clinical ground truth. A safe model-based
     # referral is valid; the EBM is not forced to return a routine diagnosis.
     assert result["status"] in {"complete", "urgent"}

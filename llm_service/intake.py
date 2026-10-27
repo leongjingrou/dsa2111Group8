@@ -10,6 +10,7 @@ from llm_service.app.schema import ExtractedSymptom, ExtractionResult
 from llm_service.app.vocab import get_vocab
 
 UNCERTAIN_ANSWERS = {"not sure", "unsure", "i don't know"}
+NEGATIVE_GROUP_ANSWERS = {"no", "nope", "none", "none of those", "not any of those"}
 PRESENCE_ANSWERS = {
     "yes": "present",
     "no": "absent",
@@ -35,7 +36,7 @@ def empty_extraction():
     )
 
 
-def safety_question(decision):
+def safety_question(decision, profile=None):
     """Ask about a conflict first, otherwise the next missing safety field."""
     conflicts = [
         hit for hit in decision.triggered_rules if hit.rule_id == "DATA_CONTRADICTION"
@@ -45,6 +46,14 @@ def safety_question(decision):
     else:
         question_field = next(iter(decision.missing_information), "presenting_symptoms")
 
+    if profile is not None and not any(
+        symptom.presence == "present" for symptom in profile.symptoms.values()
+    ):
+        return (
+            {"kind": "context", "target": "presenting_symptoms", "focus": None},
+            "Could you describe what feels wrong in your own words, including where it is, when it started, how severe it feels, and whether it is changing?",
+        )
+
     if question_field == "age":
         target = {"kind": "safety", "target": "age", "focus": None}
         return target, "What is your age in years?"
@@ -53,6 +62,27 @@ def safety_question(decision):
         return target, (
             "Are you pregnant? Please answer pregnant, not pregnant, "
             "not applicable, or not sure."
+        )
+
+    missing_symptoms = [
+        field.removeprefix("symptoms.")
+        for field in decision.missing_information
+        if field.startswith("symptoms.")
+        and get_vocab().is_valid(field.removeprefix("symptoms."))
+    ]
+    if not conflicts and len(missing_symptoms) > 1:
+        target = {
+            "kind": "safety",
+            "target": "emergency_warning_signs",
+            "targets": missing_symptoms,
+            "focus": "presence",
+        }
+        return target, (
+            "Before we continue, are you having any emergency warning signs such as "
+            "trouble breathing or chest pain; fainting, a seizure, or severe confusion; "
+            "heavy bleeding; face droop, new speech trouble, or one-sided weakness; "
+            "tongue or throat swelling; a sudden worst-ever headache; or severe abdominal pain? "
+            "Tell me which one, or say none."
         )
 
     symptom_id = question_field.removeprefix("symptoms.")
@@ -83,6 +113,29 @@ def bind_answer(message, target, profile, evidence):
         return None
     normalized_answer = message.lower().strip().rstrip(".!?")
     question_field = target["target"]
+    grouped_targets = target.get("targets", [])
+    if question_field == "emergency_warning_signs" and grouped_targets:
+        if normalized_answer in NEGATIVE_GROUP_ANSWERS:
+            for symptom_id in grouped_targets:
+                evidence.symptoms[symptom_id] = False
+            return ExtractionResult(
+                symptoms=[
+                    ExtractedSymptom(
+                        symptom_id=symptom_id,
+                        presence="absent",
+                        severity=None,
+                        duration_days=None,
+                        progression=None,
+                        evidence=message,
+                    )
+                    for symptom_id in grouped_targets
+                ],
+                unmapped_mentions=[],
+                medical_history=[],
+                allergies=[],
+                medications=[],
+            )
+        return None
     if target["kind"] == "safety":
         if question_field == "age" and _bind_age(normalized_answer, profile, evidence):
             return empty_extraction()

@@ -83,7 +83,7 @@ def finish_screen(
         if result["stop"]:
             return result, seen
         target = result["question_target"]
-        seen.append(target["target"])
+        seen.extend(target.get("targets") or [target["target"]])
         answer = (
             "30"
             if target["target"] == "age"

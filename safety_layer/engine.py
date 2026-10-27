@@ -92,6 +92,7 @@ class SafetyEngine:
         evidence: Any = None,
         candidate_condition: str | None = None,
         proposed_action: str | None = None,
+        preserve_model_referral: bool = True,
         phase: str = "pre_model",
     ) -> SafetyDecision:
         """Normalize facts, collect every rule hit, then choose the highest urgency.
@@ -108,7 +109,8 @@ class SafetyEngine:
         rule_hits = self._match_clinical_rules(facts)
         rule_hits.extend(scope.rule_hits)
         rule_hits.extend(self._check_data_quality(facts, scope.missing_fields))
-        rule_hits.extend(self._preserve_model_referral(proposed_action))
+        if preserve_model_referral:
+            rule_hits.extend(self._preserve_model_referral(proposed_action))
         decision = self._build_decision(facts, scope, rule_hits, proposed_action, phase)
         if self.audit_log is not None:
             try:

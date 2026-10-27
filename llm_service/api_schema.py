@@ -17,6 +17,7 @@ class ModelAnswer(BaseModel):
 class QuestionTarget(BaseModel):
     kind: Literal["safety", "symptom", "context"]
     target: str
+    targets: list[str] | None = None
     focus: Literal["presence", "duration", "severity", "progression"] | None
 
 

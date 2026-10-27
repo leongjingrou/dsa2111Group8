@@ -25,12 +25,16 @@ FALLBACK_TEMPLATES: dict[str, str] = {
 CONTEXT_INSTRUCTIONS: dict[str, str] = {
     "presenting_symptoms": "Ask the patient to describe the main problem or symptoms in their own words.",
     "demographics": "Ask for age, temperature, sex, and pregnancy status when relevant.",
+    "temperature": "Ask the patient for their current temperature, if they have measured it.",
+    "sex": "Ask the patient's sex for the clinical model, while allowing them to decline.",
     "medical_history": "Ask briefly about relevant medical history, medicines, and allergies.",
 }
 
 CONTEXT_FALLBACKS: dict[str, str] = {
     "presenting_symptoms": "Could you describe the main problem or symptoms you are experiencing?",
     "demographics": "What is your age and temperature, and, if relevant, are you pregnant?",
+    "temperature": "Have you measured your temperature? If so, what is it?",
+    "sex": "What sex should the clinical model use, or would you prefer not to say?",
     "medical_history": "Do you have relevant medical conditions, medicines, or allergies?",
 }
 

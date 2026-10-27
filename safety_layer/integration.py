@@ -70,6 +70,7 @@ def guard_decision(
     candidate_condition: str | None = None,
     evidence: Any = None,
     engine: SafetyEngine | None = None,
+    preserve_model_referral: bool = True,
 ) -> GuardedResult:
     """Mandatory post-model check. Use the returned record, never the original.
 
@@ -101,6 +102,7 @@ def guard_decision(
         evidence=evidence,
         candidate_condition=candidate_condition,
         proposed_action=action,
+        preserve_model_referral=preserve_model_referral,
         phase="post_model",
     )
     return result_from_safety(decision, record, engine.source_urls)

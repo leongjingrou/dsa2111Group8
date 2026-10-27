@@ -1,10 +1,16 @@
-import type { Diagnosis, Message } from './types'
+import type { Diagnosis } from './types'
 
-export const diagnose = async (history: Message[]): Promise<Diagnosis> => {
+export const diagnose = async (
+  patientMessage: string,
+  conversationId?: string,
+): Promise<Diagnosis> => {
   const res = await fetch('/api/diagnose', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages: history }),
+    body: JSON.stringify({
+      patient_message: patientMessage,
+      conversation_id: conversationId,
+    }),
   })
   if (!res.ok) throw new Error(`Diagnose failed: ${res.status}`)
   return res.json()
