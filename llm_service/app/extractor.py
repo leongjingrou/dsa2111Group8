@@ -41,7 +41,9 @@ def sanitize(result: ExtractionResult, vocab: Vocab) -> ExtractionResult:
     return result.model_copy(update={"symptoms": list(kept.values()), "unmapped_mentions": unmapped})
 
 
-async def extract_symptoms(llm: LLM, message: str, profile: Profile) -> ExtractionResult:
+async def extract_symptoms(
+    llm: LLM, message: str, profile: Profile, question_target: dict | None = None
+) -> ExtractionResult:
     vocab = get_vocab()
     result = await llm.complete_structured(
         "extract",
@@ -49,6 +51,7 @@ async def extract_symptoms(llm: LLM, message: str, profile: Profile) -> Extracti
             "patient_message": message.strip(),
             "known_symptoms": vocab.prompt_listing(),
             "current_profile": _profile_for_prompt(profile),
+            "question_target": json.dumps(question_target),
         },
         ExtractionResult,
     )

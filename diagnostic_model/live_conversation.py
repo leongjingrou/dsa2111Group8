@@ -92,7 +92,9 @@ class EvidenceState:
     progression: str | None = None
     age: float | None = None
     temperature_c: float | None = None
+    temperature_asked: bool = False
     sex: str | None = None
+    sex_asked: bool = False
     pregnant: bool | None = None
 
     def update(self, message):
@@ -138,6 +140,7 @@ class EvidenceState:
             self.temperature_c = float(
                 f"{temperature.group(1)}.{temperature.group(2) or 0}"
             )
+            self.temperature_asked = True
         age = re.search(
             r"\b(?:i am|i'm|age(?: is)?|aged)\s+(\d{1,3})(?:\s+years? old)?\b", text
         )
@@ -147,8 +150,10 @@ class EvidenceState:
                 self.age = float(candidate)
         if re.search(r"\b(female|woman)\b", text):
             self.sex = "F"
+            self.sex_asked = True
         elif re.search(r"\b(male|man)\b", text):
             self.sex = "M"
+            self.sex_asked = True
         if re.search(r"\b(not pregnant|i am not pregnant|i'm not pregnant)\b", text):
             self.pregnant = False
         elif re.search(r"\b(pregnant|expecting a baby)\b", text):

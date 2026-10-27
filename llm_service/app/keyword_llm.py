@@ -5,6 +5,7 @@ useful when measuring the local orchestration stack without including latency,
 cost, rate limits, or availability from an external LLM provider.
 """
 
+import json
 import re
 
 from .negation import is_negated
@@ -18,7 +19,32 @@ SEVERITY = {
     "moderate": "moderate",
     "mild": "mild",
     "slight": "mild",
+    "jialat": "severe",
 }
+
+TERM_STOPWORDS = {"a", "an", "of", "the"}
+
+
+def _term_hits(text, term):
+    """Find exact terms plus close, reordered multi-word phrasing.
+
+    The latter keeps the deterministic fallback useful for conversational input
+    such as ``nose all runny`` without maintaining a phrase-by-phrase rule list.
+    """
+    exact = [(match.start(), match.end()) for match in re.finditer(rf"\b{re.escape(term)}\b", text)]
+    if exact:
+        return exact
+    wanted = [token for token in re.findall(r"[a-z0-9]+", term) if token not in TERM_STOPWORDS]
+    if len(wanted) < 2:
+        return []
+    tokens = list(re.finditer(r"\b[a-z0-9]+\b", text))
+    width = len(wanted) + 2
+    for index in range(len(tokens)):
+        window = tokens[index : index + width]
+        words = {match.group() for match in window}
+        if all(token in words for token in wanted):
+            return [(window[0].start(), window[-1].end())]
+    return []
 
 
 class KeywordLLM:
@@ -61,17 +87,19 @@ class KeywordLLM:
                 *[item.lower() for item in entry.get("synonyms", [])],
             ]
             hits = [
-                (match.start(), term)
+                (start, end, term)
                 for term in terms
                 if term
-                for match in re.finditer(rf"\b{re.escape(term)}\b", text)
+                for start, end in _term_hits(text, term)
             ]
             if not hits:
                 continue
             positive_hits = [
-                (start, term) for start, term in hits if not is_negated(text, start)
+                (start, end, term)
+                for start, end, term in hits
+                if not is_negated(text, start)
             ]
-            start, hit = min(positive_hits or hits)
+            start, end, _ = min(positive_hits or hits)
             present = bool(positive_hits)
             symptoms.append(
                 ExtractedSymptom(
@@ -80,7 +108,7 @@ class KeywordLLM:
                     severity=severity if present else None,
                     duration_days=days if present else None,
                     progression=progression if present else None,
-                    evidence=message[start : start + len(hit)],
+                    evidence=message[start:end],
                 )
             )
         return ExtractionResult(
@@ -95,13 +123,13 @@ class KeywordLLM:
         if prompt_name == "ask":
             name = variables["symptom_name"]
             focus = variables["focus_instruction"]
-            if focus.startswith("whether"):
-                return f"Have you also noticed {name}?"
+            if "getting better" in focus:
+                return f"Is the {name} getting better, staying the same, or worsening?"
             if focus.startswith("how severe"):
                 return f"How severe is the {name}: mild, moderate, or severe?"
             if focus.startswith("how long"):
                 return f"How long has the {name} been going on?"
-            return f"Is the {name} getting better, staying the same, or worsening?"
+            return f"Have you also noticed {name}?"
         if prompt_name == "ask_context":
             instruction = variables["question_instruction"]
             if "main problem" in instruction:
@@ -109,10 +137,21 @@ class KeywordLLM:
             if "current temperature" in instruction:
                 return "Have you measured your temperature? If so, what is it?"
             if "patient's sex" in instruction:
-                return "What sex should the clinical model use, or would you prefer not to say?"
+                return "For this health assessment, what sex were you assigned at birth? You can also choose not to say."
             if "medical history" in instruction:
                 return "Do you have any relevant medical conditions, medicines, or allergies?"
             return "Could you tell me a little more about that?"
         if prompt_name == "explain":
-            return "The diagnostic model used the symptoms reported so far and its calibrated decision threshold."
+            record = json.loads(variables["decision_record"])
+            estimates = record.get("preliminary_estimates", [])
+            if estimates:
+                leading = estimates[0]
+                label = leading["condition"].replace("_", " ")
+                score = leading.get("score")
+                confidence = f" ({score:.0%} model confidence)" if score is not None else ""
+                return (
+                    f"The leading preliminary match is {label}{confidence}. "
+                    "A doctor should review this assessment and confirm the diagnosis."
+                )
+            return "A healthcare professional should review the assessment and decide the next step."
         raise ValueError(f"Unsupported text prompt: {prompt_name}")

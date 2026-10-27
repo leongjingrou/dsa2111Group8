@@ -34,7 +34,7 @@ CONTEXT_FALLBACKS: dict[str, str] = {
     "presenting_symptoms": "Could you describe the main problem or symptoms you are experiencing?",
     "demographics": "What is your age and temperature, and, if relevant, are you pregnant?",
     "temperature": "Have you measured your temperature? If so, what is it?",
-    "sex": "What sex should the clinical model use, or would you prefer not to say?",
+    "sex": "For this health assessment, what sex were you assigned at birth? You can also choose not to say.",
     "medical_history": "Do you have relevant medical conditions, medicines, or allergies?",
 }
 

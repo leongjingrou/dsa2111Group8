@@ -24,6 +24,36 @@ PREGNANCY_ANSWERS = {
     "not applicable": "not_applicable",
     **dict.fromkeys(UNCERTAIN_ANSWERS, "uncertain"),
 }
+NUMBER_WORDS = {
+    "zero": 0,
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+    "eleven": 11,
+    "twelve": 12,
+    "thirteen": 13,
+    "fourteen": 14,
+    "fifteen": 15,
+    "sixteen": 16,
+    "seventeen": 17,
+    "eighteen": 18,
+    "nineteen": 19,
+    "twenty": 20,
+    "thirty": 30,
+    "forty": 40,
+    "fifty": 50,
+    "sixty": 60,
+    "seventy": 70,
+    "eighty": 80,
+    "ninety": 90,
+}
 
 
 def empty_extraction():
@@ -56,13 +86,10 @@ def safety_question(decision, profile=None):
 
     if question_field == "age":
         target = {"kind": "safety", "target": "age", "focus": None}
-        return target, "What is your age in years?"
+        return target, "How old are you?"
     if question_field == "pregnancy_status":
         target = {"kind": "safety", "target": "pregnancy_status", "focus": None}
-        return target, (
-            "Are you pregnant? Please answer pregnant, not pregnant, "
-            "not applicable, or not sure."
-        )
+        return target, "Is there any chance you could be pregnant?"
 
     missing_symptoms = [
         field.removeprefix("symptoms.")
@@ -111,11 +138,14 @@ def bind_answer(message, target, profile, evidence):
     """
     if target is None:
         return None
-    normalized_answer = message.lower().strip().rstrip(".!?")
+    normalized_answer = _normalize_conversational_answer(message)
     question_field = target["target"]
     grouped_targets = target.get("targets", [])
     if question_field == "emergency_warning_signs" and grouped_targets:
-        if normalized_answer in NEGATIVE_GROUP_ANSWERS:
+        if normalized_answer in NEGATIVE_GROUP_ANSWERS or re.fullmatch(
+            r"(?:nah[, ]*)?(?:no(?:pe)?[, ]*)?(?:none|none of (?:that|them|those)|not any of (?:them|those))(?:[, ]+(?:thanks?|thank you|thankfully|thank u|tbh))?",
+            normalized_answer,
+        ):
             for symptom_id in grouped_targets:
                 evidence.symptoms[symptom_id] = False
             return ExtractionResult(
@@ -136,6 +166,13 @@ def bind_answer(message, target, profile, evidence):
                 medications=[],
             )
         return None
+    if target["kind"] == "context":
+        if question_field == "temperature" and _bind_temperature(
+            normalized_answer, evidence
+        ):
+            return empty_extraction()
+        if question_field == "sex" and _bind_sex(normalized_answer, evidence):
+            return empty_extraction()
     if target["kind"] == "safety":
         if question_field == "age" and _bind_age(normalized_answer, profile, evidence):
             return empty_extraction()
@@ -147,9 +184,10 @@ def bind_answer(message, target, profile, evidence):
     if (
         get_vocab().is_valid(question_field)
         and target.get("focus") == "presence"
-        and normalized_answer in PRESENCE_ANSWERS
     ):
-        presence = PRESENCE_ANSWERS[normalized_answer]
+        presence = _presence_from_answer(normalized_answer)
+        if presence is None:
+            return None
         if presence == "uncertain":
             evidence.symptoms.pop(question_field, None)
         else:
@@ -165,18 +203,26 @@ def bind_answer(message, target, profile, evidence):
 
 
 def _bind_age(answer, profile, evidence):
-    if re.fullmatch(r"\d{1,3}(?:\.\d+)?(?: years? old)?", answer):
-        age = float(answer.split()[0])
-        if 0 <= age <= 120:
-            profile.age = evidence.age = age
+    age = _number_from_text(answer)
+    if age is not None and 0 < age < 120:
+        profile.age = evidence.age = age
         return True
     return answer in UNCERTAIN_ANSWERS
 
 
 def _bind_pregnancy(answer, profile, evidence):
-    if answer not in PREGNANCY_ANSWERS:
-        return False
-    status = PREGNANCY_ANSWERS[answer]
+    status = PREGNANCY_ANSWERS.get(answer)
+    if status is None:
+        if re.search(r"\b(not|isn'?t|am not)\s+pregnant\b", answer):
+            status = "not_pregnant"
+        elif re.search(r"\b(pregnant|expecting)\b", answer):
+            status = "pregnant"
+        elif re.search(
+            r"\b(not applicable|doesn'?t apply|does not apply|no uterus)\b", answer
+        ):
+            status = "not_applicable"
+        else:
+            return False
     profile.pregnancy_status = status
     if status == "pregnant":
         evidence.pregnant = True
@@ -187,19 +233,141 @@ def _bind_pregnancy(answer, profile, evidence):
     return True
 
 
+def _bind_temperature(answer, evidence):
+    match = re.fullmatch(
+        r".*?((?:3[5-9]|4[0-2])(?:\.\d+)?)\s*(?:°?c|degrees?\s*c?)?.*",
+        answer,
+    )
+    fahrenheit = re.search(
+        r"\b((?:9[5-9]|10[0-8])(?:\.\d+)?)\s*(?:°?f|fahrenheit)\b",
+        answer,
+    )
+    if fahrenheit:
+        evidence.temperature_c = round((float(fahrenheit.group(1)) - 32) * 5 / 9, 1)
+        evidence.temperature_asked = True
+        return True
+    if match:
+        evidence.temperature_c = float(match.group(1))
+        evidence.temperature_asked = True
+        return True
+    if re.search(
+        r"\b(no|not measured|never measure[ds]?|haven'?t measured|don'?t know|not sure|unknown)\b",
+        answer,
+    ):
+        evidence.temperature_asked = True
+        return True
+    return False
+
+
+def _bind_sex(answer, evidence):
+    normalized = {
+        "f": "F",
+        "female": "F",
+        "woman": "F",
+        "m": "M",
+        "male": "M",
+        "man": "M",
+    }
+    if re.search(r"\b(prefer not|rather not|decline|not sure)\b", answer):
+        evidence.sex_asked = True
+        return True
+    matched = next(
+        (value for word, value in normalized.items() if re.search(rf"\b{word}\b", answer)),
+        None,
+    )
+    if matched is None:
+        return False
+    evidence.sex = matched
+    evidence.sex_asked = True
+    return True
+
+
 def _parse_symptom_detail(answer, focus):
     if focus == "duration":
-        match = re.fullmatch(
-            r"(?:for )?(\d+(?:\.\d+)?)\s*(days?|weeks?|months?)", answer
-        )
+        match = re.search(r"(\d+(?:\.\d+)?)\s*(days?|weeks?|months?)", answer)
         if match:
             days_per_unit = {"d": 1, "w": 7, "m": 30}
             return {"duration_days": float(match[1]) * days_per_unit[match[2][0]]}
-    elif focus == "severity" and answer in {"mild", "moderate", "severe"}:
-        return {"severity": answer}
-    elif focus == "progression" and answer in {"improving", "stable", "worsening"}:
-        return {"progression": answer}
+        word_match = re.search(
+            r"\b([a-z-]+(?:\s+[a-z-]+)?)\s*(days?|weeks?|months?)\b", answer
+        )
+        if word_match:
+            amount = _number_from_text(word_match[1])
+            if amount is not None:
+                days_per_unit = {"d": 1, "w": 7, "m": 30}
+                return {"duration_days": amount * days_per_unit[word_match[2][0]]}
+        if re.search(r"\b(?:yesterday|yday|yest(?:er)?day)\b", answer):
+            return {"duration_days": 1.0}
+        if re.search(r"\b(?:today|tdy|this morning|last night)\b", answer):
+            return {"duration_days": 0.5}
+    elif focus == "severity":
+        for phrase, severity in (
+            (r"\b(severe|terrible|unbearable|very bad|jialat)\b", "severe"),
+            (r"\b(moderate|medium)\b", "moderate"),
+            (r"\b(mild|slight|a little|not too bad)\b", "mild"),
+        ):
+            if re.search(phrase, answer):
+                return {"severity": severity}
+    elif focus == "progression":
+        if re.search(r"\b(better|improving|easing)\b", answer):
+            return {"progression": "improving"}
+        if re.search(r"\b(stable|same|unchanged|about the same)\b", answer):
+            return {"progression": "stable"}
+        if re.search(r"\b(worse|worsening|getting bad)\b", answer):
+            return {"progression": "worsening"}
     return {}
+
+
+def _presence_from_answer(answer):
+    if answer in PRESENCE_ANSWERS:
+        return PRESENCE_ANSWERS[answer]
+    if re.fullmatch(
+        r"(?:no(?:pe)?|not really|i (?:do not|don'?t|haven'?t)|don'?t have|not that i(?:'?ve| have) noticed)(?:[, ]+(?:thanks?|tbh))?",
+        answer,
+    ):
+        return "absent"
+    if re.fullmatch(r"(?:yes|yeah|yep|i do|i have|got|a little|sometimes)", answer):
+        return "present"
+    if re.fullmatch(r"(?:maybe|possibly|i(?:'m| am) not sure|hard to say)", answer):
+        return "uncertain"
+    return None
+
+
+def _normalize_conversational_answer(message):
+    """Normalize common shorthand and Singlish particles without changing evidence."""
+    answer = message.lower().strip().rstrip(".!?")
+    replacements = (
+        (r"\bytd\b", "yesterday"),
+        (r"\btdy\b", "today"),
+        (r"\babit\b", "a bit"),
+        (r"\bdunno\b", "not sure"),
+        (r"\bboh?\b", "no"),
+        (r"\bnvr\b", "never"),
+    )
+    for pattern, replacement in replacements:
+        answer = re.sub(pattern, replacement, answer)
+    # Sentence-final particles carry tone rather than clinical meaning.
+    answer = re.sub(r"(?:[, ]+)(?:lah|leh|lor|sia|mah|hor)+$", "", answer).strip()
+    return re.sub(r"\s+", " ", answer)
+
+
+def _number_from_text(answer):
+    numeric = re.search(r"\b\d{1,3}(?:\.\d+)?\b", answer)
+    if numeric:
+        return float(numeric.group())
+    words = answer.replace("-", " ").split()
+    values = [NUMBER_WORDS[word] for word in words if word in NUMBER_WORDS]
+    if not values:
+        return None
+    total = 0
+    for value in values:
+        if value >= 20 and value % 10 == 0:
+            total += value
+        elif total and total % 10 == 0:
+            total += value
+        else:
+            total = value
+    return float(total)
 
 
 def _symptom_extraction(symptom_id, message, presence, **details):

@@ -54,6 +54,13 @@ submitted by the client. Age and pregnancy answers are collected explicitly.
 There are no blanket negative defaults. The seven supplemental safety symptoms
 are now in the extraction vocabulary and deterministic questionnaire.
 
+Replies are context-aware rather than command-driven. Numeric temperatures,
+ages in a sentence, Celsius or Fahrenheit, conversational pregnancy/sex replies,
+and free-form symptom presence, duration, severity and progression are accepted.
+The pending question is also passed to the remote language extractor, allowing
+the configured lightweight model to interpret wider colloquial phrasing without
+giving it control over question targets or medical decisions.
+
 The five-answer model stopping policy counts model-guided evidence turns rather
 than demographic or mandatory safety-intake turns, so a consultation may ask
 more than five questions. It cannot terminate an incomplete safety screen. The

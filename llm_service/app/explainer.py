@@ -41,13 +41,21 @@ DISCLAIMERS: dict[str, str] = {
 
 def _fallback_body(record: DecisionRecord) -> str:
     parts = []
-    if record.triggered_rules:
-        parts.append("Reasons: " + "; ".join(record.triggered_rules) + ".")
+    if record.preliminary_estimates:
+        leading = record.preliminary_estimates[0]
+        label = leading.condition.replace("_", " ")
+        confidence = (
+            f" ({leading.score:.0%} model confidence)"
+            if leading.score is not None
+            else ""
+        )
+        parts.append(
+            f"The leading preliminary match is {label}{confidence}, but a doctor must confirm it."
+        )
     if record.missing_information:
         parts.append("Information not yet confirmed: " + "; ".join(record.missing_information) + ".")
-    if record.limitations:
-        parts.append("Limitations: " + "; ".join(record.limitations) + ".")
-    return " ".join(parts) or "Please speak to a healthcare professional about your concerns."
+    parts.append("Share this assessment with the healthcare professional who reviews you.")
+    return " ".join(parts)
 
 
 async def explain(llm: LLM, record: DecisionRecord, audience: Audience = "patient") -> ExplainResponse:

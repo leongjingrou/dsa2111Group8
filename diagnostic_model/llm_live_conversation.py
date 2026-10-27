@@ -83,9 +83,9 @@ def select_question_target(
         return "symptom", symptom_id, focus
 
     if answer_number >= 4:
-        if evidence.temperature_c is None:
+        if not evidence.temperature_asked:
             return "context", "temperature", None
-        if evidence.sex is None:
+        if not evidence.sex_asked:
             return "context", "sex", None
 
     entries = get_vocab()._entries
@@ -219,7 +219,9 @@ class LLMDrivenConsultation:
 
         extraction = bound_extraction
         if extraction is None:
-            extraction = await extract_symptoms(self.llm, patient_message, self.profile)
+            extraction = await extract_symptoms(
+                self.llm, patient_message, self.profile, previous_question
+            )
         self._merge_patient_facts(extraction, bound_extraction, previous_question)
         checkpoint = self._checkpoint(patient_message, extraction)
 

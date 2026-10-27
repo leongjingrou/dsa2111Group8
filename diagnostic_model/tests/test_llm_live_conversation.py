@@ -118,6 +118,8 @@ def test_llm_phrases_questions_but_predictor_owns_decisions():
         assert second["answers"]["condition"]["choice"] == "influenza"
         assert second["profile"]["symptoms"]["fever"]["duration_days"] == 2
         assert "automated pre-screening" in second["doctor_response"].lower()
-        assert llm.calls == ["extract", "ask", "extract", "explain"]
+        # The contextual binder understands "For two days" without spending a
+        # second LLM call; the model still owns the decision and explanation.
+        assert llm.calls == ["extract", "ask", "explain"]
 
     asyncio.run(run())

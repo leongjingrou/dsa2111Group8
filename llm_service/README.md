@@ -11,6 +11,15 @@ diagnostic authority.
 6. At finalisation, the LLM may explain the fixed result but cannot change its
    diagnosis, escalation, or urgency headline.
 
+The conversation contract is documented in
+[`prompts/CONVERSATION_STYLE.md`](prompts/CONVERSATION_STYLE.md). Runtime prompt
+versions remain in `prompts/prompts.yaml`. The pending server-selected question
+is supplied to extraction, so fragments such as `37`, `about two weeks`, or
+`not that I've noticed` are interpreted in context without requiring exact
+commands. Common replies are handled locally; a configured OpenAI-compatible
+lightweight model handles broader colloquial free text while remaining outside
+the diagnosis, escalation and stopping decisions.
+
 Run the combined HTTP service with the relevant model paths and provider
 settings:
 
