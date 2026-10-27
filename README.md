@@ -1,9 +1,12 @@
 # DSA2111 Group 8 — Telemedicine prototype
 
-The complete team repository is integrated with task 4's versioned safety layer.
-The backend runs intake, safety screening, EBM/Laya decision interfaces,
-knowledge-base retrieval, and guarded explanation. The frontend is still in
-progress; backend testing does not depend on it.
+The complete team repository includes the browser frontend, persisted multi-turn
+intake, versioned safety screening, EBM/Laya decision interfaces, knowledge-base
+retrieval, and guarded explanation. The Docker stack runs the frontend with three
+backend replicas sharing consultation state.
+
+The latest browser, Docker, safety and load-test handoff is recorded in
+[TESTING_NOTES.md](TESTING_NOTES.md).
 
 ## Install and test
 
@@ -61,6 +64,7 @@ python scripts/evaluate_safety_api.py --base-url http://127.0.0.1:8000 --output 
 | Medical knowledge base | [knowledge_base/README.md](knowledge_base/README.md) |
 | Language service | [llm_service/README.md](llm_service/README.md) |
 | Integration validation evidence | [backend/evaluation/REPORT.md](backend/evaluation/REPORT.md) |
+| Latest browser and server test notes | [TESTING_NOTES.md](TESTING_NOTES.md) |
 
 The consultation API always enables the versioned safety layer. Historical raw
 model/simulation benchmarks remain separate research tools. Synthetic test

@@ -35,13 +35,15 @@ For Laya, set `MODEL_BACKEND=laya`, `LAYA_MODEL_DIR`, and `LAYA_DEVICE=cuda`.
 Start a session with `POST /api/conversations`, then send each patient reply to
 `POST /api/conversations/{session_id}/turn`.
 
-The service keeps session state in one process. A multi-replica deployment must
-use sticky routing or replace the in-memory session store with shared storage.
+The integrated backend persists versioned consultation snapshots in SQLite on a
+shared Docker volume, so the supplied multi-replica Compose stack can continue a
+conversation across backend replicas.
 `LLM_BACKEND=keyword` selects the deterministic language adapter used by server
 integration and Kubernetes load tests. It removes external provider latency,
 cost, and rate limits; it is not a clinical model or evidence of real-LLM
 quality. Production defaults to `LLM_BACKEND=remote`. The `deploy/k8s-llm`
 overlay enables client-IP affinity while sessions remain process-local.
-The Singapore safety profile remains disabled by default. Setting
-`safety_profile` to `sg_moh` enables the separately logged jurisdictional
-emergency-phrase override; it does not alter model confidence.
+The standalone language-service entry point retains its configurable safety
+profile. The patient-facing integrated backend always applies the mandatory
+versioned safety rules; language-model output never alters model confidence or
+the safety disposition.
