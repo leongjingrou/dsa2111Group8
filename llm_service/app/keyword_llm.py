@@ -7,6 +7,10 @@ cost, rate limits, or availability from an external LLM provider.
 
 import json
 import re
+from functools import lru_cache
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from .negation import is_negated
 from .schema import ExtractedSymptom, ExtractionResult
@@ -47,6 +51,55 @@ def _term_hits(text, term):
     return []
 
 
+def _entry_terms(symptom_id, entry):
+    """Return deterministic phrases, including alternatives in display labels."""
+    name = entry.get("name", "").lower()
+    terms = [symptom_id.replace("_", " "), name]
+    terms.extend(item.lower() for item in entry.get("synonyms", []))
+    # Labels such as "Flank / back pain" express alternative patient wording.
+    # Matching only the entire display label discarded ordinary "back pain".
+    if "/" in name:
+        terms.extend(part.strip(" ()") for part in name.split("/"))
+    return list(dict.fromkeys(term for term in terms if term))
+
+
+@lru_cache
+def _vector_index():
+    """Build a small offline text-embedding index over labels and synonyms."""
+    phrases = []
+    symptom_ids = []
+    for symptom_id, entry in get_vocab()._entries.items():
+        terms = _entry_terms(symptom_id, entry)
+        phrases.extend(terms)
+        symptom_ids.extend([symptom_id] * len(terms))
+    vectorizer = TfidfVectorizer(
+        analyzer="char_wb",
+        ngram_range=(2, 5),
+        strip_accents="unicode",
+        sublinear_tf=True,
+    )
+    matrix = vectorizer.fit_transform(phrases)
+    return vectorizer, matrix, symptom_ids
+
+
+def _vector_match(text):
+    """Return a high-separation vector match, otherwise decline to guess."""
+    if re.search(r"\b(?:no|not|without|don'?t|never|bo)\b", text):
+        return None
+    vectorizer, matrix, symptom_ids = _vector_index()
+    similarities = cosine_similarity(vectorizer.transform([text]), matrix)[0]
+    by_symptom = {}
+    for symptom_id, score in zip(symptom_ids, similarities):
+        by_symptom[symptom_id] = max(by_symptom.get(symptom_id, 0.0), float(score))
+    ranked = sorted(by_symptom.items(), key=lambda item: item[1], reverse=True)
+    if len(ranked) < 2:
+        return None
+    (best_id, best_score), (_, second_score) = ranked[:2]
+    if best_score < 0.20 or best_score - second_score < 0.08:
+        return None
+    return best_id, best_score
+
+
 class KeywordLLM:
     """OpenAI-client-compatible deterministic benchmark double."""
 
@@ -81,11 +134,7 @@ class KeywordLLM:
 
         symptoms = []
         for symptom_id, entry in get_vocab()._entries.items():
-            terms = [
-                symptom_id.replace("_", " "),
-                entry.get("name", "").lower(),
-                *[item.lower() for item in entry.get("synonyms", [])],
-            ]
+            terms = _entry_terms(symptom_id, entry)
             hits = [
                 (start, end, term)
                 for term in terms
@@ -111,6 +160,20 @@ class KeywordLLM:
                     evidence=message[start:end],
                 )
             )
+        if not symptoms:
+            vector_match = _vector_match(text)
+            if vector_match is not None:
+                symptom_id, _ = vector_match
+                symptoms.append(
+                    ExtractedSymptom(
+                        symptom_id=symptom_id,
+                        presence="present",
+                        severity=severity,
+                        duration_days=days,
+                        progression=progression,
+                        evidence=message,
+                    )
+                )
         return ExtractionResult(
             symptoms=symptoms,
             unmapped_mentions=[],

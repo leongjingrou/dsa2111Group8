@@ -146,6 +146,19 @@ def test_vague_opening_requests_free_form_symptom_detail_before_checklist(client
     assert "in your own words" in result["reply"].lower()
 
 
+def test_specific_followup_is_processed_instead_of_repeating_opening_question(client):
+    session_id = start(client)
+    result = turn(client, session_id, "little sick")
+    assert result["question_target"]["target"] == "presenting_symptoms"
+
+    result = turn(client, session_id, "back pain and cramps a bit")
+
+    assert result["stop"] is True
+    assert result["question_target"] is None
+    assert "RF_FLANK_PAIN" in result["triggered_rules"]
+    assert "describe what feels wrong" not in result["reply"].lower()
+
+
 def test_new_emergency_interrupts_a_demographic_question(client):
     session_id = start(client)
     result = turn(client, session_id, "I have a runny nose")

@@ -11,6 +11,10 @@ Laya/CUDA inference was documented but not claimed as locally verified.
   terminal response.
 - Intake accepts open-ended sentences, fragments, typos and common Singlish such
   as `ytd`, `abit`, `bo`, `lah`, `leh`, `lor`, `jialat` and `nvr measure`.
+- The offline adapter uses exact aliases first and a conservative local TF-IDF
+  text-embedding/cosine-similarity fallback second. Low-confidence language is
+  preserved as an unmapped finding for clinician review instead of being dropped
+  or causing the opening question to loop.
 - Mandatory emergency coverage is grouped briefly; adaptive clinical questions
   may continue beyond five total turns when information is still missing.
 - Recognized answers are not asked again. Temperature, sex and symptom-detail

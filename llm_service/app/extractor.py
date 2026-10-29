@@ -5,10 +5,18 @@ the vocabulary. IDs the LLM invents are dropped and their text is kept in
 unmapped_mentions instead.
 """
 import json
+import re
 
 from .llm_client import LLM
 from .schema import ExtractionResult, Profile
 from .vocab import Vocab, get_vocab
+
+VAGUE_PRESENTING_REPLIES = re.compile(
+    r"^(?:(?:i\s+)?(?:do\s*not|don't|dunno)\s+know|not sure|unsure|"
+    r"same(?: thing)?|nothing|no idea|hard to say|just sick|feel(?:ing)? sick)"
+    r"[.! ]*$",
+    re.IGNORECASE,
+)
 
 
 def _profile_for_prompt(profile: Profile) -> str:
@@ -55,4 +63,21 @@ async def extract_symptoms(
         },
         ExtractionResult,
     )
-    return sanitize(result, vocab)
+    result = sanitize(result, vocab)
+    # Once the server explicitly asks for the presenting complaint, never
+    # silently discard a substantive answer merely because an extractor cannot
+    # map it to the model's closed vocabulary. Preserving the patient's words as
+    # an unmapped finding lets safety route it to clinician review instead of
+    # repeating the opening prompt.
+    is_presenting_answer = (
+        question_target is not None
+        and question_target.get("target") == "presenting_symptoms"
+    )
+    if (
+        is_presenting_answer
+        and not result.symptoms
+        and not result.unmapped_mentions
+        and not VAGUE_PRESENTING_REPLIES.fullmatch(message.strip())
+    ):
+        result = result.model_copy(update={"unmapped_mentions": [message.strip()]})
+    return result

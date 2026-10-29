@@ -147,6 +147,26 @@ def test_remote_extractor_receives_pending_question_context():
     assert json.loads(llm.calls[0][1]["question_target"]) == target
 
 
+def test_substantive_unmapped_presenting_answer_is_preserved_not_discarded():
+    llm = FakeLLMClient(structured={"extract": empty_extraction()})
+    target = {"kind": "context", "target": "presenting_symptoms", "focus": None}
+
+    result = asyncio.run(
+        extract_symptoms(llm, "strange cramps behind my shoulder", Profile(), target)
+    )
+
+    assert result.unmapped_mentions == ["strange cramps behind my shoulder"]
+
+
+def test_vague_presenting_answer_can_still_be_clarified():
+    llm = FakeLLMClient(structured={"extract": empty_extraction()})
+    target = {"kind": "context", "target": "presenting_symptoms", "focus": None}
+
+    result = asyncio.run(extract_symptoms(llm, "not sure", Profile(), target))
+
+    assert result.unmapped_mentions == []
+
+
 def test_colloquial_grouped_safety_denial_is_understood():
     evidence = EvidenceState()
     targets = ["chest_pain", "shortness_of_breath"]
