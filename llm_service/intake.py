@@ -76,6 +76,34 @@ def safety_question(decision, profile=None):
     else:
         question_field = next(iter(decision.missing_information), "presenting_symptoms")
 
+    uncertain = [] if profile is None else [
+        symptom
+        for symptom in profile.symptoms.values()
+        if symptom.presence == "uncertain"
+    ]
+    if uncertain:
+        symptom = uncertain[0]
+        evidence = (symptom.evidence or "that description").strip()
+        if symptom.symptom_id == "flank_pain":
+            question = (
+                f"I want to make sure I understood '{evidence}'. Is the pain specifically "
+                "in your flank—the side of your back just below the ribs—or is it elsewhere?"
+            )
+        else:
+            question = (
+                f"I want to make sure I understood '{evidence}'. Did you mean "
+                f"{get_vocab().name(symptom.symptom_id).lower()}, or something different? "
+                "Please describe where it is and what it feels like."
+            )
+        return (
+            {
+                "kind": "semantic_clarification",
+                "target": symptom.symptom_id,
+                "focus": "presence",
+            },
+            question,
+        )
+
     if profile is not None and not any(
         symptom.presence == "present" for symptom in profile.symptoms.values()
     ):

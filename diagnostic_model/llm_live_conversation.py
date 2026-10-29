@@ -220,7 +220,11 @@ class LLMDrivenConsultation:
         extraction = bound_extraction
         if extraction is None:
             extraction = await extract_symptoms(
-                self.llm, patient_message, self.profile, previous_question
+                self.llm,
+                patient_message,
+                self.profile,
+                previous_question,
+                conversation_history=self.turns,
             )
         self._merge_patient_facts(extraction, bound_extraction, previous_question)
         checkpoint = self._checkpoint(patient_message, extraction)

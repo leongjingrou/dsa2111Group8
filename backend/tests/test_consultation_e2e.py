@@ -153,10 +153,22 @@ def test_specific_followup_is_processed_instead_of_repeating_opening_question(cl
 
     result = turn(client, session_id, "back pain and cramps a bit")
 
-    assert result["stop"] is True
-    assert result["question_target"] is None
-    assert "RF_FLANK_PAIN" in result["triggered_rules"]
+    assert result["stop"] is False
+    assert result["question_target"]["kind"] == "semantic_clarification"
+    assert result["question_target"]["target"] == "flank_pain"
+    assert "side of your back just below the ribs" in result["reply"].lower()
+    assert "RF_FLANK_PAIN" not in result["triggered_rules"]
     assert "describe what feels wrong" not in result["reply"].lower()
+
+    result = turn(
+        client,
+        session_id,
+        "It is the lower middle back, not the side below my ribs; mild since yesterday.",
+    )
+
+    assert result["stop"] is True
+    assert "SCOPE_UNMAPPED" in result["triggered_rules"]
+    assert "RF_FLANK_PAIN" not in result["triggered_rules"]
 
 
 def test_new_emergency_interrupts_a_demographic_question(client):

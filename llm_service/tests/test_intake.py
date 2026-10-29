@@ -141,10 +141,19 @@ def test_symptom_presence_accepts_common_singlish(answer, expected):
 def test_remote_extractor_receives_pending_question_context():
     llm = FakeLLMClient(structured={"extract": empty_extraction()})
     target = {"kind": "symptom", "target": "wheezing", "focus": "duration"}
+    history = [
+        {"role": "doctor", "content": "How long?"},
+        {"role": "patient", "content": "about a week"},
+    ]
 
-    asyncio.run(extract_symptoms(llm, "about a week", Profile(), target))
+    asyncio.run(
+        extract_symptoms(
+            llm, "about a week", Profile(), target, conversation_history=history
+        )
+    )
 
     assert json.loads(llm.calls[0][1]["question_target"]) == target
+    assert json.loads(llm.calls[0][1]["conversation_history"]) == history
 
 
 def test_substantive_unmapped_presenting_answer_is_preserved_not_discarded():

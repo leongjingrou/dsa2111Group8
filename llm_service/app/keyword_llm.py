@@ -52,14 +52,10 @@ def _term_hits(text, term):
 
 
 def _entry_terms(symptom_id, entry):
-    """Return deterministic phrases, including alternatives in display labels."""
+    """Return explicit vocabulary phrases without inventing label alternatives."""
     name = entry.get("name", "").lower()
     terms = [symptom_id.replace("_", " "), name]
     terms.extend(item.lower() for item in entry.get("synonyms", []))
-    # Labels such as "Flank / back pain" express alternative patient wording.
-    # Matching only the entire display label discarded ordinary "back pain".
-    if "/" in name:
-        terms.extend(part.strip(" ()") for part in name.split("/"))
     return list(dict.fromkeys(term for term in terms if term))
 
 
@@ -167,7 +163,9 @@ class KeywordLLM:
                 symptoms.append(
                     ExtractedSymptom(
                         symptom_id=symptom_id,
-                        presence="present",
+                        # Vector similarity proposes a clarification candidate;
+                        # it never confirms a clinical fact by itself.
+                        presence="uncertain",
                         severity=severity,
                         duration_days=days,
                         progression=progression,

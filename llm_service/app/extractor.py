@@ -50,7 +50,11 @@ def sanitize(result: ExtractionResult, vocab: Vocab) -> ExtractionResult:
 
 
 async def extract_symptoms(
-    llm: LLM, message: str, profile: Profile, question_target: dict | None = None
+    llm: LLM,
+    message: str,
+    profile: Profile,
+    question_target: dict | None = None,
+    conversation_history: list[dict] | None = None,
 ) -> ExtractionResult:
     vocab = get_vocab()
     result = await llm.complete_structured(
@@ -60,10 +64,28 @@ async def extract_symptoms(
             "known_symptoms": vocab.prompt_listing(),
             "current_profile": _profile_for_prompt(profile),
             "question_target": json.dumps(question_target),
+            "conversation_history": json.dumps(
+                (conversation_history or [])[-12:], ensure_ascii=False
+            ),
         },
         ExtractionResult,
     )
     result = sanitize(result, vocab)
+    is_semantic_clarification = (
+        question_target is not None
+        and question_target.get("kind") == "semantic_clarification"
+    )
+    if is_semantic_clarification:
+        target = question_target.get("target")
+        definite_other_facts = [
+            symptom
+            for symptom in result.symptoms
+            if symptom.symptom_id != target or symptom.presence != "uncertain"
+        ]
+        if not definite_other_facts and not result.unmapped_mentions:
+            result = result.model_copy(
+                update={"symptoms": [], "unmapped_mentions": [message.strip()]}
+            )
     # Once the server explicitly asks for the presenting complaint, never
     # silently discard a substantive answer merely because an extractor cannot
     # map it to the model's closed vocabulary. Preserving the patient's words as

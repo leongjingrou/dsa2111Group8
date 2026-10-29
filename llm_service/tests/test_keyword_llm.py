@@ -43,7 +43,7 @@ def test_keyword_fallback_distinguishes_presence_from_progression_wording():
     assert "noticed" in presence
 
 
-def test_keyword_fallback_understands_alternative_display_label_wording():
+def test_keyword_vector_match_is_only_an_uncertain_clarification_candidate():
     result = asyncio.run(
         KeywordLLM().complete_structured(
             "extract",
@@ -52,7 +52,10 @@ def test_keyword_fallback_understands_alternative_display_label_wording():
         )
     )
 
-    assert "flank_pain" in {symptom.symptom_id for symptom in result.symptoms}
+    candidate = next(
+        symptom for symptom in result.symptoms if symptom.symptom_id == "flank_pain"
+    )
+    assert candidate.presence == "uncertain"
 
 
 def test_keyword_vector_fallback_handles_free_wording_without_forcing_weak_match():
@@ -68,7 +71,10 @@ def test_keyword_vector_fallback_handles_free_wording_without_forcing_weak_match
         )
     )
 
-    assert "shortness_of_breath" in {
-        symptom.symptom_id for symptom in matched.symptoms
-    }
+    candidate = next(
+        symptom
+        for symptom in matched.symptoms
+        if symptom.symptom_id == "shortness_of_breath"
+    )
+    assert candidate.presence == "uncertain"
     assert vague.symptoms == []
