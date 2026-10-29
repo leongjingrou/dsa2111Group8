@@ -213,7 +213,10 @@ def _bind_age(answer, profile, evidence):
 def _bind_pregnancy(answer, profile, evidence):
     status = PREGNANCY_ANSWERS.get(answer)
     if status is None:
-        if re.search(r"\b(not|isn'?t|am not)\s+pregnant\b", answer):
+        if re.search(
+            r"\b(?:(?:not|isn'?t|am not|can(?:not|'t)|could(?: not|n't))\s+(?:be\s+)?pregnant|no chance(?:\s+of\s+being)?\s+pregnant)\b",
+            answer,
+        ):
             status = "not_pregnant"
         elif re.search(r"\b(pregnant|expecting)\b", answer):
             status = "pregnant"

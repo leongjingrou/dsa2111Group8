@@ -65,6 +65,8 @@ def test_age_question_accepts_natural_answers(answer, expected):
     ("answer", "expected"),
     [
         ("No, I'm definitely not pregnant", False),
+        ("nah cannot be pregnant leh", False),
+        ("there's no chance of being pregnant", False),
         ("Yes, I am expecting", True),
         ("That does not apply to me", False),
     ],

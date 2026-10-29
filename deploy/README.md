@@ -2,6 +2,12 @@
 
 ## NVIDIA runtime for Laya
 
+The ordinary `compose.yaml` is deliberately the CPU EBM reference path. GPU
+inference belongs on the server: the browser continues to call the same `/api`
+surface while the backend loads Laya with CUDA. A GPU-capable host must provide
+the NVIDIA driver, NVIDIA Container Toolkit, a CUDA-compatible image, the trained
+Laya checkpoint and the matching stopping controller.
+
 On an Ubuntu GPU host with a working NVIDIA driver, run:
 
 ```bash
@@ -14,6 +20,13 @@ pinned container toolkit, registers the `nvidia` Docker runtime, restarts
 Docker, and verifies GPU access with `nvidia-smi` inside a CUDA container.
 Docker restart briefly interrupts running containers. Official reference:
 https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+
+Before starting the application, verify the host-to-container GPU bridge with
+`nvidia-smi` in a CUDA container. Then use `deploy/Dockerfile.laya` and the
+`deploy/k8s-laya` overlay, which set `MODEL_BACKEND=laya`,
+`LAYA_MODEL_DIR=/models/laya`, and `LAYA_DEVICE=cuda`. The browser configuration
+does not change. If those prerequisites are absent, retain the default EBM stack
+rather than silently falling back or pretending GPU inference is active.
 
 This branch turns the fixed five-answer diagnostic experiment into a stateless
 HTTP workload that can be replicated across K3s, K3d, MicroK8s, or a managed

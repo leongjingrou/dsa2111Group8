@@ -3,15 +3,24 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    env_file: ./backend/.env
     environment:
       MODEL_BACKEND: ebm
+      LLM_BACKEND: ${LLM_BACKEND:-keyword}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
       EBM_LIVE_MODEL: /models/ebm_sequential_models.joblib
       STOPPING_MODEL: /models/ebm_stopping_controller.joblib
       CONSULTATION_DB: /app/runtime/consultations.sqlite3
     volumes:
-      - ./runtime/models:/models:ro
       - consultation-state:/app/runtime
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
     deploy:
       replicas: 3
     restart: unless-stopped
@@ -21,7 +30,14 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
     restart: unless-stopped
 
 volumes:

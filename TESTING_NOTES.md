@@ -1,7 +1,9 @@
 # Browser and server test notes
 
-Verified on 27 October 2026 using the Docker Compose stack at
+Verified on 29 October 2026 using the Docker Compose stack at
 `http://localhost:8080` with one frontend and three backend replicas.
+This device ran the CPU EBM path; Docker did not expose an NVIDIA adapter, so
+Laya/CUDA inference was documented but not claimed as locally verified.
 
 ## Delivered behavior
 
@@ -30,10 +32,39 @@ Verified on 27 October 2026 using the Docker Compose stack at
 
 ```sh
 docker compose up -d --build
+docker compose ps
 ```
 
-Open `http://localhost:8080`. Use `docker compose ps` to confirm the frontend and
-all three backend replicas are running.
+The image build installs dependencies and produces the EBM model files itself;
+there is no separate host-Python, `.env`, or model-generation step for this
+offline path. These commands are shell-neutral and work from the repository root
+on Docker Desktop (Windows/macOS) and Docker Engine plus Compose (Linux). Open
+`http://localhost:8080` after `docker compose ps` shows the frontend and all three
+backend replicas as healthy. Check `http://localhost:8080/readyz` for the active
+backend and safety-policy version. Stop with `docker compose down`.
+
+The Docker path is preferred. Nginx serves the browser and proxies `/api` to the
+backend service; the backend owns consultation state, safety screening, model
+inference, knowledge retrieval and the final clinician-handoff recommendation.
+The browser alone is not a standalone diagnostic application, so the backend
+containers (or an equivalent remote deployment) must be running.
+
+## Repeatable browser flow
+
+Use this controlled in-scope fixture when demonstrating the complete browser-to-
+server path. It guarantees the test route, not a diagnosis or clinical outcome:
+
+1. `Age 31; not pregnant. Mild runny nose for 2 days; stable, no worsening.`
+2. Answer the compact emergency screen with `none of those`.
+3. Answer `No wheezing.`
+4. Answer `No, drinking normally and urine is normal.`
+
+On 29 October 2026 this completed through the live Docker stack with a routine
+teleconsultation recommendation, a preliminary common-cold model match, and the
+doctor-review disclaimer. A dense all-in-one symptom list is intentionally not
+treated as a guaranteed route: if it falls outside the model's supported evidence
+distribution, the server refers for clinician assessment instead of forcing an
+in-scope label.
 
 The checked browser path uses the deterministic local language adapter. A remote
 OpenAI-compatible lightweight model can broaden free-text handling when configured,
