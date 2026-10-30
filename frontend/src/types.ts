@@ -90,6 +90,7 @@ export type ConsultationReview = {
       name: string
       similarity_score: number
       sources: { title: string; url: string }[]
+      reported_evidence: { present: string[]; absent: string[] }
     }[]
   } | null
 }

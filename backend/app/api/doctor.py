@@ -3,7 +3,8 @@
 from fastapi import APIRouter, HTTPException, Request
 
 from knowledge_base.kb_service import retrieve_knowledge
-from llm_service.app.vocab import get_vocab
+from llm_service.app.schema import Profile
+from llm_service.condition_followups import knowledge_query, matched_condition_evidence
 from llm_service.consultation_service import consultation_response
 from llm_service.session_store import SessionMissing
 
@@ -49,24 +50,14 @@ async def review_consultation(session_id: str, request: Request):
     if trace and "SCOPE_CONDITION" in {
         hit["rule_id"] for hit in trace[-1]["safety"]["triggered_rules"]
     }:
-        symptoms = state["profile"]["symptoms"]
-        gi_findings_denied = all(
-            symptoms.get(symptom_id, {}).get("presence") == "absent"
-            for symptom_id in ("diarrhoea", "vomiting", "nausea")
-        )
-        query = " ".join(
-            get_vocab().name(symptom_id)
-            for symptom_id, symptom in symptoms.items()
-            if symptom["presence"] == "present" and get_vocab().is_valid(symptom_id)
-        )
+        profile = Profile.model_validate(state["profile"])
+        query = knowledge_query(profile)
         if query:
             knowledge_context = retrieve_knowledge(query)
-            if gi_findings_denied:
-                knowledge_context["results"] = [
-                    result
-                    for result in knowledge_context["results"]
-                    if result["condition_id"] != "gastroenteritis"
-                ]
+            for result in knowledge_context["results"]:
+                result["reported_evidence"] = matched_condition_evidence(
+                    result, state["profile"]["symptoms"]
+                )
 
     return {
         "session_id": session_id,

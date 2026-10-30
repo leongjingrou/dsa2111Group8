@@ -1,0 +1,26 @@
+{
+  "common_cold": {
+    "anchors": ["runny_nose", "nasal_congestion", "sore_throat", "cough"],
+    "followups": ["sneezing", "sore_throat", "cough"]
+  },
+  "influenza": {
+    "anchors": ["fever", "chills", "cough", "joint_muscle_pain"],
+    "followups": ["cough", "chills", "fatigue"]
+  },
+  "gastroenteritis": {
+    "anchors": ["upper_abdominal_pain", "lower_abdominal_pain", "diarrhoea", "vomiting"],
+    "followups": ["diarrhoea", "vomiting", "nausea"]
+  },
+  "migraine": {
+    "anchors": ["headache", "throbbing_headache", "light_sensitivity"],
+    "followups": ["throbbing_headache", "light_sensitivity", "nausea"]
+  },
+  "allergic_rhinitis": {
+    "anchors": ["sneezing", "itchy_nose", "runny_nose", "watery_eyes"],
+    "followups": ["itchy_nose", "watery_eyes", "sneezing"]
+  },
+  "urinary_tract_infection": {
+    "anchors": ["painful_urination", "frequent_urination", "urinary_urgency", "lower_abdominal_pain"],
+    "followups": ["frequent_urination", "urinary_urgency", "painful_urination"]
+  }
+}

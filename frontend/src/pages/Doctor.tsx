@@ -80,10 +80,7 @@ export default function Doctor() {
 
   const latest = review?.latest
   const scopeModelWithheld = latest?.triggered_rules.includes('SCOPE_CONDITION') ?? false
-  const abdominalComplaint = review?.pathway.some((step) => step.extraction.symptoms.some((symptom) =>
-    symptom.presence === 'present' && ['upper_abdominal_pain', 'lower_abdominal_pain'].includes(symptom.symptom_id))) ?? false
-  const associatedSymptomsChecked = review?.pathway.some((step) => step.extraction.symptoms.some((symptom) =>
-    ['diarrhoea', 'vomiting', 'nausea'].includes(symptom.symptom_id))) ?? false
+  const conditionFollowupAsked = review?.pathway.some((step) => step.question_target?.target === 'condition_symptoms') ?? false
   return (
     <main className="doctor">
       <header className="doctor-header">
@@ -117,8 +114,8 @@ export default function Doctor() {
                 ? <p className="doctor-muted">Condition and escalation estimates withheld after the scope review.</p>
                 : <><ModelStats title="Condition" answer={latest.diagnosis} /><ModelStats title="Escalation" answer={latest.escalation} /></>}
               {scopeModelWithheld && <p className="doctor-muted">The model's provisional top label was outside this prototype's scope, so its condition scores were withheld. This does not rule out supported conditions.</p>}
-              {scopeModelWithheld && abdominalComplaint && !associatedSymptomsChecked && <p className="doctor-muted">Gastroenteritis is among the supported conditions. This consultation ended before asking about diarrhoea, vomiting or nausea, so it cannot assess that possibility from the recorded answers.</p>}
-              {review.knowledge_context?.results.length ? <section className="doctor-knowledge"><h3>Knowledge-base text matches</h3><p>These match the recorded symptoms by wording. They are possibilities for clinician review, not model estimates or diagnoses.</p><ul>{review.knowledge_context.results.map((item) => <li key={item.condition_id}><strong>{item.name}</strong>{item.sources[0] && <> · <a href={item.sources[0].url} target="_blank" rel="noreferrer">Source</a></>}</li>)}</ul><p className="doctor-muted">Knowledge base v{review.knowledge_context.kb_version}</p></section> : null}
+              {scopeModelWithheld && !conditionFollowupAsked && <p className="doctor-muted">This saved consultation ended before the supported-condition follow-up was asked. A new consultation collects that context before the model call.</p>}
+              {review.knowledge_context?.results.length ? <section className="doctor-knowledge"><h3>Knowledge-base text matches</h3><p>These match the recorded symptoms by wording. They are possibilities for clinician review, not model estimates or diagnoses.</p><ul>{review.knowledge_context.results.map((item) => <li key={item.condition_id}><strong>{item.name}</strong>{item.sources[0] && <> · <a href={item.sources[0].url} target="_blank" rel="noreferrer">Source</a></>}{item.reported_evidence.present.length > 0 && <p>Reported: {item.reported_evidence.present.join(', ')}</p>}{item.reported_evidence.absent.length > 0 && <p>Denied: {item.reported_evidence.absent.join(', ')}</p>}</li>)}</ul><p className="doctor-muted">Knowledge base v{review.knowledge_context.kb_version}</p></section> : null}
               <p><strong>Stop probability:</strong> {scopeModelWithheld ? 'not calculated because the scope review ended the assessment' : latest.stop_probability === null ? 'unavailable' : `${percentage(latest.stop_probability)} · threshold ${percentage(latest.stop_threshold)}`}</p>
               {latest.decision_record && <><h3>Decision record</h3><p>Action: {label(latest.decision_record.recommended_action)}</p>{latest.decision_record.risk_factors.length > 0 && <p>{scopeModelWithheld ? 'Referral reason' : 'Risk factors'}: {latest.decision_record.risk_factors.join(', ')}</p>}{latest.decision_record.limitations.length > 0 && <p>Limits: {latest.decision_record.limitations.join('; ')}</p>}</>}
             </> : <p>Assessment starts after the first patient answer.</p>}

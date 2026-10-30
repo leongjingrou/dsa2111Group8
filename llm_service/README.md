@@ -20,6 +20,15 @@ commands. Common replies are handled locally; a configured OpenAI-compatible
 lightweight model handles broader colloquial free text while remaining outside
 the diagnosis, escalation and stopping decisions.
 
+After mandatory safety screening, the controller uses
+`data/condition_followups.json` to ask one bounded, condition-relevant symptom
+question for each of the six supported conditions. If the presenting symptom
+still lacks timing, severity or progression, it asks for those details together
+before the first model call. A bare "no" applies only to the listed symptoms;
+a bare "yes" gets one request to name them. The clinician review keeps textual
+knowledge-base matches separate from model estimates and shows both reported
+and denied symptom facts alongside each match.
+
 Run the combined HTTP service with the relevant model paths and provider
 settings:
 

@@ -71,7 +71,7 @@ def test_all_over_abdominal_pain_does_not_repeat_location_question(client):
 def test_scope_referral_shows_separate_gastroenteritis_text_match(app_factory):
     with TestClient(app_factory(predictor=RecordingPredictor(condition="out_of_scope"))) as client:
         session_id = start(client)
-        for answer in ("stomach ache", "upper", "24", "no", "none", "diarrhea and nausea"):
+        for answer in ("stomach ache", "upper", "24", "no", "none", "diarrhea and nausea", "2 days, mild, stable"):
             result = turn(client, session_id, answer)
         review = client.get(f"/api/conversations/{session_id}/review").json()
 
@@ -81,13 +81,17 @@ def test_scope_referral_shows_separate_gastroenteritis_text_match(app_factory):
     assert review["latest"]["decision_record"]["preliminary_estimates"] == []
 
 
-def test_scope_text_match_respects_explicit_denial_of_gi_symptoms(app_factory):
+def test_scope_text_match_displays_explicit_denial_of_gi_symptoms(app_factory):
     with TestClient(app_factory(predictor=RecordingPredictor(condition="out_of_scope"))) as client:
         session_id = start(client)
-        for answer in ("stomach ache", "upper", "24", "no", "none", "none"):
+        for answer in ("stomach ache", "upper", "24", "no", "none", "none", "2 days, mild, stable"):
             turn(client, session_id, answer)
         review = client.get(f"/api/conversations/{session_id}/review").json()
 
-    assert "gastroenteritis" not in {
-        result["condition_id"] for result in review["knowledge_context"]["results"]
+    gastro = next(
+        result for result in review["knowledge_context"]["results"]
+        if result["condition_id"] == "gastroenteritis"
+    )
+    assert {name.lower() for name in gastro["reported_evidence"]["absent"]} >= {
+        "diarrhoea", "vomiting", "nausea"
     }

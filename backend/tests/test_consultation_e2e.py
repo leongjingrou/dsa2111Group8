@@ -336,7 +336,7 @@ def test_out_of_scope_prediction_is_referred_after_model_inference(app_factory):
     assert len(predictor.calls) == 1
 
 
-def test_abdominal_complaint_collects_associated_symptoms_before_scope_prediction(app_factory):
+def test_abdominal_complaint_collects_symptoms_and_details_before_scope_prediction(app_factory):
     predictor = RecordingPredictor(condition="out_of_scope")
     with TestClient(app_factory(predictor=predictor)) as client:
         session_id = start(client)
@@ -345,16 +345,31 @@ def test_abdominal_complaint_collects_associated_symptoms_before_scope_predictio
         turn(client, session_id, "24")
         turn(client, session_id, "no")
         question = turn(client, session_id, "none")
-        assert question["question_target"]["target"] == "abdominal_associated_symptoms"
+        assert question["question_target"]["target"] == "condition_symptoms"
         assert question["diagnosis"] is None
         assert predictor.calls == []
 
-        result = turn(client, session_id, "diarrhea and nausea")
-    assert {item["symptom_id"] for item in result["extraction"]["symptoms"]} >= {
+        symptoms = turn(client, session_id, "diarrhea and nausea")
+        assert symptoms["question_target"]["target"] == "presenting_details"
+        assert predictor.calls == []
+        result = turn(client, session_id, "for 2 days, mild and stable")
+    assert {item["symptom_id"] for item in symptoms["extraction"]["symptoms"]} >= {
         "diarrhoea", "nausea"
     }
+    assert result["extraction"]["symptoms"][0]["duration_days"] == 2.0
     assert len(predictor.calls) == 1
     assert "SCOPE_CONDITION" in result["triggered_rules"]
+
+
+def test_yes_to_grouped_condition_question_requests_named_symptoms(client):
+    session_id = start(client)
+    result = turn(client, session_id, "I am 30, not pregnant. I have a sore throat")
+    result = turn(client, session_id, "none")
+    assert result["question_target"]["target"] == "condition_symptoms"
+    clarification = turn(client, session_id, "yes lah")
+    assert clarification["status"] == "asking"
+    assert clarification["question_target"]["target"] == "condition_symptoms"
+    assert "which of these" in clarification["reply"].lower()
 
 
 def test_scope_sentinel_alternative_is_not_exposed_as_a_diagnosis(app_factory):

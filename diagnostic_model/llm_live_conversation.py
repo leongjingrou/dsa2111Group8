@@ -36,6 +36,7 @@ from llm_service.app.schema import (
     Profile,
 )
 from llm_service.app.vocab import get_vocab
+from llm_service.condition_followups import next_followup
 from llm_service.intake import (
     answer_target_for_reply,
     bind_answer,
@@ -328,32 +329,42 @@ class LLMDrivenConsultation:
         if not screening.can_continue:
             return self._respond_to_safety(checkpoint, screening)
 
-        if self._needs_abdominal_context():
-            # One location answer is too little evidence to interpret an
-            # abdominal complaint. Ask about associated symptoms before the
-            # first model call; emergency screening has already completed.
-            question = (
-                "Along with the stomach pain, have you had diarrhoea, vomiting, "
-                "or nausea? Please name any you've had, or say none."
+        if (
+            answer_target is not None
+            and answer_target.get("target") == "condition_symptoms"
+            and answer_target.get("clarification_attempts", 0) < 1
+            and re.fullmatch(
+                r"(?:yes|yeah|yep|got)(?:[ ,]+(?:lah|leh|lor))?",
+                patient_message.lower().strip().rstrip(".!?"),
             )
-            self.pending_question = {
+        ):
+            choices = self._symptom_choices(answer_target["targets"])
+            question = f"Which of these have you had: {choices}? Please name them."
+            target = {**answer_target, "clarification_attempts": 1}
+            return self._ask_before_model(checkpoint, screening, target, question)
+
+        followup = next_followup(self.profile, self.trace)
+        if followup is not None:
+            condition_id, missing_symptoms = followup
+            choices = self._symptom_choices(missing_symptoms)
+            question = f"Have you also had {choices}? Name any you've had, or say none."
+            target = {
                 "kind": "context",
-                "target": "abdominal_associated_symptoms",
-                "targets": ["diarrhoea", "vomiting", "nausea"],
+                "target": "condition_symptoms",
+                "condition_id": condition_id,
+                "targets": missing_symptoms,
                 "focus": "presence",
             }
-            checkpoint.update(
-                safety=screening.to_dict(),
-                safety_findings=[],
-                safety_override_applied=False,
-                stop=False,
-                question_target=self.pending_question,
-                question_fallback_used=True,
-                doctor_response=question,
+            return self._ask_before_model(checkpoint, screening, target, question)
+
+        details_target = self._presenting_details_target()
+        if details_target is not None:
+            name = details_target["symptom_id"].replace("_", " ")
+            question = (
+                f"For the {name}, how long has it been going on, how severe is it "
+                "(mild, moderate, or severe), and is it getting better, staying the same, or getting worse?"
             )
-            self.trace.append(checkpoint)
-            self.turns.append({"role": "doctor", "content": question})
-            return checkpoint
+            return self._ask_before_model(checkpoint, screening, details_target, question)
 
         # Training used five partial evidence states. Checklist turns must not
         # create an out-of-range feature or force an incomplete safety screen.
@@ -426,22 +437,51 @@ class LLMDrivenConsultation:
             )
         self.turns.append({"role": "patient", "content": patient_message})
 
-    def _needs_abdominal_context(self):
-        abdominal_pain = {"upper_abdominal_pain", "lower_abdominal_pain"}
-        associated = {"diarrhoea", "vomiting", "nausea"}
-        return (
-            any(
-                self.profile.symptoms.get(symptom_id)
-                and self.profile.symptoms[symptom_id].presence == "present"
-                for symptom_id in abdominal_pain
-            )
-            and not any(symptom_id in self.profile.symptoms for symptom_id in associated)
-            and not any(
-                (item.get("question_target") or {}).get("target")
-                == "abdominal_associated_symptoms"
-                for item in self.trace
-            )
+    def _presenting_details_target(self):
+        if any(
+            (item.get("question_target") or {}).get("target") == "presenting_details"
+            for item in self.trace
+        ):
+            return None
+        for symptom_id, symptom in self.profile.symptoms.items():
+            if symptom.presence != "present":
+                continue
+            if any(
+                value is None
+                for value in (symptom.duration_days, symptom.severity, symptom.progression)
+            ):
+                return {
+                    "kind": "context",
+                    "target": "presenting_details",
+                    "symptom_id": symptom_id,
+                    "focus": None,
+                }
+            break
+        return None
+
+    @staticmethod
+    def _symptom_choices(symptom_ids):
+        labels = [symptom_id.replace("_", " ") for symptom_id in symptom_ids]
+        if len(labels) == 1:
+            return labels[0]
+        if len(labels) == 2:
+            return " or ".join(labels)
+        return ", ".join(labels[:-1]) + ", or " + labels[-1]
+
+    def _ask_before_model(self, checkpoint, screening, target, question):
+        self.pending_question = target
+        checkpoint.update(
+            safety=screening.to_dict(),
+            safety_findings=[],
+            safety_override_applied=False,
+            stop=False,
+            question_target=target,
+            question_fallback_used=True,
+            doctor_response=question,
         )
+        self.trace.append(checkpoint)
+        self.turns.append({"role": "doctor", "content": question})
+        return checkpoint
 
     def _check_emergency_before_extraction(self):
         has_warning_sign = any(

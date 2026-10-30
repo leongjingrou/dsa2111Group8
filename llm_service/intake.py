@@ -375,7 +375,7 @@ def bind_answer(message, target, profile, evidence):
         normalized_answer = f"{target['clarifying_number']} {normalized_answer}"
     question_field = target["target"]
     grouped_targets = target.get("targets", [])
-    if question_field == "abdominal_associated_symptoms" and grouped_targets:
+    if question_field == "condition_symptoms" and grouped_targets:
         if normalized_answer in NEGATIVE_GROUP_ANSWERS:
             return ExtractionResult(
                 symptoms=[
@@ -394,6 +394,15 @@ def bind_answer(message, target, profile, evidence):
                 allergies=[],
                 medications=[],
             )
+        return None
+    if question_field == "presenting_details":
+        symptom_id = target.get("symptom_id")
+        if symptom_id and get_vocab().is_valid(symptom_id):
+            details = {}
+            for focus in ("duration", "severity", "progression"):
+                details.update(_parse_symptom_detail(normalized_answer, focus))
+            if details:
+                return _symptom_extraction(symptom_id, message, "present", **details)
         return None
     if question_field == "emergency_warning_signs" and grouped_targets:
         if normalized_answer in NEGATIVE_GROUP_ANSWERS or re.fullmatch(
