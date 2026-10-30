@@ -78,6 +78,64 @@ def _vector_index():
     return vectorizer, matrix, symptom_ids
 
 
+@lru_cache
+def _word_index():
+    phrases = []
+    symptom_ids = []
+    for symptom_id, entry in get_vocab()._entries.items():
+        terms = _entry_terms(symptom_id, entry)
+        phrases.extend(terms)
+        symptom_ids.extend([symptom_id] * len(terms))
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2), strip_accents="unicode", sublinear_tf=True)
+    return vectorizer, vectorizer.fit_transform(phrases), symptom_ids
+
+
+def _rank_index(query, index):
+    vectorizer, matrix, symptom_ids = index
+    similarities = cosine_similarity(vectorizer.transform([query]), matrix)[0]
+    by_symptom = {}
+    for symptom_id, score in zip(symptom_ids, similarities):
+        by_symptom[symptom_id] = max(by_symptom.get(symptom_id, 0.0), float(score))
+    return sorted(by_symptom.items(), key=lambda item: (-item[1], item[0]))
+
+
+def ranked_clarification_candidates(text):
+    """Retrieve related vocabulary labels for a patient-confirmed choice.
+
+    Lay terms improve retrieval only; they never create a clinical fact. Keep
+    candidates in one lexical family so a generic word such as "pain" cannot
+    produce a menu of unrelated body sites.
+    """
+    if re.search(r"\b(?:no|not|without|don'?t|never|bo)\b", text.lower()):
+        return [], None
+    query = text.lower()
+    for pattern, replacement in (
+        (r"\b(?:stomach|belly|tummy)\b", "abdominal"),
+        (r"\b(?:hurts?|hurting|aches?|aching)\b", "pain"),
+        (r"\bhead pain\b", "headache"),
+    ):
+        query = re.sub(pattern, replacement, query)
+    word_ranked = _rank_index(query, _word_index())
+    vector_ranked = _rank_index(query, _vector_index())
+    # Both run for every query. Prefer word-level source overlap when it is
+    # strong; character vectors recover spelling/phrasing variation otherwise.
+    source = "word_tfidf" if word_ranked and word_ranked[0][1] >= 0.4 else "character_vector"
+    ranked = word_ranked if source == "word_tfidf" else vector_ranked
+    if not ranked or ranked[0][1] < 0.4:
+        return [], source
+    best_id, best_score = ranked[0]
+    best_terms = set(best_id.split("_")) - {"pain", "severe", "upper", "lower"}
+    best_category = get_vocab()._entries[best_id].get("category")
+    candidates = [
+        symptom_id
+        for symptom_id, score in ranked
+        if score >= max(0.35, best_score * (0.4 if source == "word_tfidf" else 0.65))
+        and get_vocab()._entries[symptom_id].get("category") == best_category
+        and (set(symptom_id.split("_")) & best_terms)
+    ][:4]
+    return (candidates if len(candidates) >= 2 else []), source
+
+
 def _vector_match(text):
     """Return a high-separation vector match, otherwise decline to guess."""
     if re.search(r"\b(?:no|not|without|don'?t|never|bo)\b", text):

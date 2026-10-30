@@ -139,6 +139,34 @@ def test_explicit_negated_chest_pain_does_not_create_a_false_positive(client):
     assert "RF_CHEST_PAIN" not in result["triggered_rules"]
 
 
+def test_unspecified_stomach_pain_asks_candidate_then_preserves_worsening(client):
+    session_id = start(client)
+    first = turn(client, session_id, "stomach hurting for past few days, getting a bit worse?")
+    assert first["status"] == "asking"
+    assert first["question_target"]["target"] == "symptom_choice"
+    assert "upper abdominal" in first["reply"].lower()
+    assert first["diagnosis"] is None
+
+    second = turn(client, session_id, "upper")
+    pain = next(
+        symptom for symptom in second["extraction"]["symptoms"]
+        if symptom["symptom_id"] == "upper_abdominal_pain"
+    )
+    assert pain["presence"] == "present"
+    assert pain["progression"] == "worsening"
+    assert pain["severity"] is None
+    assert "severe_abdominal_pain" not in {
+        symptom["symptom_id"] for symptom in second["extraction"]["symptoms"]
+    }
+
+
+def test_severe_stomach_pain_still_triggers_emergency_without_model(client):
+    result = turn(client, start(client), "I have severe stomach pain")
+    assert result["status"] == "urgent"
+    assert "RF_SEVERE_ABDOMINAL_PAIN" in result["triggered_rules"]
+    assert result["diagnosis"] is None
+
+
 def test_vague_opening_requests_free_form_symptom_detail_before_checklist(client):
     result = turn(client, start(client), "feeling a bit sick ah")
     assert result["status"] == "asking"

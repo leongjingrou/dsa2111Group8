@@ -62,6 +62,12 @@ ALIASES = {
         "continuous vomiting",
         "keep vomiting",
     ),
+    "severe_abdominal_pain": (
+        "severe stomach pain",
+        "severe belly pain",
+        "severe tummy pain",
+        "severe stomach ache",
+    ),
 }
 
 

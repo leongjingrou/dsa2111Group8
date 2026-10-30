@@ -26,6 +26,8 @@ export type QuestionTarget = {
   target: string
   targets: string[] | null
   focus: string | null
+  candidates?: string[]
+  candidate_source?: 'word_tfidf' | 'character_vector'
 }
 
 export type RuleHit = { rule_id: string; disposition: string; reason: string }

@@ -6,6 +6,7 @@ answers for the rest of the safety checklist.
 
 import re
 
+from llm_service.app.keyword_llm import ranked_clarification_candidates
 from llm_service.app.schema import ExtractedSymptom, ExtractionResult
 from llm_service.app.vocab import get_vocab
 
@@ -99,6 +100,94 @@ def duration_without_unit(message, target):
     if re.fullmatch(r"\d+(?:\.\d+)?", answer) or answer in NUMBER_WORDS:
         return answer
     return None
+
+
+def vector_clarification(message):
+    """Offer closely related vocabulary terms without asserting any of them."""
+    candidates, source = ranked_clarification_candidates(message)
+    if not candidates:
+        return None
+    labels = [get_vocab().name(symptom_id).lower() for symptom_id in candidates]
+    choices = "; ".join(f"{index}. {label}" for index, label in enumerate(labels, 1))
+    return (
+        {
+            "kind": "semantic_clarification",
+            "target": "symptom_choice",
+            "focus": "presence",
+            "candidates": candidates,
+            "candidate_source": source,
+            "original_text": message,
+        },
+        f"To make sure I understood, which best matches what you described: {choices}? "
+        "You can reply with a number, describe it in your own words, or say none of these.",
+    )
+
+
+def resolve_vector_choice(message, target):
+    """Bind a brief choice only when it selects one candidate unambiguously."""
+    original = target.get("original_text", "")
+    reply = _normalize_conversational_answer(message)
+    candidates = target.get("candidates", [])
+    selected = None
+    number = re.fullmatch(r"(?:option |number |#)?([1-9])", reply)
+    if number and int(number[1]) <= len(candidates):
+        selected = candidates[int(number[1]) - 1]
+    else:
+        matches = []
+        for symptom_id in candidates:
+            distinctive = set(symptom_id.split("_")) - {"pain", "abdominal", "headache"}
+            if any(re.search(rf"\b{re.escape(word)}\b", reply) for word in distinctive):
+                matches.append(symptom_id)
+        if len(matches) == 1:
+            selected = matches[0]
+        elif len(matches) == 2 and any(sid.startswith("severe_") for sid in matches):
+            # "upper and severe" identifies a location plus severity, rather
+            # than two competing locations. Preserve both facts for screening.
+            selected = next((sid for sid in matches if not sid.startswith("severe_")), None)
+        elif reply in {get_vocab().name(symptom_id).lower() for symptom_id in candidates}:
+            named = [sid for sid in candidates if get_vocab().name(sid).lower() == reply]
+            if len(named) == 1:
+                selected = named[0]
+    if selected is None:
+        return ExtractionResult(
+            symptoms=[],
+            unmapped_mentions=[original or message],
+            medical_history=[],
+            allergies=[],
+            medications=[],
+        )
+    combined = f"{original} {message}".lower()
+    duration = _parse_symptom_detail(combined, "duration")
+    progression = _parse_symptom_detail(combined, "progression")
+    severity = _parse_symptom_detail(combined, "severity")
+    symptoms = [
+        ExtractedSymptom(
+            symptom_id=selected,
+            presence="present",
+            severity=severity.get("severity"),
+            duration_days=duration.get("duration_days"),
+            progression=progression.get("progression"),
+            evidence=f"{original} | {message}",
+        )
+    ]
+    if severity.get("severity") == "severe" and "abdominal" in selected:
+        symptoms.append(
+            ExtractedSymptom(
+                symptom_id="severe_abdominal_pain",
+                presence="present",
+                severity="severe",
+                duration_days=duration.get("duration_days"),
+                progression=progression.get("progression"),
+                evidence=f"{original} | {message}",
+            )
+        )
+    return ExtractionResult(
+        symptoms=symptoms,
+        unmapped_mentions=[],
+        medical_history=[],
+        allergies=[],
+        medications=[],
+    )
 
 
 def safety_question(decision, profile=None):

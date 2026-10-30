@@ -50,6 +50,14 @@ a time unit (for example, `2d`, `3 weeks`, or `yesterday`); a bare number is not
 silently treated as days. The intake asks for the unit and accepts a brief
 follow-up such as `days`.
 
+For broad wording such as “my stomach hurts,” word-level TF-IDF and character
+vector similarity both retrieve candidate vocabulary terms. Strong word-level
+overlap takes priority; otherwise the character vector can suggest related
+terms. The intake asks the patient to choose or clarify before adding a symptom
+to the profile. The original worsening detail is retained with a confirmed
+choice. Explicit severe stomach pain continues through the emergency safety
+rule.
+
 `localhost` is reachable only from this computer. Testing from another device
 requires publishing the service on a reachable host and configuring its firewall,
 TLS and access controls. Stop the local stack with `docker compose down`; the

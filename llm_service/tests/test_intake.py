@@ -12,6 +12,8 @@ from llm_service.intake import (
     bind_answer,
     duration_without_unit,
     empty_extraction,
+    resolve_vector_choice,
+    vector_clarification,
 )
 
 
@@ -231,3 +233,42 @@ def test_bare_duration_is_clarified_and_unit_only_reply_uses_saved_number():
     extraction = bind_answer("days", clarified, profile, EvidenceState())
     assert extraction.symptoms[0].duration_days == 2.0
     assert extraction.symptoms[0].evidence == "days"
+
+
+def test_generic_stomach_pain_uses_ranked_candidates_without_guessing_severity():
+    wording = "stomach hurting for past few days, getting a bit worse?"
+    target, question = vector_clarification(wording)
+    assert target["target"] == "symptom_choice"
+    assert target["candidate_source"] in {"word_tfidf", "character_vector"}
+    assert {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(target["candidates"])
+    assert "upper abdominal" in question.lower()
+    assert vector_clarification("no stomach pain") is None
+    result = resolve_vector_choice("upper", target)
+    assert [symptom.symptom_id for symptom in result.symptoms] == ["upper_abdominal_pain"]
+    assert result.symptoms[0].progression == "worsening"
+    assert result.symptoms[0].severity is None
+    assert result.symptoms[0].duration_days is None
+
+
+def test_generic_stomach_pain_is_not_forced_to_upper_or_lower_when_unsure():
+    target, _ = vector_clarification("my belly hurts")
+    result = resolve_vector_choice("all over", target)
+    assert result.symptoms == []
+    assert result.unmapped_mentions == ["my belly hurts"]
+
+
+def test_location_and_explicit_severity_are_both_retained_after_clarification():
+    target, _ = vector_clarification("my stomach hurts")
+    result = resolve_vector_choice("upper and severe", target)
+    assert {symptom.symptom_id for symptom in result.symptoms} == {
+        "upper_abdominal_pain", "severe_abdominal_pain"
+    }
+
+
+def test_vector_clarification_reuses_vocabulary_for_another_symptom_family():
+    target, _ = vector_clarification("my head hurts")
+    assert "headache" in target["candidates"]
+    assert any("headache" in candidate and candidate != "headache" for candidate in target["candidates"])
+    chosen = target["candidates"].index("headache") + 1
+    result = resolve_vector_choice(str(chosen), target)
+    assert result.symptoms[0].symptom_id == "headache"

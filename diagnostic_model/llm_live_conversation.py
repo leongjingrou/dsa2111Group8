@@ -40,7 +40,9 @@ from llm_service.intake import (
     bind_answer,
     duration_without_unit,
     empty_extraction,
+    resolve_vector_choice,
     safety_question,
+    vector_clarification,
 )
 from safety_layer import SafetyEngine, guard_decision
 from safety_layer.integration import result_from_safety
@@ -243,6 +245,33 @@ class LLMDrivenConsultation:
                 f"Was that {bare_duration} days, weeks, or months? "
                 "You can reply with just the unit."
             )
+            checkpoint.update(
+                safety=decision.to_dict(),
+                safety_findings=[],
+                safety_override_applied=False,
+                stop=False,
+                question_target=self.pending_question,
+                question_fallback_used=True,
+                doctor_response=question,
+            )
+            self.trace.append(checkpoint)
+            self.turns.append({"role": "doctor", "content": question})
+            return checkpoint
+
+        clarification = None
+        if answer_target is not None and answer_target.get("target") == "symptom_choice":
+            bound_extraction = resolve_vector_choice(patient_message, answer_target)
+        elif bound_extraction is None and (
+            answer_target is None or answer_target.get("kind") == "context"
+        ):
+            clarification = vector_clarification(patient_message)
+        if clarification is not None:
+            decision = self.safety_engine.evaluate(self.profile, evidence=self.evidence)
+            checkpoint = self._checkpoint(patient_message, empty_extraction())
+            checkpoint["answer_target"] = answer_target
+            if decision.disposition in {"emergency", "urgent_review", "clinician_review"}:
+                return self._respond_to_safety(checkpoint, decision)
+            self.pending_question, question = clarification
             checkpoint.update(
                 safety=decision.to_dict(),
                 safety_findings=[],
