@@ -33,6 +33,15 @@ container, whose Nginx proxy forwards them to the replicated backend service.
 Only the server loads the diagnostic model, safety rules, consultation store and
 optional language model; the browser never downloads or runs those models.
 
+The local clinician view is available at `http://localhost:8081`. After the
+first patient answer, the chat's **Doctor view** button opens the matching
+consultation there. The page refreshes every three seconds and shows the actual
+question sequence, patient answers, safety rule hits, guarded recommendation,
+model probabilities (when permitted), and stopping score. It reads the saved
+server trace and does not expose hidden language-model reasoning. The clinician
+view contains patient text and is a local demonstration feature; add access
+control before exposing either port to other users or networks.
+
 `localhost` is reachable only from this computer. Testing from another device
 requires publishing the service on a reachable host and configuring its firewall,
 TLS and access controls. Stop the local stack with `docker compose down`; the

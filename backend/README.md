@@ -48,6 +48,14 @@ The response includes:
 | `decision_record` | Guarded recommendation; null while clarification is needed |
 | `knowledge_base` | Retrieved reference entries and KB version, when a model assessment is made |
 
+`GET /api/conversations/{session_id}/review` returns a read-only clinician
+projection of the saved trace: each asked question, answer, response, question
+target, safety evaluation, model output when allowed, and stop score. It also
+includes the latest guarded response. It returns 404 for unknown or expired
+sessions. The endpoint contains patient text; the local prototype uses the
+unguessable session ID as its lookup key, and a network deployment needs
+clinician authentication and access control.
+
 Repeat until `stop` is true. Ask the actual returned question. A short yes/no/
 not-sure answer is bound to that server-selected question, not to a question
 submitted by the client. Age and pregnancy answers are collected explicitly.

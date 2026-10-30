@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { diagnose, transcribe } from '../api'
+import { diagnose, SafetyAuditError, transcribe } from '../api'
 import ChatBubble from '../components/ChatBubble'
 import ChatInput from '../components/ChatInput'
 import { BackIcon, BotIcon } from '../components/Icons'
@@ -47,15 +47,25 @@ const Chat = () => {
     setMessages(history)
     setLoading(true)
     try {
-      const result = await diagnose(text, conversationId)
+      const result = await diagnose(text, conversationId, crypto.randomUUID())
       setConversationId(result.conversation_id)
       reply(result.reply)
       setStatus(result.status)
-    } catch {
-      reply('Sorry, something went wrong. Please try again.')
+    } catch (cause) {
+      if (cause instanceof SafetyAuditError) setStatus('urgent')
+      reply(cause instanceof Error && !cause.message.startsWith('Diagnose failed:')
+        ? cause.message
+        : 'Sorry, something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const openDoctorView = () => {
+    if (!conversationId) return
+    const url = new URL(`/doctor/${encodeURIComponent(conversationId)}`, window.location.href)
+    if (url.port === '8080') url.port = '8081'
+    window.open(url.toString(), '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -66,6 +76,7 @@ const Chat = () => {
         </button>
         <BotIcon size={22} />
         <span>Telemedicine Assistant</span>
+        {conversationId && <button className="doctor-link" onClick={openDoctorView}>Doctor view</button>}
       </header>
       <section className="messages">
         {messages.map((msg, i) => (

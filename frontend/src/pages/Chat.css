@@ -22,6 +22,15 @@
   padding: 6px;
 }
 
+.doctor-link {
+  margin-left: auto;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  background: transparent;
+  font-size: .85rem;
+}
+.doctor-link:hover { background: rgba(255, 255, 255, .15); }
+
 .messages {
   flex: 1;
   overflow-y: auto;
