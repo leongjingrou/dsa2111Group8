@@ -172,6 +172,10 @@ class KeywordLLM:
                 float(duration.group(1))
                 * {"day": 1, "week": 7, "month": 30}[duration.group(2)]
             )
+        elif re.search(r"\b(?:since\s+)?(?:yesterday|yday|ytd)\b", text):
+            days = 1.0
+        elif re.search(r"\b(?:since\s+)?(?:today|this morning|last night)\b", text):
+            days = 0.5
         progression = next(
             (
                 value

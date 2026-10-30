@@ -29,6 +29,10 @@ function ModelStats({ title, answer }: { title: string; answer: ModelAnswer | nu
 
 function PathwayStep({ step }: { step: ReviewTurn }) {
   const rules = step.safety.triggered_rules
+  const symptomContext = step.question_target?.target === 'symptom_choice'
+    ? step.question_target
+    : step.answer_target?.target === 'symptom_choice' ? step.answer_target : null
+  const reported = symptomContext?.reported_details
   return (
     <li className="doctor-step">
       <div className="doctor-step-title">
@@ -43,6 +47,7 @@ function PathwayStep({ step }: { step: ReviewTurn }) {
         <dt>Next question</dt><dd>{step.question_target ? `${label(step.question_target.target)}${step.question_target.focus ? ` · ${label(step.question_target.focus)}` : ''}` : 'Consultation complete'}</dd>
       </dl>
       {step.question_target?.target === 'symptom_choice' && <div className="doctor-reasons"><strong>Possible matches</strong><p>{step.question_target.candidate_source === 'word_tfidf' ? 'TF-IDF word overlap' : 'Character vector similarity'} suggested {step.question_target.candidates?.map(label).join(', ')}. Awaiting the patient’s choice before recording a symptom.</p></div>}
+      {symptomContext && <div className="doctor-reasons"><strong>Patient-reported context</strong><p>{symptomContext.original_text?.replaceAll(' | ', ' · ')}</p>{reported && (reported.duration_text || reported.progression || reported.severity) && <ul>{reported.duration_text && <li>Timing: {reported.duration_text}</li>}{reported.progression && <li>Change: {reported.progression}</li>}{reported.severity && <li>Severity described: {reported.severity}</li>}</ul>}</div>}
       {(step.extraction.symptoms.length > 0 || step.extraction.unmapped_mentions.length > 0) && <div className="doctor-reasons"><strong>Interpreted facts</strong><ul>{step.extraction.symptoms.map((fact, index) => <li key={`${fact.symptom_id}-${index}`}>{label(fact.symptom_id)}: {fact.presence}{fact.severity ? `, ${fact.severity}` : ''}{fact.duration_days !== null ? `, ${fact.duration_days} day(s)` : ''}{fact.progression ? `, ${fact.progression}` : ''}</li>)}{step.extraction.unmapped_mentions.map((mention, index) => <li key={`unmapped-${index}`}>Unresolved patient wording: {mention}</li>)}</ul></div>}
       {rules.length > 0 && <div className="doctor-reasons"><strong>Rules fired</strong><ul>{rules.map((rule) => <li key={rule.rule_id}>{rule.rule_id}: {rule.reason}</li>)}</ul></div>}
       {step.safety.missing_information.length > 0 && <p><strong>Missing:</strong> {step.safety.missing_information.map(label).join(', ')}</p>}

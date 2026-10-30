@@ -150,6 +150,13 @@ class EvidenceState:
         age = re.search(
             r"\b(?:i am|i'm|age(?: is)?|aged)\s+(\d{1,3})(?:\s+years? old)?\b", text
         )
+        if age is None:
+            # Patients often start with "31, not pregnant" or "31 years old".
+            # Require the number at the start so a symptom duration is not age.
+            age = re.search(
+                r"^(\d{1,3})(?:\s+years? old\b|\s*,\s*(?:not\s+)?pregnant\b)",
+                text,
+            )
         if age:
             candidate = int(age.group(1))
             if 0 < candidate < 120:

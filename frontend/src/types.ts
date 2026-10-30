@@ -28,6 +28,12 @@ export type QuestionTarget = {
   focus: string | null
   candidates?: string[]
   candidate_source?: 'word_tfidf' | 'character_vector'
+  original_text?: string
+  reported_details?: {
+    duration_text: string | null
+    progression: string | null
+    severity: string | null
+  }
 }
 
 export type RuleHit = { rule_id: string; disposition: string; reason: string }

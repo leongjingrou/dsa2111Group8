@@ -102,6 +102,45 @@ def duration_without_unit(message, target):
     return None
 
 
+def reported_context(message):
+    """Keep qualitative patient details without inventing model-ready values."""
+    text = message.lower()
+    duration = re.search(
+        r"\b(?:for\s+)?(?:(?:the\s+)?(?:past|last)\s+)?"
+        r"(?:a\s+)?(?:few|several|couple(?: of)?|\d+(?:\.\d+)?)\s+"
+        r"(?:days?|weeks?|months?)\b|\bsince\s+(?:yesterday|last night|this morning)\b",
+        text,
+    )
+    return {
+        "duration_text": duration.group(0) if duration else None,
+        "progression": _parse_symptom_detail(text, "progression").get("progression"),
+        "severity": _parse_symptom_detail(text, "severity").get("severity"),
+    }
+
+
+def _context_recap(details):
+    clauses = []
+    duration = details.get("duration_text")
+    if duration:
+        if duration.startswith("for past "):
+            duration = duration.replace("for past ", "for the past ", 1)
+        elif duration.startswith("past "):
+            duration = "for the " + duration
+        elif duration.startswith("last "):
+            duration = "for the " + duration
+        elif not duration.startswith(("for ", "since ")):
+            duration = "for " + duration
+        clauses.append(f"it has been happening {duration}")
+    progression = details.get("progression")
+    if progression:
+        clauses.append({
+            "worsening": "it is getting worse",
+            "improving": "it is getting better",
+            "stable": "it has stayed the same",
+        }[progression])
+    return "You mentioned " + " and ".join(clauses) + ". " if clauses else ""
+
+
 def vector_clarification(message):
     """Offer closely related vocabulary terms without asserting any of them."""
     candidates, source = ranked_clarification_candidates(message)
@@ -109,14 +148,16 @@ def vector_clarification(message):
         return None
     labels = [get_vocab().name(symptom_id).lower() for symptom_id in candidates]
     choices = "; ".join(f"{index}. {label}" for index, label in enumerate(labels, 1))
+    details = reported_context(message)
+    recap = _context_recap(details)
     if {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(candidates):
         question = (
-            "Where is the stomach pain mainly: upper abdomen near the ribs, "
+            recap + "Where is the stomach pain mainly: upper abdomen near the ribs, "
             "lower abdomen, or all over? If it feels severe, please say that too."
         )
     else:
         question = (
-            f"To make sure I understood, which best matches what you described: {choices}? "
+            recap + f"To make sure I understood, which best matches what you described: {choices}? "
             "You can reply with a number or describe it in your own words."
         )
     return (
@@ -127,6 +168,7 @@ def vector_clarification(message):
             "candidates": candidates,
             "candidate_source": source,
             "original_text": message,
+            "reported_details": details,
         },
         question,
     )
@@ -203,22 +245,26 @@ def resolve_vector_choice(message, target):
 def retry_vector_clarification(message, target):
     """Keep an unresolved answer in the pending question for a clearer retry."""
     attempts = int(target.get("clarification_attempts", 0)) + 1
+    combined = f"{target.get('original_text', '')} | {message}".strip(" |")
+    details = reported_context(combined)
     updated = {
         **target,
         "clarification_attempts": attempts,
-        "original_text": f"{target.get('original_text', '')} | {message}".strip(" |"),
+        "original_text": combined,
+        "reported_details": details,
     }
     candidates = target.get("candidates", [])
+    recap = _context_recap(details)
     if {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(candidates):
         question = (
-            "I have your description. To understand the location, is it mainly "
+            recap + "To understand the location, is it mainly "
             "upper abdomen, lower abdomen, or all over? You can answer with just "
             "'upper', 'lower', or 'all over'."
         )
     else:
         labels = [get_vocab().name(sid).lower() for sid in candidates]
         choices = "; ".join(f"{index}. {name}" for index, name in enumerate(labels, 1))
-        question = f"I have your description. Which option fits best: {choices}? You can reply with just a number."
+        question = recap + f"Which option fits best: {choices}? You can reply with just a number."
     return updated, question
 
 

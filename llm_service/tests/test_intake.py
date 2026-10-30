@@ -243,6 +243,10 @@ def test_generic_stomach_pain_uses_ranked_candidates_without_guessing_severity()
     assert target["candidate_source"] in {"word_tfidf", "character_vector"}
     assert {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(target["candidates"])
     assert "upper abdomen" in question.lower()
+    assert target["reported_details"]["duration_text"] == "for past few days"
+    assert target["reported_details"]["progression"] == "worsening"
+    assert "past few days" in question.lower()
+    assert "getting worse" in question.lower()
     assert vector_clarification("no stomach pain") is None
     result = resolve_vector_choice("upper", target)
     assert [symptom.symptom_id for symptom in result.symptoms] == ["upper_abdominal_pain"]
@@ -258,6 +262,17 @@ def test_generic_stomach_pain_is_not_forced_to_upper_or_lower_when_unsure():
     assert retry["clarification_attempts"] == 1
     assert "my belly hurts" in retry["original_text"]
     assert "upper abdomen" in question.lower()
+
+
+def test_retry_question_uses_new_details_from_repeated_description():
+    target, _ = vector_clarification("stomach pain")
+    retry, question = retry_vector_clarification(
+        "stomach hurting for past few days, getting a bit worse", target
+    )
+    assert retry["reported_details"]["duration_text"] == "for past few days"
+    assert retry["reported_details"]["progression"] == "worsening"
+    assert "past few days" in question.lower()
+    assert "getting worse" in question.lower()
 
 
 def test_location_and_explicit_severity_are_both_retained_after_clarification():

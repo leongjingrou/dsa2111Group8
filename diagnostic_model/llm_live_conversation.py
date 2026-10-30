@@ -7,6 +7,7 @@ decision. It never selects a diagnosis, escalation category, or stopping point.
 import argparse
 import asyncio
 import json
+import re
 from dataclasses import asdict
 from pathlib import Path
 
@@ -264,12 +265,25 @@ class LLMDrivenConsultation:
             bound_extraction = resolve_vector_choice(patient_message, answer_target)
             if bound_extraction is None:
                 answer = patient_message.lower().strip().rstrip(".!?")
-                if answer in {"none", "none of these", "all over"} or answer_target.get("clarification_attempts", 0) >= 2:
+                location_declined = (
+                    {"upper_abdominal_pain", "lower_abdominal_pain"}
+                    <= set(answer_target.get("candidates", []))
+                    and re.search(r"\b(?:all over|everywhere)\b", answer)
+                    and not re.search(r"\b(?:not|isn't|is not)\s+(?:all over|everywhere)\b", answer)
+                )
+                if (
+                    answer in {"none", "none of these", "none of those"}
+                    or location_declined
+                    or answer_target.get("clarification_attempts", 0) >= 2
+                ):
                     # The closed vocabulary cannot represent this description.
                     # Preserve the patient's words for clinician review after
                     # giving a repeated description a chance to be clarified.
                     extraction = empty_extraction()
-                    extraction.unmapped_mentions = [answer_target.get("original_text") or patient_message]
+                    original = answer_target.get("original_text", "")
+                    extraction.unmapped_mentions = [
+                        f"{original} | {patient_message}" if original else patient_message
+                    ]
                     bound_extraction = extraction
                 else:
                     clarification = retry_vector_clarification(patient_message, answer_target)

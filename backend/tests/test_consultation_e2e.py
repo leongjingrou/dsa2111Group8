@@ -84,6 +84,21 @@ def test_preliminary_urgent_model_label_waits_for_stopping_policy(app_factory):
     assert "MODEL_URGENT" in result["triggered_rules"]
 
 
+def test_casual_opening_with_age_and_pregnancy_skips_repeated_questions(client):
+    session_id = start(client)
+    result = turn(
+        client,
+        session_id,
+        "31, not pregnant. I have a runny nose since yesterday, a bit worse today",
+    )
+    assert result["question_target"]["target"] == "emergency_warning_signs"
+    assert result["extraction"]["symptoms"][0]["duration_days"] == 1.0
+    result = turn(client, session_id, "none of those")
+    assert result["question_target"]["focus"] != "duration"
+    review = client.get(f"/api/conversations/{session_id}/review").json()
+    assert review["pathway"][0]["patient_answer"].startswith("31, not pregnant")
+
+
 @pytest.mark.parametrize(
     ("message", "rule"),
     [

@@ -37,3 +37,30 @@ def test_review_of_emergency_keeps_model_results_empty(client):
 
 def test_review_requires_existing_session(client):
     assert client.get("/api/conversations/missing/review").status_code == 404
+
+
+def test_review_retains_qualitative_context_before_and_after_symptom_choice(client):
+    session_id = start(client)
+    turn(client, session_id, "stomach pain")
+    repeated = turn(client, session_id, "stomach hurting for past few days, getting a bit worse")
+    assert "past few days" in repeated["reply"].lower()
+    assert "getting worse" in repeated["reply"].lower()
+    pending = client.get(f"/api/conversations/{session_id}/review").json()["pathway"][1]
+    details = pending["question_target"]["reported_details"]
+    assert details["duration_text"] == "for past few days"
+    assert details["progression"] == "worsening"
+    turn(client, session_id, "upper")
+    resolved = client.get(f"/api/conversations/{session_id}/review").json()["pathway"][2]
+    assert resolved["answer_target"]["reported_details"] == details
+    assert resolved["extraction"]["symptoms"][0]["progression"] == "worsening"
+
+
+def test_all_over_abdominal_pain_does_not_repeat_location_question(client):
+    session_id = start(client)
+    first = turn(client, session_id, "stomach pain")
+    assert "upper abdomen" in first["reply"].lower()
+    response = turn(client, session_id, "It hurts all over actually")
+    assert response["question_target"] is None or response["question_target"]["target"] != "symptom_choice"
+    assert response["extraction"]["unmapped_mentions"] == [
+        "stomach pain | It hurts all over actually"
+    ]

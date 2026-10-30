@@ -59,7 +59,9 @@ choice. Explicit severe stomach pain continues through the emergency safety
 rule.
 If a patient repeats the description instead of selecting a location, the
 intake keeps the consultation open and asks a simpler follow-up. It preserves
-both messages for a later answer.
+both messages and their qualitative timing/change details for a later answer.
+The clinician review displays this patient-reported context while the symptom
+choice is pending and after it is resolved.
 
 `localhost` is reachable only from this computer. Testing from another device
 requires publishing the service on a reachable host and configuring its firewall,
