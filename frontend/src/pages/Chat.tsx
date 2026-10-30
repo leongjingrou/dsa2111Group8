@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router'
 import { diagnose, SafetyAuditError, transcribe } from '../api'
 import ChatBubble from '../components/ChatBubble'
 import ChatInput from '../components/ChatInput'
-import { BackIcon, BotIcon } from '../components/Icons'
+import { BackIcon } from '../components/Icons'
 import useRecorder from '../hooks/useRecorder'
 import useSpeech from '../hooks/useSpeech'
 import type { DiagnosticStatus, Message } from '../types'
@@ -11,7 +11,7 @@ import './Chat.css'
 
 const greeting: Message = {
   role: 'bot',
-  text: 'Hello! I am your telemedicine assistant. How are you feeling today?',
+  text: 'Hello, what seems to be the problem today?',
 }
 
 const Chat = () => {
@@ -70,14 +70,15 @@ const Chat = () => {
 
   return (
     <main className="chat">
-      <header>
+      <header className="chat-header">
         <button className="back" onClick={() => navigate('/')} aria-label="Back to home">
           <BackIcon size={20} />
         </button>
-        <BotIcon size={22} />
-        <span>Telemedicine Assistant</span>
+        <span className="chat-brand"><span className="brand-mark">+</span><span><strong>Clinical intake</strong><small>Patient consultation</small></span></span>
+        <span className="chat-state">{status === 'asking' ? 'In progress' : 'Completed'}</span>
         {conversationId && <button className="doctor-link" onClick={openDoctorView}>Doctor view</button>}
       </header>
+      <div className="chat-context"><strong>Symptom assessment</strong><span>Answer in your own words. Brief replies are okay when they answer the latest question.</span></div>
       <section className="messages">
         {messages.map((msg, i) => (
           <ChatBubble
@@ -91,9 +92,7 @@ const Chat = () => {
         <div ref={bottom} />
       </section>
       {status !== 'asking' && (
-        <button className="end-diagnosis" onClick={() => navigate('/')}>
-          End consultation
-        </button>
+        <div className="chat-finish"><span>Assessment complete</span><button className="end-diagnosis" onClick={() => navigate('/')}>Return home</button></div>
       )}
       {status === 'asking' && (
         <ChatInput onSend={send} onToggleMic={toggleMic} recording={recording} disabled={loading} />

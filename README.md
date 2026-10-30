@@ -42,6 +42,14 @@ server trace and does not expose hidden language-model reasoning. The clinician
 view contains patient text and is a local demonstration feature; add access
 control before exposing either port to other users or networks.
 
+The intake accepts brief replies against the current question. A short reply
+that explicitly names a symptom from one of the last three questions is
+applied to that earlier question, and the review shows which question was used.
+Bare answers are never reassigned to a past question. Duration replies need
+a time unit (for example, `2d`, `3 weeks`, or `yesterday`); a bare number is not
+silently treated as days. The intake asks for the unit and accepts a brief
+follow-up such as `days`.
+
 `localhost` is reachable only from this computer. Testing from another device
 requires publishing the service on a reachable host and configuring its firewall,
 TLS and access controls. Stop the local stack with `docker compose down`; the

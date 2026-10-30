@@ -55,6 +55,7 @@ export type ReviewTurn = {
   patient_answer: string
   response: string
   question_target: QuestionTarget | null
+  answer_target: QuestionTarget | null
   extraction: {
     symptoms: { symptom_id: string; presence: string; severity: string | null; duration_days: number | null; progression: string | null }[]
     unmapped_mentions: string[]

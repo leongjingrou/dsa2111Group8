@@ -38,8 +38,9 @@ function PathwayStep({ step }: { step: ReviewTurn }) {
       <dl>
         <dt>Question asked</dt><dd>{step.question_asked}</dd>
         <dt>Patient answer</dt><dd>{step.patient_answer}</dd>
+        <dt>Answer applied to</dt><dd>{step.answer_target ? `${label(step.answer_target.target)}${step.answer_target.focus ? ` · ${label(step.answer_target.focus)}` : ''}` : 'Opening description'}</dd>
         <dt>Next response</dt><dd>{step.response}</dd>
-        <dt>Next question target</dt><dd>{step.question_target ? `${label(step.question_target.kind)} · ${label(step.question_target.target)}${step.question_target.focus ? ` · ${label(step.question_target.focus)}` : ''}` : 'None'}</dd>
+        <dt>Next question</dt><dd>{step.question_target ? `${label(step.question_target.target)}${step.question_target.focus ? ` · ${label(step.question_target.focus)}` : ''}` : 'Consultation complete'}</dd>
       </dl>
       {(step.extraction.symptoms.length > 0 || step.extraction.unmapped_mentions.length > 0) && <div className="doctor-reasons"><strong>Interpreted facts</strong><ul>{step.extraction.symptoms.map((fact, index) => <li key={`${fact.symptom_id}-${index}`}>{label(fact.symptom_id)}: {fact.presence}{fact.severity ? `, ${fact.severity}` : ''}{fact.duration_days !== null ? `, ${fact.duration_days} day(s)` : ''}{fact.progression ? `, ${fact.progression}` : ''}</li>)}{step.extraction.unmapped_mentions.map((mention, index) => <li key={`unmapped-${index}`}>Unmapped: {mention}</li>)}</ul></div>}
       {rules.length > 0 && <div className="doctor-reasons"><strong>Rules fired</strong><ul>{rules.map((rule) => <li key={rule.rule_id}>{rule.rule_id}: {rule.reason}</li>)}</ul></div>}
@@ -66,23 +67,24 @@ export default function Doctor() {
   }, [sessionId])
 
   useEffect(() => {
-    void load()
+    const initial = window.setTimeout(() => void load(), 0)
     const timer = window.setInterval(() => void load(), 3000)
-    return () => window.clearInterval(timer)
+    return () => { window.clearTimeout(initial); window.clearInterval(timer) }
   }, [load])
 
   const latest = review?.latest
   return (
     <main className="doctor">
       <header className="doctor-header">
-        <div><p className="doctor-eyebrow">Clinician view · local prototype</p><h1>Consultation pathway</h1></div>
-        <div className="doctor-actions"><button onClick={() => void load()}>Refresh</button><Link to="/">Home</Link></div>
+        <div className="doctor-heading"><span className="brand-mark">+</span><div><p className="doctor-eyebrow">CLINICIAN WORKSPACE · LOCAL DEMO</p><h1>Consultation review</h1></div></div>
+        <div className="doctor-actions"><span className="doctor-live">Syncs every 3 seconds</span><button onClick={() => void load()}>Refresh</button><Link to="/">Home</Link></div>
       </header>
-      <p className="doctor-note">This view shows recorded questions, rule decisions, and model outputs. It does not expose hidden language-model reasoning. The assessment is preliminary and requires clinical review.</p>
+      <p className="doctor-note">Recorded patient answers, question path, safety decisions and model estimates. For review by a clinician; this is a preliminary assessment.</p>
       {!sessionId && <form className="doctor-lookup" onSubmit={(event) => { event.preventDefault(); if (enteredId.trim()) navigate(`/doctor/${encodeURIComponent(enteredId.trim())}`) }}><label htmlFor="session-id">Consultation ID</label><input id="session-id" value={enteredId} onChange={(event) => setEnteredId(event.target.value)} placeholder="Paste the ID from the consultation" /><button type="submit">Open review</button></form>}
       {error && <p className="doctor-error" role="alert">{error}</p>}
-      {!review && !error && <p>Loading consultation…</p>}
+      {sessionId && !review && !error && <p>Loading consultation…</p>}
       {review && <>
+        <div className="doctor-record"><span>CONSULTATION RECORD</span><code>{review.session_id}</code><span className={review.finished ? 'doctor-record-state done' : 'doctor-record-state'}>{review.finished ? 'Completed' : 'In progress'}</span></div>
         <div className="doctor-summary">
           <section><span>Status</span><strong>{latest ? label(latest.status) : 'waiting for first answer'}</strong></section>
           <section><span>Answers</span><strong>{review.pathway.length}</strong></section>

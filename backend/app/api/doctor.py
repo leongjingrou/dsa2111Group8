@@ -28,6 +28,7 @@ async def review_consultation(session_id: str, request: Request):
                 "patient_answer": checkpoint["latest_response"],
                 "response": checkpoint["doctor_response"],
                 "question_target": checkpoint.get("question_target"),
+                "answer_target": checkpoint.get("answer_target"),
                 "extraction": checkpoint["extraction"],
                 "safety": checkpoint["safety"],
                 "diagnosis": (checkpoint.get("answers") or {}).get("condition"),

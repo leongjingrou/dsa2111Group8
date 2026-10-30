@@ -7,7 +7,12 @@ from diagnostic_model.live_conversation import EvidenceState
 from llm_service.app.extractor import extract_symptoms
 from llm_service.app.llm_client import FakeLLMClient
 from llm_service.app.schema import Profile, SymptomState
-from llm_service.intake import bind_answer, empty_extraction
+from llm_service.intake import (
+    answer_target_for_reply,
+    bind_answer,
+    duration_without_unit,
+    empty_extraction,
+)
 
 
 def test_bare_temperature_is_bound_to_temperature_question():
@@ -192,3 +197,37 @@ def test_colloquial_grouped_safety_denial_is_understood():
     )
     assert extraction is not None
     assert all(evidence.symptoms[target] is False for target in targets)
+
+
+def test_short_reply_can_explicitly_refer_to_a_recent_symptom_question():
+    earlier = {"kind": "symptom", "target": "cough", "focus": "duration"}
+    pending = {"kind": "safety", "target": "age", "focus": None}
+    assert answer_target_for_reply("2d for the cough", pending, [earlier, pending]) == earlier
+    assert answer_target_for_reply("30", pending, [earlier, pending]) == pending
+
+
+def test_brief_duration_with_explicit_unit_is_bound_without_guessing():
+    profile = Profile(symptoms={"cough": SymptomState(symptom_id="cough", presence="present")})
+    target = {"kind": "symptom", "target": "cough", "focus": "duration"}
+    extraction = bind_answer("2d for the cough", target, profile, EvidenceState())
+    assert extraction.symptoms[0].duration_days == 2.0
+    assert bind_answer("2", target, profile, EvidenceState()) is None
+
+
+def test_named_yes_no_answer_can_bind_to_a_recent_presence_question():
+    target = {"kind": "symptom", "target": "cough", "focus": "presence"}
+    evidence = EvidenceState()
+    extraction = bind_answer("no cough", target, Profile(), evidence)
+    assert extraction.symptoms[0].presence == "absent"
+    assert evidence.symptoms["cough"] is False
+
+
+def test_bare_duration_is_clarified_and_unit_only_reply_uses_saved_number():
+    profile = Profile(symptoms={"cough": SymptomState(symptom_id="cough", presence="present")})
+    target = {"kind": "symptom", "target": "cough", "focus": "duration"}
+    assert duration_without_unit("2", target) == "2"
+    assert duration_without_unit("2d", target) is None
+    clarified = {**target, "clarifying_number": "2"}
+    extraction = bind_answer("days", clarified, profile, EvidenceState())
+    assert extraction.symptoms[0].duration_days == 2.0
+    assert extraction.symptoms[0].evidence == "days"

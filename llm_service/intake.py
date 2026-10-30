@@ -66,6 +66,41 @@ def empty_extraction():
     )
 
 
+def answer_target_for_reply(message, pending_target, recent_targets):
+    """Use an earlier question only when a short reply names its symptom.
+
+    A bare yes/no or number still belongs to the pending question. This avoids
+    silently turning an ambiguous answer into a different clinical fact.
+    """
+    if pending_target is None or len(message.split()) > 12:
+        return pending_target
+    normalized = _normalize_conversational_answer(message)
+    matches = []
+    for target in reversed(recent_targets[-3:]):
+        if not target or target == pending_target:
+            continue
+        symptom_id = target.get("target", "")
+        if not get_vocab().is_valid(symptom_id):
+            continue
+        if any(
+            phrase and re.search(rf"\b{re.escape(phrase.lower())}\b", normalized)
+            for phrase in get_vocab().phrases(symptom_id)
+        ):
+            matches.append(target)
+    # Several named symptoms need full extraction, not a guessed binding.
+    return matches[0] if len(matches) == 1 else pending_target
+
+
+def duration_without_unit(message, target):
+    """Identify a bare amount that cannot safely be converted to days."""
+    if target is None or target.get("focus") != "duration":
+        return None
+    answer = _normalize_conversational_answer(message)
+    if re.fullmatch(r"\d+(?:\.\d+)?", answer) or answer in NUMBER_WORDS:
+        return answer
+    return None
+
+
 def safety_question(decision, profile=None):
     """Ask about a conflict first, otherwise the next missing safety field."""
     conflicts = [
@@ -167,6 +202,10 @@ def bind_answer(message, target, profile, evidence):
     if target is None:
         return None
     normalized_answer = _normalize_conversational_answer(message)
+    if target.get("clarifying_number") and normalized_answer in {
+        "day", "days", "week", "weeks", "month", "months"
+    }:
+        normalized_answer = f"{target['clarifying_number']} {normalized_answer}"
     question_field = target["target"]
     grouped_targets = target.get("targets", [])
     if question_field == "emergency_warning_signs" and grouped_targets:
@@ -214,6 +253,10 @@ def bind_answer(message, target, profile, evidence):
         and target.get("focus") == "presence"
     ):
         presence = _presence_from_answer(normalized_answer)
+        if presence is None:
+            presence = _presence_from_answer(
+                _without_target_phrase(normalized_answer, question_field)
+            )
         if presence is None:
             return None
         if presence == "uncertain":
@@ -315,7 +358,10 @@ def _bind_sex(answer, evidence):
 
 def _parse_symptom_detail(answer, focus):
     if focus == "duration":
-        match = re.search(r"(\d+(?:\.\d+)?)\s*(days?|weeks?|months?)", answer)
+        match = re.search(
+            r"\b(\d+(?:\.\d+)?)\s*(days?|d|weeks?|wks?|w|months?|mos?|m)\b",
+            answer,
+        )
         if match:
             days_per_unit = {"d": 1, "w": 7, "m": 30}
             return {"duration_days": float(match[1]) * days_per_unit[match[2][0]]}
@@ -347,6 +393,19 @@ def _parse_symptom_detail(answer, focus):
         if re.search(r"\b(worse|worsening|getting bad)\b", answer):
             return {"progression": "worsening"}
     return {}
+
+
+def _without_target_phrase(answer, symptom_id):
+    """Remove one explicit symptom reference from a brief presence answer."""
+    for phrase in sorted(get_vocab().phrases(symptom_id), key=len, reverse=True):
+        if phrase:
+            answer = re.sub(
+                rf"\b(?:for|about|to)?\s*(?:the|my)?\s*{re.escape(phrase.lower())}\b",
+                " ",
+                answer,
+                count=1,
+            )
+    return re.sub(r"\s+", " ", answer).strip(" ,")
 
 
 def _presence_from_answer(answer):

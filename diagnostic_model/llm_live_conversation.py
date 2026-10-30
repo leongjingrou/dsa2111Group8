@@ -35,7 +35,13 @@ from llm_service.app.schema import (
     Profile,
 )
 from llm_service.app.vocab import get_vocab
-from llm_service.intake import bind_answer, empty_extraction, safety_question
+from llm_service.intake import (
+    answer_target_for_reply,
+    bind_answer,
+    duration_without_unit,
+    empty_extraction,
+    safety_question,
+)
 from safety_layer import SafetyEngine, guard_decision
 from safety_layer.integration import result_from_safety
 
@@ -206,8 +212,13 @@ class LLMDrivenConsultation:
             raise RuntimeError("The consultation has already stopped")
 
         previous_question = self.pending_question
+        answer_target = answer_target_for_reply(
+            patient_message,
+            previous_question,
+            [item.get("question_target") for item in self.trace],
+        )
         bound_extraction = bind_answer(
-            patient_message, previous_question, self.profile, self.evidence
+            patient_message, answer_target, self.profile, self.evidence
         )
         self._record_patient_answer(patient_message)
 
@@ -215,7 +226,35 @@ class LLMDrivenConsultation:
         emergency_decision = self._check_emergency_before_extraction()
         if emergency_decision is not None:
             checkpoint = self._checkpoint(patient_message, empty_extraction())
+            checkpoint["answer_target"] = answer_target
             return self._respond_to_safety(checkpoint, emergency_decision)
+
+        bare_duration = duration_without_unit(patient_message, answer_target)
+        if bare_duration is not None:
+            # A number without a unit is clinically ambiguous. Keep it in the
+            # persisted pending question and ask for the unit before inference.
+            decision = self.safety_engine.evaluate(self.profile, evidence=self.evidence)
+            checkpoint = self._checkpoint(patient_message, empty_extraction())
+            checkpoint["answer_target"] = answer_target
+            if not decision.can_continue:
+                return self._respond_to_safety(checkpoint, decision)
+            self.pending_question = {**answer_target, "clarifying_number": bare_duration}
+            question = (
+                f"Was that {bare_duration} days, weeks, or months? "
+                "You can reply with just the unit."
+            )
+            checkpoint.update(
+                safety=decision.to_dict(),
+                safety_findings=[],
+                safety_override_applied=False,
+                stop=False,
+                question_target=self.pending_question,
+                question_fallback_used=True,
+                doctor_response=question,
+            )
+            self.trace.append(checkpoint)
+            self.turns.append({"role": "doctor", "content": question})
+            return checkpoint
 
         extraction = bound_extraction
         if extraction is None:
@@ -223,11 +262,12 @@ class LLMDrivenConsultation:
                 self.llm,
                 patient_message,
                 self.profile,
-                previous_question,
+                answer_target,
                 conversation_history=self.turns,
             )
-        self._merge_patient_facts(extraction, bound_extraction, previous_question)
+        self._merge_patient_facts(extraction, bound_extraction, answer_target)
         checkpoint = self._checkpoint(patient_message, extraction)
+        checkpoint["answer_target"] = answer_target
 
         screening = self._screen_before_model(checkpoint["patient_answer"])
         if not screening.can_continue:

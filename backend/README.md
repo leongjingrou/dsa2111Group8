@@ -56,6 +56,14 @@ sessions. The endpoint contains patient text; the local prototype uses the
 unguessable session ID as its lookup key, and a network deployment needs
 clinician authentication and access control.
 
+The trace includes `answer_target`, which records the question used to
+interpret a brief reply. The server uses the pending question by default. It
+uses a recent symptom question only when the reply explicitly names that
+symptom; a bare yes/no or number is never assigned to a past question.
+For a duration question, a bare number triggers a unit clarification. The
+number is saved with that pending question, so a reply of `days`, `weeks`, or
+`months` completes it without guessing a unit.
+
 Repeat until `stop` is true. Ask the actual returned question. A short yes/no/
 not-sure answer is bound to that server-selected question, not to a question
 submitted by the client. Age and pregnancy answers are collected explicitly.
