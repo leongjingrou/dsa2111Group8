@@ -2,9 +2,8 @@
 
 from fastapi import APIRouter, HTTPException, Request
 
-from knowledge_base.kb_service import retrieve_knowledge
 from llm_service.app.schema import Profile
-from llm_service.condition_followups import knowledge_query, matched_condition_evidence
+from llm_service.condition_followups import supported_condition_matches
 from llm_service.consultation_service import consultation_response
 from llm_service.session_store import SessionMissing
 
@@ -43,21 +42,14 @@ async def review_consultation(session_id: str, request: Request):
             }
         )
 
-    # A scope referral withholds model estimates. Give the clinician separate
-    # textual knowledge-base matches from reported positive symptoms only.
-    # Similarity scores are retrieval scores, not diagnostic probabilities.
+    # A scope referral withholds model estimates. Show only text matches with
+    # corroborating positive symptoms; retrieval scores are not probabilities.
     knowledge_context = None
     if trace and "SCOPE_CONDITION" in {
         hit["rule_id"] for hit in trace[-1]["safety"]["triggered_rules"]
     }:
         profile = Profile.model_validate(state["profile"])
-        query = knowledge_query(profile)
-        if query:
-            knowledge_context = retrieve_knowledge(query)
-            for result in knowledge_context["results"]:
-                result["reported_evidence"] = matched_condition_evidence(
-                    result, state["profile"]["symptoms"]
-                )
+        knowledge_context = supported_condition_matches(profile)
 
     return {
         "session_id": session_id,

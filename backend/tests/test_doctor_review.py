@@ -78,20 +78,17 @@ def test_scope_referral_shows_separate_gastroenteritis_text_match(app_factory):
     assert result["diagnosis"] is None
     assert "SCOPE_CONDITION" in result["triggered_rules"]
     assert review["knowledge_context"]["results"][0]["condition_id"] == "gastroenteritis"
+    assert "overlap with Gastroenteritis" in result["reply"]
+    assert "not a diagnosis" in result["reply"]
     assert review["latest"]["decision_record"]["preliminary_estimates"] == []
 
 
-def test_scope_text_match_displays_explicit_denial_of_gi_symptoms(app_factory):
+def test_scope_text_match_does_not_claim_gastroenteritis_from_pain_alone(app_factory):
     with TestClient(app_factory(predictor=RecordingPredictor(condition="out_of_scope"))) as client:
         session_id = start(client)
         for answer in ("stomach ache", "upper", "24", "no", "none", "none", "2 days, mild, stable"):
-            turn(client, session_id, answer)
+            result = turn(client, session_id, answer)
         review = client.get(f"/api/conversations/{session_id}/review").json()
 
-    gastro = next(
-        result for result in review["knowledge_context"]["results"]
-        if result["condition_id"] == "gastroenteritis"
-    )
-    assert {name.lower() for name in gastro["reported_evidence"]["absent"]} >= {
-        "diarrhoea", "vomiting", "nausea"
-    }
+    assert review["knowledge_context"]["results"] == []
+    assert "overlap with Gastroenteritis" not in result["reply"]

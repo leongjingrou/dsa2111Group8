@@ -36,7 +36,7 @@ from llm_service.app.schema import (
     Profile,
 )
 from llm_service.app.vocab import get_vocab
-from llm_service.condition_followups import next_followup
+from llm_service.condition_followups import next_followup, supported_condition_matches
 from llm_service.intake import (
     answer_target_for_reply,
     bind_answer,
@@ -199,8 +199,20 @@ class LLMDrivenConsultation:
         if stop:
             self.finished = True
             self.pending_question = None
+            patient_message = result.patient_message
+            if any(hit.rule_id == "SCOPE_CONDITION" for hit in decision.triggered_rules):
+                matches = supported_condition_matches(self.profile)
+                if matches and matches["results"]:
+                    names = [item["name"] for item in matches["results"][:2]]
+                    possibilities = " or ".join(names)
+                    patient_message = (
+                        f"Your reported symptoms overlap with {possibilities} "
+                        "in this prototype's knowledge base. This is a possibility "
+                        "for a clinician to review, not a diagnosis. "
+                        + patient_message
+                    )
             checkpoint.update(
-                question_target=None, doctor_response=result.patient_message
+                question_target=None, doctor_response=patient_message
             )
         else:
             self.pending_question, question = safety_question(decision, self.profile)

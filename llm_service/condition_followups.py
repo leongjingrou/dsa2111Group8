@@ -81,3 +81,29 @@ def matched_condition_evidence(result, symptoms):
         ]
         for presence in ("present", "absent")
     }
+
+
+def supported_condition_matches(profile):
+    """Return text matches backed by an anchor and a second reported symptom.
+
+    A retrieval score alone can rank a condition for a shared symptom such as
+    nausea. Requiring two positive facts, including a condition anchor, keeps
+    that weak overlap out of patient-facing possibilities.
+    """
+    query = knowledge_query(profile)
+    if not query:
+        return None
+    matches = retrieve_knowledge(query, top_k=len(followup_config()))
+    present = positive_symptoms(profile)
+    supported = []
+    for result in matches["results"]:
+        plan = followup_config().get(result["condition_id"])
+        if plan is None or not present.intersection(plan["anchors"]):
+            continue
+        result["reported_evidence"] = matched_condition_evidence(
+            result, {key: value.model_dump() for key, value in profile.symptoms.items()}
+        )
+        if len(result["reported_evidence"]["present"]) >= 2:
+            supported.append(result)
+    matches["results"] = supported
+    return matches
