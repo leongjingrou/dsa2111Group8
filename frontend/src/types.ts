@@ -19,6 +19,7 @@ export type Diagnosis = {
   decision_record: DecisionRecord | null
   stop_probability: number | null
   stop_threshold: number
+  triggered_rules: string[]
 }
 
 export type QuestionTarget = {
@@ -81,4 +82,14 @@ export type ConsultationReview = {
   finished: boolean
   pathway: ReviewTurn[]
   latest: Diagnosis | null
+  knowledge_context: {
+    kb_version: string
+    disclaimer: string
+    results: {
+      condition_id: string
+      name: string
+      similarity_score: number
+      sources: { title: string; url: string }[]
+    }[]
+  } | null
 }

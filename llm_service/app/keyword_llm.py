@@ -56,6 +56,8 @@ def _entry_terms(symptom_id, entry):
     name = entry.get("name", "").lower()
     terms = [symptom_id.replace("_", " "), name]
     terms.extend(item.lower() for item in entry.get("synonyms", []))
+    if symptom_id == "diarrhoea":
+        terms.append("diarrhea")
     return list(dict.fromkeys(term for term in terms if term))
 
 

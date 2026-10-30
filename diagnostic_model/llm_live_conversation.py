@@ -328,6 +328,33 @@ class LLMDrivenConsultation:
         if not screening.can_continue:
             return self._respond_to_safety(checkpoint, screening)
 
+        if self._needs_abdominal_context():
+            # One location answer is too little evidence to interpret an
+            # abdominal complaint. Ask about associated symptoms before the
+            # first model call; emergency screening has already completed.
+            question = (
+                "Along with the stomach pain, have you had diarrhoea, vomiting, "
+                "or nausea? Please name any you've had, or say none."
+            )
+            self.pending_question = {
+                "kind": "context",
+                "target": "abdominal_associated_symptoms",
+                "targets": ["diarrhoea", "vomiting", "nausea"],
+                "focus": "presence",
+            }
+            checkpoint.update(
+                safety=screening.to_dict(),
+                safety_findings=[],
+                safety_override_applied=False,
+                stop=False,
+                question_target=self.pending_question,
+                question_fallback_used=True,
+                doctor_response=question,
+            )
+            self.trace.append(checkpoint)
+            self.turns.append({"role": "doctor", "content": question})
+            return checkpoint
+
         # Training used five partial evidence states. Checklist turns must not
         # create an out-of-range feature or force an incomplete safety screen.
         answer_number = min(
@@ -398,6 +425,23 @@ class LLMDrivenConsultation:
                 "pregnant" if self.evidence.pregnant else "not_pregnant"
             )
         self.turns.append({"role": "patient", "content": patient_message})
+
+    def _needs_abdominal_context(self):
+        abdominal_pain = {"upper_abdominal_pain", "lower_abdominal_pain"}
+        associated = {"diarrhoea", "vomiting", "nausea"}
+        return (
+            any(
+                self.profile.symptoms.get(symptom_id)
+                and self.profile.symptoms[symptom_id].presence == "present"
+                for symptom_id in abdominal_pain
+            )
+            and not any(symptom_id in self.profile.symptoms for symptom_id in associated)
+            and not any(
+                (item.get("question_target") or {}).get("target")
+                == "abdominal_associated_symptoms"
+                for item in self.trace
+            )
+        )
 
     def _check_emergency_before_extraction(self):
         has_warning_sign = any(

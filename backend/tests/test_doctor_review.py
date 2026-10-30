@@ -1,6 +1,8 @@
 """The clinician view must reflect the persisted, guarded decision path."""
 
-from backend.tests.conftest import start, turn
+from fastapi.testclient import TestClient
+
+from backend.tests.conftest import RecordingPredictor, start, turn
 
 
 def test_review_tracks_questions_and_safety_without_inventing_model_output(client):
@@ -64,3 +66,28 @@ def test_all_over_abdominal_pain_does_not_repeat_location_question(client):
     assert response["extraction"]["unmapped_mentions"] == [
         "stomach pain | It hurts all over actually"
     ]
+
+
+def test_scope_referral_shows_separate_gastroenteritis_text_match(app_factory):
+    with TestClient(app_factory(predictor=RecordingPredictor(condition="out_of_scope"))) as client:
+        session_id = start(client)
+        for answer in ("stomach ache", "upper", "24", "no", "none", "diarrhea and nausea"):
+            result = turn(client, session_id, answer)
+        review = client.get(f"/api/conversations/{session_id}/review").json()
+
+    assert result["diagnosis"] is None
+    assert "SCOPE_CONDITION" in result["triggered_rules"]
+    assert review["knowledge_context"]["results"][0]["condition_id"] == "gastroenteritis"
+    assert review["latest"]["decision_record"]["preliminary_estimates"] == []
+
+
+def test_scope_text_match_respects_explicit_denial_of_gi_symptoms(app_factory):
+    with TestClient(app_factory(predictor=RecordingPredictor(condition="out_of_scope"))) as client:
+        session_id = start(client)
+        for answer in ("stomach ache", "upper", "24", "no", "none", "none"):
+            turn(client, session_id, answer)
+        review = client.get(f"/api/conversations/{session_id}/review").json()
+
+    assert "gastroenteritis" not in {
+        result["condition_id"] for result in review["knowledge_context"]["results"]
+    }

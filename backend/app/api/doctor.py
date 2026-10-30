@@ -2,6 +2,8 @@
 
 from fastapi import APIRouter, HTTPException, Request
 
+from knowledge_base.kb_service import retrieve_knowledge
+from llm_service.app.vocab import get_vocab
 from llm_service.consultation_service import consultation_response
 from llm_service.session_store import SessionMissing
 
@@ -40,9 +42,36 @@ async def review_consultation(session_id: str, request: Request):
             }
         )
 
+    # A scope referral withholds model estimates. Give the clinician separate
+    # textual knowledge-base matches from reported positive symptoms only.
+    # Similarity scores are retrieval scores, not diagnostic probabilities.
+    knowledge_context = None
+    if trace and "SCOPE_CONDITION" in {
+        hit["rule_id"] for hit in trace[-1]["safety"]["triggered_rules"]
+    }:
+        symptoms = state["profile"]["symptoms"]
+        gi_findings_denied = all(
+            symptoms.get(symptom_id, {}).get("presence") == "absent"
+            for symptom_id in ("diarrhoea", "vomiting", "nausea")
+        )
+        query = " ".join(
+            get_vocab().name(symptom_id)
+            for symptom_id, symptom in symptoms.items()
+            if symptom["presence"] == "present" and get_vocab().is_valid(symptom_id)
+        )
+        if query:
+            knowledge_context = retrieve_knowledge(query)
+            if gi_findings_denied:
+                knowledge_context["results"] = [
+                    result
+                    for result in knowledge_context["results"]
+                    if result["condition_id"] != "gastroenteritis"
+                ]
+
     return {
         "session_id": session_id,
         "finished": state["finished"],
         "pathway": pathway,
+        "knowledge_context": knowledge_context,
         "latest": consultation_response(session_id, trace[-1]) if trace else None,
     }
