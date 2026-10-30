@@ -109,6 +109,16 @@ def vector_clarification(message):
         return None
     labels = [get_vocab().name(symptom_id).lower() for symptom_id in candidates]
     choices = "; ".join(f"{index}. {label}" for index, label in enumerate(labels, 1))
+    if {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(candidates):
+        question = (
+            "Where is the stomach pain mainly: upper abdomen near the ribs, "
+            "lower abdomen, or all over? If it feels severe, please say that too."
+        )
+    else:
+        question = (
+            f"To make sure I understood, which best matches what you described: {choices}? "
+            "You can reply with a number or describe it in your own words."
+        )
     return (
         {
             "kind": "semantic_clarification",
@@ -118,13 +128,15 @@ def vector_clarification(message):
             "candidate_source": source,
             "original_text": message,
         },
-        f"To make sure I understood, which best matches what you described: {choices}? "
-        "You can reply with a number, describe it in your own words, or say none of these.",
+        question,
     )
 
 
 def resolve_vector_choice(message, target):
-    """Bind a brief choice only when it selects one candidate unambiguously."""
+    """Bind a choice only when it selects one candidate unambiguously.
+
+    None means the reply needs another question; it is not an unmapped finding.
+    """
     original = target.get("original_text", "")
     reply = _normalize_conversational_answer(message)
     candidates = target.get("candidates", [])
@@ -149,13 +161,11 @@ def resolve_vector_choice(message, target):
             if len(named) == 1:
                 selected = named[0]
     if selected is None:
-        return ExtractionResult(
-            symptoms=[],
-            unmapped_mentions=[original or message],
-            medical_history=[],
-            allergies=[],
-            medications=[],
-        )
+        severe_candidates = [sid for sid in candidates if sid.startswith("severe_")]
+        if len(severe_candidates) == 1 and _parse_symptom_detail(reply, "severity").get("severity") == "severe":
+            selected = severe_candidates[0]
+    if selected is None:
+        return None
     combined = f"{original} {message}".lower()
     duration = _parse_symptom_detail(combined, "duration")
     progression = _parse_symptom_detail(combined, "progression")
@@ -188,6 +198,28 @@ def resolve_vector_choice(message, target):
         allergies=[],
         medications=[],
     )
+
+
+def retry_vector_clarification(message, target):
+    """Keep an unresolved answer in the pending question for a clearer retry."""
+    attempts = int(target.get("clarification_attempts", 0)) + 1
+    updated = {
+        **target,
+        "clarification_attempts": attempts,
+        "original_text": f"{target.get('original_text', '')} | {message}".strip(" |"),
+    }
+    candidates = target.get("candidates", [])
+    if {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(candidates):
+        question = (
+            "I have your description. To understand the location, is it mainly "
+            "upper abdomen, lower abdomen, or all over? You can answer with just "
+            "'upper', 'lower', or 'all over'."
+        )
+    else:
+        labels = [get_vocab().name(sid).lower() for sid in candidates]
+        choices = "; ".join(f"{index}. {name}" for index, name in enumerate(labels, 1))
+        question = f"I have your description. Which option fits best: {choices}? You can reply with just a number."
+    return updated, question
 
 
 def safety_question(decision, profile=None):

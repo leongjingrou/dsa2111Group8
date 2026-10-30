@@ -41,6 +41,7 @@ from llm_service.intake import (
     duration_without_unit,
     empty_extraction,
     resolve_vector_choice,
+    retry_vector_clarification,
     safety_question,
     vector_clarification,
 )
@@ -261,6 +262,17 @@ class LLMDrivenConsultation:
         clarification = None
         if answer_target is not None and answer_target.get("target") == "symptom_choice":
             bound_extraction = resolve_vector_choice(patient_message, answer_target)
+            if bound_extraction is None:
+                answer = patient_message.lower().strip().rstrip(".!?")
+                if answer in {"none", "none of these", "all over"} or answer_target.get("clarification_attempts", 0) >= 2:
+                    # The closed vocabulary cannot represent this description.
+                    # Preserve the patient's words for clinician review after
+                    # giving a repeated description a chance to be clarified.
+                    extraction = empty_extraction()
+                    extraction.unmapped_mentions = [answer_target.get("original_text") or patient_message]
+                    bound_extraction = extraction
+                else:
+                    clarification = retry_vector_clarification(patient_message, answer_target)
         elif bound_extraction is None and (
             answer_target is None or answer_target.get("kind") == "context"
         ):

@@ -144,7 +144,7 @@ def test_unspecified_stomach_pain_asks_candidate_then_preserves_worsening(client
     first = turn(client, session_id, "stomach hurting for past few days, getting a bit worse?")
     assert first["status"] == "asking"
     assert first["question_target"]["target"] == "symptom_choice"
-    assert "upper abdominal" in first["reply"].lower()
+    assert "upper abdomen" in first["reply"].lower()
     assert first["diagnosis"] is None
 
     second = turn(client, session_id, "upper")
@@ -158,6 +158,36 @@ def test_unspecified_stomach_pain_asks_candidate_then_preserves_worsening(client
     assert "severe_abdominal_pain" not in {
         symptom["symptom_id"] for symptom in second["extraction"]["symptoms"]
     }
+
+
+def test_repeated_stomach_description_gets_a_clearer_question_and_keeps_context(client):
+    session_id = start(client)
+    first = turn(client, session_id, "stomach pain")
+    assert first["question_target"]["target"] == "symptom_choice"
+    repeated = turn(
+        client, session_id, "stomach hurting for past few days, getting a bit worse"
+    )
+    assert repeated["status"] == "asking"
+    assert repeated["diagnosis"] is None
+    assert repeated["extraction"]["unmapped_mentions"] == []
+    assert repeated["question_target"]["target"] == "symptom_choice"
+    assert "upper abdomen" in repeated["reply"].lower()
+    resolved = turn(client, session_id, "upper")
+    pain = next(
+        item for item in resolved["extraction"]["symptoms"]
+        if item["symptom_id"] == "upper_abdominal_pain"
+    )
+    assert pain["progression"] == "worsening"
+
+
+def test_unresolved_choice_has_bounded_retries_before_clinician_review(client):
+    session_id = start(client)
+    turn(client, session_id, "stomach pain")
+    assert turn(client, session_id, "stomach pain")["status"] == "asking"
+    assert turn(client, session_id, "stomach pain")["status"] == "asking"
+    final = turn(client, session_id, "stomach pain")
+    assert final["stop"] is True
+    assert final["safety"]["disposition"] == "clinician_review"
 
 
 def test_severe_stomach_pain_still_triggers_emergency_without_model(client):

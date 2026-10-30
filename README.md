@@ -57,6 +57,9 @@ terms. The intake asks the patient to choose or clarify before adding a symptom
 to the profile. The original worsening detail is retained with a confirmed
 choice. Explicit severe stomach pain continues through the emergency safety
 rule.
+If a patient repeats the description instead of selecting a location, the
+intake keeps the consultation open and asks a simpler follow-up. It preserves
+both messages for a later answer.
 
 `localhost` is reachable only from this computer. Testing from another device
 requires publishing the service on a reachable host and configuring its firewall,
