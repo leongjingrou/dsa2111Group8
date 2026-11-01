@@ -6,6 +6,7 @@ answers for the rest of the safety checklist.
 
 import re
 
+from llm_service.app.keyword_llm import ranked_clarification_candidates
 from llm_service.app.schema import ExtractedSymptom, ExtractionResult
 from llm_service.app.vocab import get_vocab
 
@@ -64,6 +65,207 @@ def empty_extraction():
         allergies=[],
         medications=[],
     )
+
+
+def answer_target_for_reply(message, pending_target, recent_targets):
+    """Use an earlier question only when a short reply names its symptom.
+
+    A bare yes/no or number still belongs to the pending question. This avoids
+    silently turning an ambiguous answer into a different clinical fact.
+    """
+    if pending_target is None or len(message.split()) > 12:
+        return pending_target
+    normalized = _normalize_conversational_answer(message)
+    matches = []
+    for target in reversed(recent_targets[-3:]):
+        if not target or target == pending_target:
+            continue
+        symptom_id = target.get("target", "")
+        if not get_vocab().is_valid(symptom_id):
+            continue
+        if any(
+            phrase and re.search(rf"\b{re.escape(phrase.lower())}\b", normalized)
+            for phrase in get_vocab().phrases(symptom_id)
+        ):
+            matches.append(target)
+    # Several named symptoms need full extraction, not a guessed binding.
+    return matches[0] if len(matches) == 1 else pending_target
+
+
+def duration_without_unit(message, target):
+    """Identify a bare amount that cannot safely be converted to days."""
+    if target is None or target.get("focus") != "duration":
+        return None
+    answer = _normalize_conversational_answer(message)
+    if re.fullmatch(r"\d+(?:\.\d+)?", answer) or answer in NUMBER_WORDS:
+        return answer
+    return None
+
+
+def reported_context(message):
+    """Keep qualitative patient details without inventing model-ready values."""
+    text = message.lower()
+    duration = re.search(
+        r"\b(?:for\s+)?(?:(?:the\s+)?(?:past|last)\s+)?"
+        r"(?:a\s+)?(?:few|several|couple(?: of)?|\d+(?:\.\d+)?)\s+"
+        r"(?:days?|weeks?|months?)\b|\bsince\s+(?:yesterday|last night|this morning)\b",
+        text,
+    )
+    return {
+        "duration_text": duration.group(0) if duration else None,
+        "progression": _parse_symptom_detail(text, "progression").get("progression"),
+        "severity": _parse_symptom_detail(text, "severity").get("severity"),
+    }
+
+
+def _context_recap(details):
+    clauses = []
+    duration = details.get("duration_text")
+    if duration:
+        if duration.startswith("for past "):
+            duration = duration.replace("for past ", "for the past ", 1)
+        elif duration.startswith("past "):
+            duration = "for the " + duration
+        elif duration.startswith("last "):
+            duration = "for the " + duration
+        elif not duration.startswith(("for ", "since ")):
+            duration = "for " + duration
+        clauses.append(f"it has been happening {duration}")
+    progression = details.get("progression")
+    if progression:
+        clauses.append({
+            "worsening": "it is getting worse",
+            "improving": "it is getting better",
+            "stable": "it has stayed the same",
+        }[progression])
+    return "You mentioned " + " and ".join(clauses) + ". " if clauses else ""
+
+
+def vector_clarification(message):
+    """Offer closely related vocabulary terms without asserting any of them."""
+    candidates, source = ranked_clarification_candidates(message)
+    if not candidates:
+        return None
+    labels = [get_vocab().name(symptom_id).lower() for symptom_id in candidates]
+    choices = "; ".join(f"{index}. {label}" for index, label in enumerate(labels, 1))
+    details = reported_context(message)
+    recap = _context_recap(details)
+    if {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(candidates):
+        question = (
+            recap + "Where is the stomach pain mainly: upper abdomen near the ribs, "
+            "lower abdomen, or all over? If it feels severe, please say that too."
+        )
+    else:
+        question = (
+            recap + f"To make sure I understood, which best matches what you described: {choices}? "
+            "You can reply with a number or describe it in your own words."
+        )
+    return (
+        {
+            "kind": "semantic_clarification",
+            "target": "symptom_choice",
+            "focus": "presence",
+            "candidates": candidates,
+            "candidate_source": source,
+            "original_text": message,
+            "reported_details": details,
+        },
+        question,
+    )
+
+
+def resolve_vector_choice(message, target):
+    """Bind a choice only when it selects one candidate unambiguously.
+
+    None means the reply needs another question; it is not an unmapped finding.
+    """
+    original = target.get("original_text", "")
+    reply = _normalize_conversational_answer(message)
+    candidates = target.get("candidates", [])
+    selected = None
+    number = re.fullmatch(r"(?:option |number |#)?([1-9])", reply)
+    if number and int(number[1]) <= len(candidates):
+        selected = candidates[int(number[1]) - 1]
+    else:
+        matches = []
+        for symptom_id in candidates:
+            distinctive = set(symptom_id.split("_")) - {"pain", "abdominal", "headache"}
+            if any(re.search(rf"\b{re.escape(word)}\b", reply) for word in distinctive):
+                matches.append(symptom_id)
+        if len(matches) == 1:
+            selected = matches[0]
+        elif len(matches) == 2 and any(sid.startswith("severe_") for sid in matches):
+            # "upper and severe" identifies a location plus severity, rather
+            # than two competing locations. Preserve both facts for screening.
+            selected = next((sid for sid in matches if not sid.startswith("severe_")), None)
+        elif reply in {get_vocab().name(symptom_id).lower() for symptom_id in candidates}:
+            named = [sid for sid in candidates if get_vocab().name(sid).lower() == reply]
+            if len(named) == 1:
+                selected = named[0]
+    if selected is None:
+        severe_candidates = [sid for sid in candidates if sid.startswith("severe_")]
+        if len(severe_candidates) == 1 and _parse_symptom_detail(reply, "severity").get("severity") == "severe":
+            selected = severe_candidates[0]
+    if selected is None:
+        return None
+    combined = f"{original} {message}".lower()
+    duration = _parse_symptom_detail(combined, "duration")
+    progression = _parse_symptom_detail(combined, "progression")
+    severity = _parse_symptom_detail(combined, "severity")
+    symptoms = [
+        ExtractedSymptom(
+            symptom_id=selected,
+            presence="present",
+            severity=severity.get("severity"),
+            duration_days=duration.get("duration_days"),
+            progression=progression.get("progression"),
+            evidence=f"{original} | {message}",
+        )
+    ]
+    if severity.get("severity") == "severe" and "abdominal" in selected:
+        symptoms.append(
+            ExtractedSymptom(
+                symptom_id="severe_abdominal_pain",
+                presence="present",
+                severity="severe",
+                duration_days=duration.get("duration_days"),
+                progression=progression.get("progression"),
+                evidence=f"{original} | {message}",
+            )
+        )
+    return ExtractionResult(
+        symptoms=symptoms,
+        unmapped_mentions=[],
+        medical_history=[],
+        allergies=[],
+        medications=[],
+    )
+
+
+def retry_vector_clarification(message, target):
+    """Keep an unresolved answer in the pending question for a clearer retry."""
+    attempts = int(target.get("clarification_attempts", 0)) + 1
+    combined = f"{target.get('original_text', '')} | {message}".strip(" |")
+    details = reported_context(combined)
+    updated = {
+        **target,
+        "clarification_attempts": attempts,
+        "original_text": combined,
+        "reported_details": details,
+    }
+    candidates = target.get("candidates", [])
+    recap = _context_recap(details)
+    if {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(candidates):
+        question = (
+            recap + "To understand the location, is it mainly "
+            "upper abdomen, lower abdomen, or all over? You can answer with just "
+            "'upper', 'lower', or 'all over'."
+        )
+    else:
+        labels = [get_vocab().name(sid).lower() for sid in candidates]
+        choices = "; ".join(f"{index}. {name}" for index, name in enumerate(labels, 1))
+        question = recap + f"Which option fits best: {choices}? You can reply with just a number."
+    return updated, question
 
 
 def safety_question(decision, profile=None):
@@ -167,8 +369,41 @@ def bind_answer(message, target, profile, evidence):
     if target is None:
         return None
     normalized_answer = _normalize_conversational_answer(message)
+    if target.get("clarifying_number") and normalized_answer in {
+        "day", "days", "week", "weeks", "month", "months"
+    }:
+        normalized_answer = f"{target['clarifying_number']} {normalized_answer}"
     question_field = target["target"]
     grouped_targets = target.get("targets", [])
+    if question_field == "condition_symptoms" and grouped_targets:
+        if normalized_answer in NEGATIVE_GROUP_ANSWERS:
+            return ExtractionResult(
+                symptoms=[
+                    ExtractedSymptom(
+                        symptom_id=symptom_id,
+                        presence="absent",
+                        severity=None,
+                        duration_days=None,
+                        progression=None,
+                        evidence=message,
+                    )
+                    for symptom_id in grouped_targets
+                ],
+                unmapped_mentions=[],
+                medical_history=[],
+                allergies=[],
+                medications=[],
+            )
+        return None
+    if question_field == "presenting_details":
+        symptom_id = target.get("symptom_id")
+        if symptom_id and get_vocab().is_valid(symptom_id):
+            details = {}
+            for focus in ("duration", "severity", "progression"):
+                details.update(_parse_symptom_detail(normalized_answer, focus))
+            if details:
+                return _symptom_extraction(symptom_id, message, "present", **details)
+        return None
     if question_field == "emergency_warning_signs" and grouped_targets:
         if normalized_answer in NEGATIVE_GROUP_ANSWERS or re.fullmatch(
             r"(?:nah[, ]*)?(?:no(?:pe)?[, ]*)?(?:none|none of (?:that|them|those)|not any of (?:them|those))(?:[, ]+(?:thanks?|thank you|thankfully|thank u|tbh))?",
@@ -214,6 +449,10 @@ def bind_answer(message, target, profile, evidence):
         and target.get("focus") == "presence"
     ):
         presence = _presence_from_answer(normalized_answer)
+        if presence is None:
+            presence = _presence_from_answer(
+                _without_target_phrase(normalized_answer, question_field)
+            )
         if presence is None:
             return None
         if presence == "uncertain":
@@ -315,7 +554,10 @@ def _bind_sex(answer, evidence):
 
 def _parse_symptom_detail(answer, focus):
     if focus == "duration":
-        match = re.search(r"(\d+(?:\.\d+)?)\s*(days?|weeks?|months?)", answer)
+        match = re.search(
+            r"\b(\d+(?:\.\d+)?)\s*(days?|d|weeks?|wks?|w|months?|mos?|m)\b",
+            answer,
+        )
         if match:
             days_per_unit = {"d": 1, "w": 7, "m": 30}
             return {"duration_days": float(match[1]) * days_per_unit[match[2][0]]}
@@ -347,6 +589,19 @@ def _parse_symptom_detail(answer, focus):
         if re.search(r"\b(worse|worsening|getting bad)\b", answer):
             return {"progression": "worsening"}
     return {}
+
+
+def _without_target_phrase(answer, symptom_id):
+    """Remove one explicit symptom reference from a brief presence answer."""
+    for phrase in sorted(get_vocab().phrases(symptom_id), key=len, reverse=True):
+        if phrase:
+            answer = re.sub(
+                rf"\b(?:for|about|to)?\s*(?:the|my)?\s*{re.escape(phrase.lower())}\b",
+                " ",
+                answer,
+                count=1,
+            )
+    return re.sub(r"\s+", " ", answer).strip(" ,")
 
 
 def _presence_from_answer(answer):

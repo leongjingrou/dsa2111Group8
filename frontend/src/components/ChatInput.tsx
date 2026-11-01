@@ -22,10 +22,12 @@ const ChatInput = ({ onSend, onToggleMic, recording, disabled }: ChatInputProps)
 
   return (
     <form className="chat-input" onSubmit={submit}>
+      <label className="sr-only" htmlFor="patient-answer">Your answer</label>
       <input
+        id="patient-answer"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={recording ? 'Listening...' : 'Describe your symptoms...'}
+        placeholder={recording ? 'Listening…' : 'Type your answer…'}
         disabled={disabled || recording}
       />
       <button
@@ -38,7 +40,7 @@ const ChatInput = ({ onSend, onToggleMic, recording, disabled }: ChatInputProps)
         {recording ? <StopIcon size={20} /> : <MicIcon size={20} />}
       </button>
       <button type="submit" disabled={disabled || recording || !text.trim()}>
-        Send
+        Send answer
       </button>
     </form>
   )

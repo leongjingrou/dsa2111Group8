@@ -84,6 +84,21 @@ def test_preliminary_urgent_model_label_waits_for_stopping_policy(app_factory):
     assert "MODEL_URGENT" in result["triggered_rules"]
 
 
+def test_casual_opening_with_age_and_pregnancy_skips_repeated_questions(client):
+    session_id = start(client)
+    result = turn(
+        client,
+        session_id,
+        "31, not pregnant. I have a runny nose since yesterday, a bit worse today",
+    )
+    assert result["question_target"]["target"] == "emergency_warning_signs"
+    assert result["extraction"]["symptoms"][0]["duration_days"] == 1.0
+    result = turn(client, session_id, "none of those")
+    assert result["question_target"]["focus"] != "duration"
+    review = client.get(f"/api/conversations/{session_id}/review").json()
+    assert review["pathway"][0]["patient_answer"].startswith("31, not pregnant")
+
+
 @pytest.mark.parametrize(
     ("message", "rule"),
     [
@@ -137,6 +152,64 @@ def test_explicit_negated_chest_pain_does_not_create_a_false_positive(client):
     result = turn(client, start(client), "I have a runny nose but no chest pain")
     assert result["status"] == "asking"
     assert "RF_CHEST_PAIN" not in result["triggered_rules"]
+
+
+def test_unspecified_stomach_pain_asks_candidate_then_preserves_worsening(client):
+    session_id = start(client)
+    first = turn(client, session_id, "stomach hurting for past few days, getting a bit worse?")
+    assert first["status"] == "asking"
+    assert first["question_target"]["target"] == "symptom_choice"
+    assert "upper abdomen" in first["reply"].lower()
+    assert first["diagnosis"] is None
+
+    second = turn(client, session_id, "upper")
+    pain = next(
+        symptom for symptom in second["extraction"]["symptoms"]
+        if symptom["symptom_id"] == "upper_abdominal_pain"
+    )
+    assert pain["presence"] == "present"
+    assert pain["progression"] == "worsening"
+    assert pain["severity"] is None
+    assert "severe_abdominal_pain" not in {
+        symptom["symptom_id"] for symptom in second["extraction"]["symptoms"]
+    }
+
+
+def test_repeated_stomach_description_gets_a_clearer_question_and_keeps_context(client):
+    session_id = start(client)
+    first = turn(client, session_id, "stomach pain")
+    assert first["question_target"]["target"] == "symptom_choice"
+    repeated = turn(
+        client, session_id, "stomach hurting for past few days, getting a bit worse"
+    )
+    assert repeated["status"] == "asking"
+    assert repeated["diagnosis"] is None
+    assert repeated["extraction"]["unmapped_mentions"] == []
+    assert repeated["question_target"]["target"] == "symptom_choice"
+    assert "upper abdomen" in repeated["reply"].lower()
+    resolved = turn(client, session_id, "upper")
+    pain = next(
+        item for item in resolved["extraction"]["symptoms"]
+        if item["symptom_id"] == "upper_abdominal_pain"
+    )
+    assert pain["progression"] == "worsening"
+
+
+def test_unresolved_choice_has_bounded_retries_before_clinician_review(client):
+    session_id = start(client)
+    turn(client, session_id, "stomach pain")
+    assert turn(client, session_id, "stomach pain")["status"] == "asking"
+    assert turn(client, session_id, "stomach pain")["status"] == "asking"
+    final = turn(client, session_id, "stomach pain")
+    assert final["stop"] is True
+    assert final["safety"]["disposition"] == "clinician_review"
+
+
+def test_severe_stomach_pain_still_triggers_emergency_without_model(client):
+    result = turn(client, start(client), "I have severe stomach pain")
+    assert result["status"] == "urgent"
+    assert "RF_SEVERE_ABDOMINAL_PAIN" in result["triggered_rules"]
+    assert result["diagnosis"] is None
 
 
 def test_vague_opening_requests_free_form_symptom_detail_before_checklist(client):
@@ -261,6 +334,42 @@ def test_out_of_scope_prediction_is_referred_after_model_inference(app_factory):
     assert result["diagnosis"] is None
     assert result["decision_record"]["preliminary_estimates"] == []
     assert len(predictor.calls) == 1
+
+
+def test_abdominal_complaint_collects_symptoms_and_details_before_scope_prediction(app_factory):
+    predictor = RecordingPredictor(condition="out_of_scope")
+    with TestClient(app_factory(predictor=predictor)) as client:
+        session_id = start(client)
+        turn(client, session_id, "stomach ache")
+        turn(client, session_id, "upper")
+        turn(client, session_id, "24")
+        turn(client, session_id, "no")
+        question = turn(client, session_id, "none")
+        assert question["question_target"]["target"] == "condition_symptoms"
+        assert question["diagnosis"] is None
+        assert predictor.calls == []
+
+        symptoms = turn(client, session_id, "diarrhea and nausea")
+        assert symptoms["question_target"]["target"] == "presenting_details"
+        assert predictor.calls == []
+        result = turn(client, session_id, "for 2 days, mild and stable")
+    assert {item["symptom_id"] for item in symptoms["extraction"]["symptoms"]} >= {
+        "diarrhoea", "nausea"
+    }
+    assert result["extraction"]["symptoms"][0]["duration_days"] == 2.0
+    assert len(predictor.calls) == 1
+    assert "SCOPE_CONDITION" in result["triggered_rules"]
+
+
+def test_yes_to_grouped_condition_question_requests_named_symptoms(client):
+    session_id = start(client)
+    result = turn(client, session_id, "I am 30, not pregnant. I have a sore throat")
+    result = turn(client, session_id, "none")
+    assert result["question_target"]["target"] == "condition_symptoms"
+    clarification = turn(client, session_id, "yes lah")
+    assert clarification["status"] == "asking"
+    assert clarification["question_target"]["target"] == "condition_symptoms"
+    assert "which of these" in clarification["reply"].lower()
 
 
 def test_scope_sentinel_alternative_is_not_exposed_as_a_diagnosis(app_factory):

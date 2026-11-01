@@ -7,7 +7,15 @@ from diagnostic_model.live_conversation import EvidenceState
 from llm_service.app.extractor import extract_symptoms
 from llm_service.app.llm_client import FakeLLMClient
 from llm_service.app.schema import Profile, SymptomState
-from llm_service.intake import bind_answer, empty_extraction
+from llm_service.intake import (
+    answer_target_for_reply,
+    bind_answer,
+    duration_without_unit,
+    empty_extraction,
+    resolve_vector_choice,
+    retry_vector_clarification,
+    vector_clarification,
+)
 
 
 def test_bare_temperature_is_bound_to_temperature_question():
@@ -192,3 +200,93 @@ def test_colloquial_grouped_safety_denial_is_understood():
     )
     assert extraction is not None
     assert all(evidence.symptoms[target] is False for target in targets)
+
+
+def test_short_reply_can_explicitly_refer_to_a_recent_symptom_question():
+    earlier = {"kind": "symptom", "target": "cough", "focus": "duration"}
+    pending = {"kind": "safety", "target": "age", "focus": None}
+    assert answer_target_for_reply("2d for the cough", pending, [earlier, pending]) == earlier
+    assert answer_target_for_reply("30", pending, [earlier, pending]) == pending
+
+
+def test_brief_duration_with_explicit_unit_is_bound_without_guessing():
+    profile = Profile(symptoms={"cough": SymptomState(symptom_id="cough", presence="present")})
+    target = {"kind": "symptom", "target": "cough", "focus": "duration"}
+    extraction = bind_answer("2d for the cough", target, profile, EvidenceState())
+    assert extraction.symptoms[0].duration_days == 2.0
+    assert bind_answer("2", target, profile, EvidenceState()) is None
+
+
+def test_named_yes_no_answer_can_bind_to_a_recent_presence_question():
+    target = {"kind": "symptom", "target": "cough", "focus": "presence"}
+    evidence = EvidenceState()
+    extraction = bind_answer("no cough", target, Profile(), evidence)
+    assert extraction.symptoms[0].presence == "absent"
+    assert evidence.symptoms["cough"] is False
+
+
+def test_bare_duration_is_clarified_and_unit_only_reply_uses_saved_number():
+    profile = Profile(symptoms={"cough": SymptomState(symptom_id="cough", presence="present")})
+    target = {"kind": "symptom", "target": "cough", "focus": "duration"}
+    assert duration_without_unit("2", target) == "2"
+    assert duration_without_unit("2d", target) is None
+    clarified = {**target, "clarifying_number": "2"}
+    extraction = bind_answer("days", clarified, profile, EvidenceState())
+    assert extraction.symptoms[0].duration_days == 2.0
+    assert extraction.symptoms[0].evidence == "days"
+
+
+def test_generic_stomach_pain_uses_ranked_candidates_without_guessing_severity():
+    wording = "stomach hurting for past few days, getting a bit worse?"
+    target, question = vector_clarification(wording)
+    assert target["target"] == "symptom_choice"
+    assert target["candidate_source"] in {"word_tfidf", "character_vector"}
+    assert {"upper_abdominal_pain", "lower_abdominal_pain"} <= set(target["candidates"])
+    assert "upper abdomen" in question.lower()
+    assert target["reported_details"]["duration_text"] == "for past few days"
+    assert target["reported_details"]["progression"] == "worsening"
+    assert "past few days" in question.lower()
+    assert "getting worse" in question.lower()
+    assert vector_clarification("no stomach pain") is None
+    result = resolve_vector_choice("upper", target)
+    assert [symptom.symptom_id for symptom in result.symptoms] == ["upper_abdominal_pain"]
+    assert result.symptoms[0].progression == "worsening"
+    assert result.symptoms[0].severity is None
+    assert result.symptoms[0].duration_days is None
+
+
+def test_generic_stomach_pain_is_not_forced_to_upper_or_lower_when_unsure():
+    target, _ = vector_clarification("my belly hurts")
+    assert resolve_vector_choice("all over", target) is None
+    retry, question = retry_vector_clarification("my belly hurts", target)
+    assert retry["clarification_attempts"] == 1
+    assert "my belly hurts" in retry["original_text"]
+    assert "upper abdomen" in question.lower()
+
+
+def test_retry_question_uses_new_details_from_repeated_description():
+    target, _ = vector_clarification("stomach pain")
+    retry, question = retry_vector_clarification(
+        "stomach hurting for past few days, getting a bit worse", target
+    )
+    assert retry["reported_details"]["duration_text"] == "for past few days"
+    assert retry["reported_details"]["progression"] == "worsening"
+    assert "past few days" in question.lower()
+    assert "getting worse" in question.lower()
+
+
+def test_location_and_explicit_severity_are_both_retained_after_clarification():
+    target, _ = vector_clarification("my stomach hurts")
+    result = resolve_vector_choice("upper and severe", target)
+    assert {symptom.symptom_id for symptom in result.symptoms} == {
+        "upper_abdominal_pain", "severe_abdominal_pain"
+    }
+
+
+def test_vector_clarification_reuses_vocabulary_for_another_symptom_family():
+    target, _ = vector_clarification("my head hurts")
+    assert "headache" in target["candidates"]
+    assert any("headache" in candidate and candidate != "headache" for candidate in target["candidates"])
+    chosen = target["candidates"].index("headache") + 1
+    result = resolve_vector_choice(str(chosen), target)
+    assert result.symptoms[0].symptom_id == "headache"

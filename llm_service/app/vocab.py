@@ -58,6 +58,16 @@ class Vocab:
         entry = self._entries[symptom_id]
         return entry.get("name") or symptom_id.replace("_", " ")
 
+    def phrases(self, symptom_id: str) -> list[str]:
+        """Return explicit names a patient might use for a known symptom."""
+        if symptom_id not in self._entries:
+            raise UnknownSymptomError(symptom_id)
+        entry = self._entries[symptom_id]
+        return list(dict.fromkeys(
+            [symptom_id.replace("_", " "), entry.get("name", "")]
+            + list(entry.get("synonyms") or [])
+        ))
+
     def is_red_flag(self, symptom_id: str) -> bool:
         """For the safety layer / orchestrator. Not used by the LLM prompts."""
         if symptom_id not in self._entries:

@@ -102,6 +102,11 @@ def test_llm_phrases_questions_but_predictor_owns_decisions():
             sid: SymptomState(symptom_id=sid, presence="absent")
             for sid in SafetyEngine().required_screening
         }
+        # Isolate the model/LLM contract after the bounded intake questions.
+        session.trace = [
+            {"question_target": {"target": "condition_symptoms"}, "answers": None},
+            {"question_target": {"target": "presenting_details"}, "answers": None},
+        ]
         first = await session.receive("I have a fever")
         assert first["stop"] is False
         assert first["doctor_response"] == "How long have you had the fever?"

@@ -7,6 +7,7 @@ decision. It never selects a diagnosis, escalation category, or stopping point.
 import argparse
 import asyncio
 import json
+import re
 from dataclasses import asdict
 from pathlib import Path
 
@@ -35,7 +36,17 @@ from llm_service.app.schema import (
     Profile,
 )
 from llm_service.app.vocab import get_vocab
-from llm_service.intake import bind_answer, empty_extraction, safety_question
+from llm_service.condition_followups import next_followup, supported_condition_matches
+from llm_service.intake import (
+    answer_target_for_reply,
+    bind_answer,
+    duration_without_unit,
+    empty_extraction,
+    resolve_vector_choice,
+    retry_vector_clarification,
+    safety_question,
+    vector_clarification,
+)
 from safety_layer import SafetyEngine, guard_decision
 from safety_layer.integration import result_from_safety
 
@@ -188,8 +199,20 @@ class LLMDrivenConsultation:
         if stop:
             self.finished = True
             self.pending_question = None
+            patient_message = result.patient_message
+            if any(hit.rule_id == "SCOPE_CONDITION" for hit in decision.triggered_rules):
+                matches = supported_condition_matches(self.profile)
+                if matches and matches["results"]:
+                    names = [item["name"] for item in matches["results"][:2]]
+                    possibilities = " or ".join(names)
+                    patient_message = (
+                        f"Your reported symptoms overlap with {possibilities} "
+                        "in this prototype's knowledge base. This is a possibility "
+                        "for a clinician to review, not a diagnosis. "
+                        + patient_message
+                    )
             checkpoint.update(
-                question_target=None, doctor_response=result.patient_message
+                question_target=None, doctor_response=patient_message
             )
         else:
             self.pending_question, question = safety_question(decision, self.profile)
@@ -206,8 +229,13 @@ class LLMDrivenConsultation:
             raise RuntimeError("The consultation has already stopped")
 
         previous_question = self.pending_question
+        answer_target = answer_target_for_reply(
+            patient_message,
+            previous_question,
+            [item.get("question_target") for item in self.trace],
+        )
         bound_extraction = bind_answer(
-            patient_message, previous_question, self.profile, self.evidence
+            patient_message, answer_target, self.profile, self.evidence
         )
         self._record_patient_answer(patient_message)
 
@@ -215,7 +243,86 @@ class LLMDrivenConsultation:
         emergency_decision = self._check_emergency_before_extraction()
         if emergency_decision is not None:
             checkpoint = self._checkpoint(patient_message, empty_extraction())
+            checkpoint["answer_target"] = answer_target
             return self._respond_to_safety(checkpoint, emergency_decision)
+
+        bare_duration = duration_without_unit(patient_message, answer_target)
+        if bare_duration is not None:
+            # A number without a unit is clinically ambiguous. Keep it in the
+            # persisted pending question and ask for the unit before inference.
+            decision = self.safety_engine.evaluate(self.profile, evidence=self.evidence)
+            checkpoint = self._checkpoint(patient_message, empty_extraction())
+            checkpoint["answer_target"] = answer_target
+            if not decision.can_continue:
+                return self._respond_to_safety(checkpoint, decision)
+            self.pending_question = {**answer_target, "clarifying_number": bare_duration}
+            question = (
+                f"Was that {bare_duration} days, weeks, or months? "
+                "You can reply with just the unit."
+            )
+            checkpoint.update(
+                safety=decision.to_dict(),
+                safety_findings=[],
+                safety_override_applied=False,
+                stop=False,
+                question_target=self.pending_question,
+                question_fallback_used=True,
+                doctor_response=question,
+            )
+            self.trace.append(checkpoint)
+            self.turns.append({"role": "doctor", "content": question})
+            return checkpoint
+
+        clarification = None
+        if answer_target is not None and answer_target.get("target") == "symptom_choice":
+            bound_extraction = resolve_vector_choice(patient_message, answer_target)
+            if bound_extraction is None:
+                answer = patient_message.lower().strip().rstrip(".!?")
+                location_declined = (
+                    {"upper_abdominal_pain", "lower_abdominal_pain"}
+                    <= set(answer_target.get("candidates", []))
+                    and re.search(r"\b(?:all over|everywhere)\b", answer)
+                    and not re.search(r"\b(?:not|isn't|is not)\s+(?:all over|everywhere)\b", answer)
+                )
+                if (
+                    answer in {"none", "none of these", "none of those"}
+                    or location_declined
+                    or answer_target.get("clarification_attempts", 0) >= 2
+                ):
+                    # The closed vocabulary cannot represent this description.
+                    # Preserve the patient's words for clinician review after
+                    # giving a repeated description a chance to be clarified.
+                    extraction = empty_extraction()
+                    original = answer_target.get("original_text", "")
+                    extraction.unmapped_mentions = [
+                        f"{original} | {patient_message}" if original else patient_message
+                    ]
+                    bound_extraction = extraction
+                else:
+                    clarification = retry_vector_clarification(patient_message, answer_target)
+        elif bound_extraction is None and (
+            answer_target is None or answer_target.get("kind") == "context"
+        ):
+            clarification = vector_clarification(patient_message)
+        if clarification is not None:
+            decision = self.safety_engine.evaluate(self.profile, evidence=self.evidence)
+            checkpoint = self._checkpoint(patient_message, empty_extraction())
+            checkpoint["answer_target"] = answer_target
+            if decision.disposition in {"emergency", "urgent_review", "clinician_review"}:
+                return self._respond_to_safety(checkpoint, decision)
+            self.pending_question, question = clarification
+            checkpoint.update(
+                safety=decision.to_dict(),
+                safety_findings=[],
+                safety_override_applied=False,
+                stop=False,
+                question_target=self.pending_question,
+                question_fallback_used=True,
+                doctor_response=question,
+            )
+            self.trace.append(checkpoint)
+            self.turns.append({"role": "doctor", "content": question})
+            return checkpoint
 
         extraction = bound_extraction
         if extraction is None:
@@ -223,15 +330,53 @@ class LLMDrivenConsultation:
                 self.llm,
                 patient_message,
                 self.profile,
-                previous_question,
+                answer_target,
                 conversation_history=self.turns,
             )
-        self._merge_patient_facts(extraction, bound_extraction, previous_question)
+        self._merge_patient_facts(extraction, bound_extraction, answer_target)
         checkpoint = self._checkpoint(patient_message, extraction)
+        checkpoint["answer_target"] = answer_target
 
         screening = self._screen_before_model(checkpoint["patient_answer"])
         if not screening.can_continue:
             return self._respond_to_safety(checkpoint, screening)
+
+        if (
+            answer_target is not None
+            and answer_target.get("target") == "condition_symptoms"
+            and answer_target.get("clarification_attempts", 0) < 1
+            and re.fullmatch(
+                r"(?:yes|yeah|yep|got)(?:[ ,]+(?:lah|leh|lor))?",
+                patient_message.lower().strip().rstrip(".!?"),
+            )
+        ):
+            choices = self._symptom_choices(answer_target["targets"])
+            question = f"Which of these have you had: {choices}? Please name them."
+            target = {**answer_target, "clarification_attempts": 1}
+            return self._ask_before_model(checkpoint, screening, target, question)
+
+        followup = next_followup(self.profile, self.trace)
+        if followup is not None:
+            condition_id, missing_symptoms = followup
+            choices = self._symptom_choices(missing_symptoms)
+            question = f"Have you also had {choices}? Name any you've had, or say none."
+            target = {
+                "kind": "context",
+                "target": "condition_symptoms",
+                "condition_id": condition_id,
+                "targets": missing_symptoms,
+                "focus": "presence",
+            }
+            return self._ask_before_model(checkpoint, screening, target, question)
+
+        details_target = self._presenting_details_target()
+        if details_target is not None:
+            name = details_target["symptom_id"].replace("_", " ")
+            question = (
+                f"For the {name}, how long has it been going on, how severe is it "
+                "(mild, moderate, or severe), and is it getting better, staying the same, or getting worse?"
+            )
+            return self._ask_before_model(checkpoint, screening, details_target, question)
 
         # Training used five partial evidence states. Checklist turns must not
         # create an out-of-range feature or force an incomplete safety screen.
@@ -303,6 +448,52 @@ class LLMDrivenConsultation:
                 "pregnant" if self.evidence.pregnant else "not_pregnant"
             )
         self.turns.append({"role": "patient", "content": patient_message})
+
+    def _presenting_details_target(self):
+        if any(
+            (item.get("question_target") or {}).get("target") == "presenting_details"
+            for item in self.trace
+        ):
+            return None
+        for symptom_id, symptom in self.profile.symptoms.items():
+            if symptom.presence != "present":
+                continue
+            if any(
+                value is None
+                for value in (symptom.duration_days, symptom.severity, symptom.progression)
+            ):
+                return {
+                    "kind": "context",
+                    "target": "presenting_details",
+                    "symptom_id": symptom_id,
+                    "focus": None,
+                }
+            break
+        return None
+
+    @staticmethod
+    def _symptom_choices(symptom_ids):
+        labels = [symptom_id.replace("_", " ") for symptom_id in symptom_ids]
+        if len(labels) == 1:
+            return labels[0]
+        if len(labels) == 2:
+            return " or ".join(labels)
+        return ", ".join(labels[:-1]) + ", or " + labels[-1]
+
+    def _ask_before_model(self, checkpoint, screening, target, question):
+        self.pending_question = target
+        checkpoint.update(
+            safety=screening.to_dict(),
+            safety_findings=[],
+            safety_override_applied=False,
+            stop=False,
+            question_target=target,
+            question_fallback_used=True,
+            doctor_response=question,
+        )
+        self.trace.append(checkpoint)
+        self.turns.append({"role": "doctor", "content": question})
+        return checkpoint
 
     def _check_emergency_before_extraction(self):
         has_warning_sign = any(

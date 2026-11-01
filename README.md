@@ -33,6 +33,36 @@ container, whose Nginx proxy forwards them to the replicated backend service.
 Only the server loads the diagnostic model, safety rules, consultation store and
 optional language model; the browser never downloads or runs those models.
 
+The local clinician view is available at `http://localhost:8081`. After the
+first patient answer, the chat's **Doctor view** button opens the matching
+consultation there. The page refreshes every three seconds and shows the actual
+question sequence, patient answers, safety rule hits, guarded recommendation,
+model probabilities (when permitted), and stopping score. It reads the saved
+server trace and does not expose hidden language-model reasoning. The clinician
+view contains patient text and is a local demonstration feature; add access
+control before exposing either port to other users or networks.
+
+The intake accepts brief replies against the current question. A short reply
+that explicitly names a symptom from one of the last three questions is
+applied to that earlier question, and the review shows which question was used.
+Bare answers are never reassigned to a past question. Duration replies need
+a time unit (for example, `2d`, `3 weeks`, or `yesterday`); a bare number is not
+silently treated as days. The intake asks for the unit and accepts a brief
+follow-up such as `days`.
+
+For broad wording such as “my stomach hurts,” word-level TF-IDF and character
+vector similarity both retrieve candidate vocabulary terms. Strong word-level
+overlap takes priority; otherwise the character vector can suggest related
+terms. The intake asks the patient to choose or clarify before adding a symptom
+to the profile. The original worsening detail is retained with a confirmed
+choice. Explicit severe stomach pain continues through the emergency safety
+rule.
+If a patient repeats the description instead of selecting a location, the
+intake keeps the consultation open and asks a simpler follow-up. It preserves
+both messages and their qualitative timing/change details for a later answer.
+The clinician review displays this patient-reported context while the symptom
+choice is pending and after it is resolved.
+
 `localhost` is reachable only from this computer. Testing from another device
 requires publishing the service on a reachable host and configuring its firewall,
 TLS and access controls. Stop the local stack with `docker compose down`; the

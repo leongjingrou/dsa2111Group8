@@ -11,14 +11,14 @@ from .vocab import get_vocab
 FOCUS_INSTRUCTIONS: dict[str, str] = {
     "presence": "whether the patient currently has this symptom",
     "severity": "how severe it is (mild, moderate or severe)",
-    "duration": "how long they have had it",
+    "duration": "how long they have had it, asking for a number and time unit",
     "progression": "whether it is getting better, staying the same or getting worse",
 }
 
 FALLBACK_TEMPLATES: dict[str, str] = {
     "presence": "Do you have {name}?",
     "severity": "How severe is your {name}: mild, moderate or severe?",
-    "duration": "How long have you had {name}?",
+    "duration": "How long have you had {name}? Please include days, weeks, or months.",
     "progression": "Is your {name} getting better, staying the same or getting worse?",
 }
 
