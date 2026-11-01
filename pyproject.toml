@@ -11,6 +11,7 @@ dependencies = [
   "interpret-core>=0.7.8,<0.8",
   "joblib>=1.4,<2",
   "matplotlib>=3.9,<4",
+  "model2vec>=0.10,<0.11",
   "openai>=1.0,<3",
   "pandas>=2.2,<4",
   "pillow>=11,<13",

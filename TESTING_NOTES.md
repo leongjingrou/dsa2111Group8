@@ -11,10 +11,10 @@ Laya/CUDA inference was documented but not claimed as locally verified.
   terminal response.
 - Intake accepts open-ended sentences, fragments, typos and common Singlish such
   as `ytd`, `abit`, `bo`, `lah`, `leh`, `lor`, `jialat` and `nvr measure`.
-- The offline adapter uses exact aliases first and a conservative local TF-IDF
-  text-embedding/cosine-similarity fallback second. Low-confidence language is
-  preserved as an unmapped finding for clinician review instead of being dropped
-  or causing the opening question to loop.
+- The offline adapter uses exact aliases first and a bundled Model2Vec semantic
+  encoder second. Context-limited, high-margin matches can record a finding;
+  ambiguous or unrestricted language stays uncertain for clarification instead
+  of being silently converted into a symptom.
 - Mandatory emergency coverage is grouped briefly; adaptive clinical questions
   may continue beyond five total turns when information is still missing.
 - Recognized answers are not asked again. Temperature, sex and symptom-detail
@@ -52,6 +52,19 @@ backend service; the backend owns consultation state, safety screening, model
 inference, knowledge retrieval and the final clinician-handoff recommendation.
 The browser alone is not a standalone diagnostic application, so the backend
 containers (or an equivalent remote deployment) must be running.
+
+## Semantic-language regression (1 November 2026)
+
+- Docker image: `minishlab/potion-base-8M` downloaded at build time and served
+  locally at runtime; no external inference call is made.
+- Focused semantic/API suite: 58 tests passed with the real local encoder.
+- Live browser replay: `I have had a moderate fever since yesterday, staying
+  the same` was retained as fever / moderate / 1 day / stable; the contextual
+  reply `yeah a bit tired` was interpreted as fatigue and did not repeat the
+  fever-detail question.
+- Localized phrase checks covered `damn shag, no energy`, `shivering like mad`,
+  and `nose damn blocked`. Vague `little sick` and ambiguous `feel like puking`
+  were deliberately not promoted to definite findings.
 
 ## Repeatable browser flow
 

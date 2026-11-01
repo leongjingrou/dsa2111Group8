@@ -16,9 +16,12 @@ The conversation contract is documented in
 versions remain in `prompts/prompts.yaml`. The pending server-selected question
 is supplied to extraction, so fragments such as `37`, `about two weeks`, or
 `not that I've noticed` are interpreted in context without requiring exact
-commands. Common replies are handled locally; a configured OpenAI-compatible
-lightweight model handles broader colloquial free text while remaining outside
-the diagnosis, escalation and stopping decisions.
+commands. Common replies are handled locally. The Docker build adds a compact
+Model2Vec encoder for semantic retrieval over symptom descriptions, so
+paraphrases, minor wording variation and selected Singlish can be interpreted
+without an embedding API. A configured OpenAI-compatible lightweight model can
+still handle broader free text while remaining outside the diagnosis,
+escalation and stopping decisions.
 
 After mandatory safety screening, the controller uses
 `data/condition_followups.json` to ask one bounded, condition-relevant symptom
@@ -49,8 +52,11 @@ shared Docker volume, so the supplied multi-replica Compose stack can continue a
 conversation across backend replicas.
 `LLM_BACKEND=keyword` selects the deterministic language adapter used by server
 integration and Kubernetes load tests. It removes external provider latency,
-cost, and rate limits; it is not a clinical model or evidence of real-LLM
-quality. Production defaults to `LLM_BACKEND=remote`. The `deploy/k8s-llm`
+cost, and rate limits. When `SEMANTIC_MODEL_PATH` points to the baked local
+Model2Vec files, the adapter uses dense CPU retrieval only inside a constrained
+symptom vocabulary. Similarity outside an explicit question remains uncertain
+and requires clarification. This is not a clinical model or evidence of
+real-LLM quality. Production defaults to `LLM_BACKEND=remote`. The `deploy/k8s-llm`
 overlay enables client-IP affinity while sessions remain process-local.
 The standalone language-service entry point retains its configurable safety
 profile. The patient-facing integrated backend always applies the mandatory

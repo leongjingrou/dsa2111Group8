@@ -371,11 +371,25 @@ class LLMDrivenConsultation:
 
         details_target = self._presenting_details_target()
         if details_target is not None:
+            symptom = self.profile.symptoms[details_target["symptom_id"]]
             name = details_target["symptom_id"].replace("_", " ")
-            question = (
-                f"For the {name}, how long has it been going on, how severe is it "
-                "(mild, moderate, or severe), and is it getting better, staying the same, or getting worse?"
-            )
+            missing_prompts = []
+            if symptom.duration_days is None:
+                missing_prompts.append("how long it has been going on")
+            if symptom.severity is None:
+                missing_prompts.append("how severe it feels")
+            if symptom.progression is None:
+                missing_prompts.append(
+                    "whether it is getting better, staying the same, or getting worse"
+                )
+            if len(missing_prompts) == 1:
+                question = f"For the {name}, {missing_prompts[0]}?"
+            else:
+                question = (
+                    f"For the {name}, please tell me "
+                    + ", ".join(missing_prompts[:-1])
+                    + f", and {missing_prompts[-1]}."
+                )
             return self._ask_before_model(checkpoint, screening, details_target, question)
 
         # Training used five partial evidence states. Checklist turns must not

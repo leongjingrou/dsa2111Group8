@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from .negation import is_negated
 from .schema import ExtractedSymptom, ExtractionResult
+from .semantic_matcher import semantic_match
 from .vocab import get_vocab
 
 SEVERITY = {
@@ -166,6 +167,10 @@ class KeywordLLM:
             raise ValueError(f"Unsupported structured prompt: {prompt_name}")
         message = variables["patient_message"]
         text = message.lower()
+        try:
+            question_target = json.loads(variables.get("question_target") or "null")
+        except (TypeError, json.JSONDecodeError):
+            question_target = None
         severity = next((value for key, value in SEVERITY.items() if key in text), None)
         duration = re.search(r"(\d+(?:\.\d+)?)\s*(day|week|month)s?", text)
         days = None
@@ -184,8 +189,10 @@ class KeywordLLM:
                 for key, value in (
                     ("wors", "worsening"),
                     ("improv", "improving"),
+                    ("better", "improving"),
                     ("stable", "stable"),
                     ("unchanged", "stable"),
+                    ("same", "stable"),
                 )
                 if key in text
             ),
@@ -220,15 +227,43 @@ class KeywordLLM:
                     evidence=message[start:end],
                 )
             )
+        grouped_targets = (
+            question_target.get("targets", [])
+            if question_target
+            and question_target.get("target") == "condition_symptoms"
+            else None
+        )
+        semantic_candidates = grouped_targets if grouped_targets else None
+        local_match = semantic_match(text, semantic_candidates)
+        existing_ids = {symptom.symptom_id for symptom in symptoms}
+        if local_match is not None and local_match.symptom_id not in existing_ids:
+            has_contrast = bool(re.search(r"\b(?:but|however|though)\b", text))
+            semantic_presence = (
+                "uncertain"
+                if has_contrast or not grouped_targets
+                else "absent"
+                if is_negated(text, len(text))
+                else "present"
+            )
+            symptoms.append(
+                ExtractedSymptom(
+                    symptom_id=local_match.symptom_id,
+                    presence=semantic_presence,
+                    severity=severity if semantic_presence == "present" else None,
+                    duration_days=days if semantic_presence == "present" else None,
+                    progression=progression if semantic_presence == "present" else None,
+                    evidence=message,
+                )
+            )
         if not symptoms:
             vector_match = _vector_match(text)
             if vector_match is not None:
                 symptom_id, _ = vector_match
+                # When the server has just named a small set of symptoms, a
+                # character-level near match still requires clarification.
                 symptoms.append(
                     ExtractedSymptom(
                         symptom_id=symptom_id,
-                        # Vector similarity proposes a clarification candidate;
-                        # it never confirms a clinical fact by itself.
                         presence="uncertain",
                         severity=severity,
                         duration_days=days,

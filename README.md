@@ -20,9 +20,10 @@ docker compose up -d --build
 docker compose ps
 ```
 
-That single build command installs the container dependencies and trains/packages
-the local EBM artifacts automatically. No host Python environment, copied `.env`
-file, or manual model-training command is required for the offline demonstration.
+That single build command installs the container dependencies, trains/packages
+the local EBM artifacts, and downloads a small CPU Model2Vec semantic encoder.
+No host Python environment, copied `.env` file, or manual model-training command
+is required for the offline demonstration.
 The same commands work in PowerShell, Command Prompt, macOS Terminal and common
 Linux shells. Wait until `docker compose ps` reports the frontend and all backend
 replicas as healthy, then open `http://localhost:8080`. Readiness is also exposed
@@ -57,6 +58,13 @@ terms. The intake asks the patient to choose or clarify before adding a symptom
 to the profile. The original worsening detail is retained with a confirmed
 choice. Explicit severe stomach pain continues through the emergency safety
 rule.
+The Docker backend also runs the baked-in Model2Vec encoder locally. It compares
+free wording with plain-language symptom descriptions, including selected
+Singapore usage such as `shag` for tiredness and `lao sai` for diarrhoea. Within
+an immediately preceding symptom question, a high-margin match can resolve a
+clear paraphrase such as `a bit tired` to fatigue. Outside that constrained
+context, semantic similarity only triggers clarification; it does not silently
+create a clinical fact. Ambiguous wording is deliberately left unresolved.
 If a patient repeats the description instead of selecting a location, the
 intake keeps the consultation open and asks a simpler follow-up. It preserves
 both messages and their qualitative timing/change details for a later answer.
@@ -88,8 +96,13 @@ Use a clean Python 3.13 environment:
 ```sh
 python3.13 -m venv .venv
 .venv/bin/python -m pip install -e ".[test,serve,speech]"
+.venv/bin/python -c "from model2vec import StaticModel; StaticModel.from_pretrained('minishlab/potion-base-8M', normalize=True).save_pretrained('runtime/models/semantic')"
 .venv/bin/python -m pytest
 ```
+
+Set `SEMANTIC_MODEL_PATH=runtime/models/semantic` when running the native
+offline adapter. Docker sets this automatically and performs no embedding API
+calls at runtime.
 
 The suite includes real local HTTP tests, which train small synthetic EBM and
 stopping models and launch the actual backend in a subprocess. Internet/API keys
