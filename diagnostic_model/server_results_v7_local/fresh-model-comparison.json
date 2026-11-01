@@ -1,0 +1,46 @@
+{
+  "schema": "local-model-comparison/v1",
+  "recorded_at": "2026-11-01T12:47:27+08:00",
+  "git_commit": "903a0a8e12cff4049757101ce86bcb3ec32cedd9",
+  "matched_holdout": {
+    "rows_total": 180,
+    "rows_holdout": 45,
+    "features": 29,
+    "classes": 6,
+    "fresh_in_docker": {
+      "ebm": {
+        "accuracy": 0.9778,
+        "f1_macro": 0.9774,
+        "log_loss": 0.0597,
+        "brier": 0.0296
+      },
+      "logistic_regression": {
+        "accuracy": 0.9778,
+        "f1_macro": 0.9774,
+        "log_loss": 0.1051,
+        "brier": 0.0392
+      },
+      "ebm_best_parameters": {
+        "learning_rate": 0.03,
+        "max_bins": 16
+      }
+    },
+    "recorded_repository_artifact_not_rerun_locally": {
+      "laya_full_tuning": {
+        "accuracy": 0.8667,
+        "f1_macro": 0.8661,
+        "log_loss": 0.4057,
+        "brier": 0.2057,
+        "ece_10_bins": 0.0558,
+        "amortized_latency_ms_per_case": 16.18
+      },
+      "source": "diagnostic_model/evaluation_audit.json and EBM_Laya_Evaluation_Report.md"
+    }
+  },
+  "laya_local_rerun": {
+    "status": "blocked",
+    "reason": "The NVIDIA container runtime is installed, but Docker Desktop/WSL reported no GPU adapters; the fine-tuned checkpoint is not stored in this repository.",
+    "gpu_probe_error": "nvidia-container-cli: initialization error: WSL environment detected but no adapters were found"
+  },
+  "warning": "All model-quality values use synthetic data and are pipeline checks, not clinical validation."
+}

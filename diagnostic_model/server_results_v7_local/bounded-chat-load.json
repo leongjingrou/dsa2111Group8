@@ -1,0 +1,20 @@
+{
+  "schema": "bounded-chat-load/v1",
+  "base_url": "http://frontend",
+  "concurrency": 8,
+  "consultations": 20,
+  "completed_consultations": 20,
+  "errors": 0,
+  "requests": 160,
+  "wall_seconds": 4.69,
+  "throughput_requests_per_second": 34.116,
+  "latency_ms": {
+    "mean": 188.33,
+    "p50": 176.801,
+    "p95": 410.792,
+    "p99": 479.102,
+    "max": 684.437
+  },
+  "failed_examples": [],
+  "warning": "Synthetic bounded developer load; not a production SLA or clinical validation."
+}
