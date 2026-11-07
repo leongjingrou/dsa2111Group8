@@ -1,0 +1,6 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,start conversation,CatchResponseError('HTTP 0'),659,2026-11-07T17:25:05Z,2026-11-07T17:28:41Z
+DELETE,discard conversation,"ConnectionRefusedError(111, 'Connection refused')",114,2026-11-07T17:25:05Z,2026-11-07T17:28:23Z
+POST,conversation turn,CatchResponseError('HTTP 0'),1187,2026-11-07T17:25:05Z,2026-11-07T17:28:46Z
+DELETE,discard conversation,RemoteDisconnected('Remote end closed connection without response'),24,2026-11-07T17:26:08Z,2026-11-07T17:28:41Z
+DELETE,discard conversation,"ConnectionResetError(104, 'Connection reset by peer')",335,2026-11-07T17:25:05Z,2026-11-07T17:28:41Z

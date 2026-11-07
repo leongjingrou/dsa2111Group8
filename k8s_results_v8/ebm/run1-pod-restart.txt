@@ -1,0 +1,93 @@
+Name:             diagnosis-api-786dcf56c-p6zdj
+Namespace:        diagnosis-sim
+Priority:         0
+Service Account:  default
+Node:             k3d-diagnosis-sim-agent-0/172.21.0.5
+Start Time:       Sun, 08 Nov 2026 00:59:05 +0800
+Labels:           app.kubernetes.io/name=diagnosis-api
+                  pod-template-hash=786dcf56c
+Annotations:      <none>
+Status:           Running
+SeccompProfile:   RuntimeDefault
+IP:               10.42.2.11
+IPs:
+  IP:           10.42.2.11
+Controlled By:  ReplicaSet/diagnosis-api-786dcf56c
+Containers:
+  api:
+    Container ID:  containerd://34c24558b44ca30a3e184bc166827b2ae1cb14c2b5f885592ac5f4ada290eed9
+    Image:         diagnosis-api:llm-orchestrated
+    Image ID:      sha256:797719415056e5305c3e8af0bbdcc0dbbe40414b5e7730fb1bf8bdc69f34f575
+    Port:          8080/TCP (http)
+    Host Port:     0/TCP (http)
+    Command:
+      uvicorn
+    Args:
+      llm_service.orchestrated_main:app
+      --host
+      0.0.0.0
+      --port
+      8080
+      --workers
+      1
+    State:          Running
+      Started:      Sun, 08 Nov 2026 01:00:53 +0800
+    Last State:     Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Sun, 08 Nov 2026 00:59:06 +0800
+      Finished:     Sun, 08 Nov 2026 01:00:52 +0800
+    Ready:          True
+    Restart Count:  1
+    Limits:
+      cpu:     1
+      memory:  1Gi
+    Requests:
+      cpu:      250m
+      memory:   384Mi
+    Liveness:   http-get http://:http/healthz delay=15s timeout=5s period=10s #success=1 #failure=6
+    Readiness:  http-get http://:http/readyz delay=5s timeout=5s period=5s #success=1 #failure=3
+    Environment:
+      MODEL_BACKEND:        ebm
+      EBM_LIVE_MODEL:       /models/ebm_sequential_models.joblib
+      STOPPING_MODEL:       /models/ebm_stopping_controller.joblib
+      LLM_BACKEND:          keyword
+      MAX_ACTIVE_SESSIONS:  4096
+      CONSULTATION_DB:      /app/runtime/consultations.sqlite3
+    Mounts:
+      /app/runtime from consultation-state (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-j8872 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  consultation-state:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  consultation-state
+    ReadOnly:   false
+  kube-api-access-j8872:
+    Type:                     Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:   3607
+    ConfigMapName:            kube-root-ca.crt
+    Optional:                 false
+    DownwardAPI:              true
+QoS Class:                    Burstable
+Node-Selectors:               <none>
+Tolerations:                  node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Topology Spread Constraints:  kubernetes.io/hostname:ScheduleAnyway when max skew 1 is exceeded for selector app.kubernetes.io/name=diagnosis-api
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  20m                 default-scheduler  Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-p6zdj to k3d-diagnosis-sim-agent-0
+  Normal   Killing    19m                 kubelet            spec.containers{api}: Container api failed liveness probe, will be restarted
+  Warning  Unhealthy  18m                 kubelet            spec.containers{api}: Readiness probe failed: Get "http://10.42.2.11:8080/readyz": read tcp 10.42.2.1:56614->10.42.2.11:8080: read: connection reset by peer
+  Normal   Pulled     18m (x2 over 20m)   kubelet            spec.containers{api}: Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+  Normal   Created    18m (x2 over 20m)   kubelet            spec.containers{api}: Container created
+  Normal   Started    18m (x2 over 20m)   kubelet            spec.containers{api}: Container started
+  Warning  Unhealthy  18m (x7 over 19m)   kubelet            spec.containers{api}: Liveness probe failed: Get "http://10.42.2.11:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+  Warning  Unhealthy  18m (x17 over 19m)  kubelet            spec.containers{api}: Readiness probe failed: Get "http://10.42.2.11:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)

@@ -1,0 +1,134 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                     MESSAGE
+20m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-p6zdj          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-p6zdj to k3d-diagnosis-sim-agent-0
+17m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-xdc58          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-xdc58 to k3d-diagnosis-sim-agent-0
+29m         Warning   FailedScheduling               pod/diagnosis-api-d6b48c494-fvhx6          running PreBind plugin "VolumeBinding": Operation cannot be fulfilled on persistentvolumeclaims "consultation-state": the object has been modified; please apply your changes to the latest version and try again
+23m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-njtjr          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-njtjr to k3d-diagnosis-sim-agent-0
+26m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-bmkvd          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-bmkvd to k3d-diagnosis-sim-agent-0
+24m         Normal    Scheduled                      pod/locust-master                          Successfully assigned diagnosis-sim/locust-master to k3d-diagnosis-sim-server-0
+29m         Normal    Scheduled                      pod/diagnosis-api-d6b48c494-fvhx6          Successfully assigned diagnosis-sim/diagnosis-api-d6b48c494-fvhx6 to k3d-diagnosis-sim-agent-0
+25m         Normal    Scheduled                      pod/locust-worker-66f5dd89c4-mwm76         Successfully assigned diagnosis-sim/locust-worker-66f5dd89c4-mwm76 to k3d-diagnosis-sim-agent-0
+29m         Normal    Scheduled                      pod/diagnosis-api-d6b48c494-6v8rm          Successfully assigned diagnosis-sim/diagnosis-api-d6b48c494-6v8rm to k3d-diagnosis-sim-agent-0
+25m         Normal    Scheduled                      pod/locust-worker-66f5dd89c4-zbvcd         Successfully assigned diagnosis-sim/locust-worker-66f5dd89c4-zbvcd to k3d-diagnosis-sim-agent-1
+17m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-mgb9r          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-mgb9r to k3d-diagnosis-sim-agent-0
+26m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-z7qkw          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-z7qkw to k3d-diagnosis-sim-agent-0
+25m         Normal    Scheduled                      pod/locust-worker-66f5dd89c4-4sbp8         Successfully assigned diagnosis-sim/locust-worker-66f5dd89c4-4sbp8 to k3d-diagnosis-sim-server-0
+19m         Normal    Scheduled                      pod/diagnosis-api-786dcf56c-jshsq          Successfully assigned diagnosis-sim/diagnosis-api-786dcf56c-jshsq to k3d-diagnosis-sim-agent-0
+25m         Normal    Scheduled                      pod/locust-worker-66f5dd89c4-wf4b6         Successfully assigned diagnosis-sim/locust-worker-66f5dd89c4-wf4b6 to k3d-diagnosis-sim-agent-1
+29m         Normal    WaitForFirstConsumer           persistentvolumeclaim/consultation-state   waiting for first consumer to be created before binding
+29m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-d6b48c494 from 0 to 2
+29m         Normal    NoPods                         poddisruptionbudget/diagnosis-api          No matching pods found
+29m         Normal    Provisioning                   persistentvolumeclaim/consultation-state   External provisioner is provisioning volume for claim "diagnosis-sim/consultation-state"
+29m         Normal    SuccessfulCreate               replicaset/diagnosis-api-d6b48c494         Created pod: diagnosis-api-d6b48c494-6v8rm
+29m         Normal    SuccessfulCreate               replicaset/diagnosis-api-d6b48c494         Created pod: diagnosis-api-d6b48c494-fvhx6
+29m         Normal    ExternalProvisioning           persistentvolumeclaim/consultation-state   Waiting for a volume to be created either by the external provisioner 'rancher.io/local-path' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.
+29m         Normal    ProvisioningSucceeded          persistentvolumeclaim/consultation-state   Successfully provisioned volume pvc-127ed718-8b59-4c37-991b-b80bfb6529cb
+29m         Normal    Started                        pod/diagnosis-api-d6b48c494-fvhx6          Container started
+29m         Normal    Pulled                         pod/diagnosis-api-d6b48c494-fvhx6          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+29m         Normal    Created                        pod/diagnosis-api-d6b48c494-fvhx6          Container created
+29m         Normal    Pulled                         pod/diagnosis-api-d6b48c494-6v8rm          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+29m         Normal    Started                        pod/diagnosis-api-d6b48c494-6v8rm          Container started
+29m         Normal    Created                        pod/diagnosis-api-d6b48c494-6v8rm          Container created
+29m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/diagnosis-api      failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+29m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/diagnosis-api      invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+26m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-z7qkw
+26m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-786dcf56c from 0 to 1
+26m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled down replica set diagnosis-api-d6b48c494 from 2 to 1
+26m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-bmkvd
+26m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-786dcf56c from 1 to 2
+26m         Normal    Killing                        pod/diagnosis-api-d6b48c494-6v8rm          Stopping container api
+26m         Normal    SuccessfulDelete               replicaset/diagnosis-api-d6b48c494         Deleted pod: diagnosis-api-d6b48c494-6v8rm
+26m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled down replica set diagnosis-api-d6b48c494 from 1 to 0
+26m         Normal    SuccessfulDelete               replicaset/diagnosis-api-d6b48c494         Deleted pod: diagnosis-api-d6b48c494-fvhx6
+26m         Normal    Killing                        pod/diagnosis-api-d6b48c494-fvhx6          Stopping container api
+26m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/diagnosis-api      invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+26m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/diagnosis-api      failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+25m         Normal    ScalingReplicaSet              deployment/locust-worker                   Scaled up replica set locust-worker-66f5dd89c4 from 0 to 4
+25m         Normal    SuccessfulCreate               replicaset/locust-worker-66f5dd89c4        Created pod: locust-worker-66f5dd89c4-zbvcd
+25m         Normal    SuccessfulCreate               replicaset/locust-worker-66f5dd89c4        Created pod: locust-worker-66f5dd89c4-mwm76
+25m         Normal    SuccessfulCreate               replicaset/locust-worker-66f5dd89c4        Created pod: locust-worker-66f5dd89c4-4sbp8
+25m         Normal    SuccessfulCreate               replicaset/locust-worker-66f5dd89c4        Created pod: locust-worker-66f5dd89c4-wf4b6
+24m         Normal    Created                        pod/locust-master                          Container created
+24m         Normal    Started                        pod/locust-master                          Container started
+24m         Normal    Pulled                         pod/locust-master                          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+23m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-njtjr
+23m         Normal    SuccessfulRescale              horizontalpodautoscaler/diagnosis-api      New size: 3; reason: cpu resource utilization (percentage of request) above target
+23m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-786dcf56c from 2 to 3
+21m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-z7qkw          Liveness probe failed: Get "http://10.42.2.7:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+20m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-bmkvd          Readiness probe failed: Get "http://10.42.2.8:8080/readyz": read tcp 10.42.2.1:35090->10.42.2.8:8080: read: connection reset by peer
+20m         Normal    SuccessfulRescale              horizontalpodautoscaler/diagnosis-api      New size: 4; reason: cpu resource utilization (percentage of request) above target
+20m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-786dcf56c from 3 to 4
+20m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-p6zdj
+20m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-njtjr          Liveness probe failed: Get "http://10.42.2.10:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+20m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-njtjr          Readiness probe failed: Get "http://10.42.2.10:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+19m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-bmkvd          Readiness probe failed: Get "http://10.42.2.8:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+19m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-jshsq
+19m         Normal    SuccessfulRescale              horizontalpodautoscaler/diagnosis-api      New size: 5; reason: cpu resource utilization (percentage of request) above target
+19m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-786dcf56c from 4 to 5
+19m         Normal    Killing                        pod/diagnosis-api-786dcf56c-bmkvd          Container api failed liveness probe, will be restarted
+19m         Normal    Killing                        pod/diagnosis-api-786dcf56c-p6zdj          Container api failed liveness probe, will be restarted
+18m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-p6zdj          Readiness probe failed: Get "http://10.42.2.11:8080/readyz": read tcp 10.42.2.1:56614->10.42.2.11:8080: read: connection reset by peer
+18m         Normal    Created                        pod/diagnosis-api-786dcf56c-p6zdj          Container created
+18m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-p6zdj          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+18m         Normal    Started                        pod/diagnosis-api-786dcf56c-p6zdj          Container started
+18m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-bmkvd          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+18m         Normal    Started                        pod/diagnosis-api-786dcf56c-bmkvd          Container started
+18m         Normal    Created                        pod/diagnosis-api-786dcf56c-bmkvd          Container created
+18m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-p6zdj          Liveness probe failed: Get "http://10.42.2.11:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+18m         Normal    Killing                        pod/diagnosis-api-786dcf56c-z7qkw          Container api failed liveness probe, will be restarted
+18m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-p6zdj          Readiness probe failed: Get "http://10.42.2.11:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+18m         Normal    Killing                        pod/diagnosis-api-786dcf56c-njtjr          Container api failed liveness probe, will be restarted
+18m         Normal    Started                        pod/diagnosis-api-786dcf56c-njtjr          Container started
+18m         Normal    Created                        pod/diagnosis-api-786dcf56c-njtjr          Container created
+18m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-njtjr          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+18m         Normal    Created                        pod/diagnosis-api-786dcf56c-z7qkw          Container created
+18m         Normal    Started                        pod/diagnosis-api-786dcf56c-z7qkw          Container started
+18m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-z7qkw          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+17m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-bmkvd          Liveness probe failed: Get "http://10.42.2.8:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-jshsq          Liveness probe failed: Get "http://10.42.2.12:8080/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Normal    Killing                        pod/diagnosis-api-786dcf56c-jshsq          Container api failed liveness probe, will be restarted
+17m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-z7qkw          Readiness probe failed: Get "http://10.42.2.7:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-jshsq          Readiness probe failed: Get "http://10.42.2.12:8080/readyz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-jshsq          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+17m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-jshsq          Readiness probe failed: Get "http://10.42.2.12:8080/readyz": read tcp 10.42.2.1:53028->10.42.2.12:8080: read: connection reset by peer
+17m         Normal    SuccessfulRescale              horizontalpodautoscaler/diagnosis-api      New size: 7; reason: cpu resource utilization (percentage of request) above target
+17m         Normal    Created                        pod/diagnosis-api-786dcf56c-jshsq          Container created
+17m         Normal    Started                        pod/diagnosis-api-786dcf56c-jshsq          Container started
+17m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   Scaled up replica set diagnosis-api-786dcf56c from 5 to 7
+17m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-mgb9r
+17m         Normal    SuccessfulCreate               replicaset/diagnosis-api-786dcf56c         Created pod: diagnosis-api-786dcf56c-xdc58
+17m         Normal    Started                        pod/diagnosis-api-786dcf56c-xdc58          Container started
+17m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-mgb9r          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+17m         Normal    Started                        pod/diagnosis-api-786dcf56c-mgb9r          Container started
+17m         Normal    Created                        pod/diagnosis-api-786dcf56c-mgb9r          Container created
+17m         Normal    Pulled                         pod/diagnosis-api-786dcf56c-xdc58          Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+17m         Normal    Created                        pod/diagnosis-api-786dcf56c-xdc58          Container created
+15m         Normal    Killing                        pod/diagnosis-api-786dcf56c-jshsq          Stopping container api
+15m         Normal    SuccessfulDelete               replicaset/diagnosis-api-786dcf56c         Deleted pod: diagnosis-api-786dcf56c-bmkvd
+15m         Normal    SuccessfulDelete               replicaset/diagnosis-api-786dcf56c         Deleted pod: diagnosis-api-786dcf56c-jshsq
+15m         Normal    SuccessfulRescale              horizontalpodautoscaler/diagnosis-api      New size: 3; reason: All metrics below target
+15m         Normal    Killing                        pod/diagnosis-api-786dcf56c-njtjr          Stopping container api
+15m         Normal    Killing                        pod/diagnosis-api-786dcf56c-z7qkw          Stopping container api
+15m         Normal    Killing                        pod/diagnosis-api-786dcf56c-bmkvd          Stopping container api
+15m         Normal    SuccessfulDelete               replicaset/diagnosis-api-786dcf56c         Deleted pod: diagnosis-api-786dcf56c-z7qkw
+15m         Normal    SuccessfulDelete               replicaset/diagnosis-api-786dcf56c         Deleted pod: diagnosis-api-786dcf56c-njtjr
+15m         Warning   Unhealthy                      pod/diagnosis-api-786dcf56c-jshsq          Readiness probe failed: Get "http://10.42.2.12:8080/readyz": dial tcp 10.42.2.12:8080: connect: connection refused
+14m         Normal    SuccessfulRescale              horizontalpodautoscaler/diagnosis-api      New size: 2; reason: All metrics below target
+14m         Normal    Killing                        pod/diagnosis-api-786dcf56c-mgb9r          Stopping container api
+14m         Normal    ScalingReplicaSet              deployment/diagnosis-api                   (combined from similar events): Scaled down replica set diagnosis-api-786dcf56c from 3 to 2
+14m         Normal    SuccessfulDelete               replicaset/diagnosis-api-786dcf56c         Deleted pod: diagnosis-api-786dcf56c-mgb9r
+95s         Warning   BackOff                        pod/locust-worker-66f5dd89c4-wf4b6         Back-off restarting failed container worker in pod locust-worker-66f5dd89c4-wf4b6_diagnosis-sim(d0d2c0b4-72ba-484f-8edf-bdd3513ca871)
+94s         Warning   BackOff                        pod/locust-worker-66f5dd89c4-mwm76         Back-off restarting failed container worker in pod locust-worker-66f5dd89c4-mwm76_diagnosis-sim(459ba214-91fc-452c-af2b-ee79ad6abd48)
+89s         Warning   BackOff                        pod/locust-worker-66f5dd89c4-4sbp8         Back-off restarting failed container worker in pod locust-worker-66f5dd89c4-4sbp8_diagnosis-sim(59963047-e721-44a3-9184-03ebbf6ccbba)
+85s         Warning   BackOff                        pod/locust-worker-66f5dd89c4-zbvcd         Back-off restarting failed container worker in pod locust-worker-66f5dd89c4-zbvcd_diagnosis-sim(8ff36b3f-e316-42ef-af26-f9a26eb4f79b)
+50s         Normal    Started                        pod/locust-worker-66f5dd89c4-wf4b6         Container started
+50s         Normal    Created                        pod/locust-worker-66f5dd89c4-wf4b6         Container created
+50s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-wf4b6         Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+42s         Normal    Started                        pod/locust-worker-66f5dd89c4-mwm76         Container started
+42s         Normal    Created                        pod/locust-worker-66f5dd89c4-mwm76         Container created
+42s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-mwm76         Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+37s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-4sbp8         Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+36s         Normal    Started                        pod/locust-worker-66f5dd89c4-4sbp8         Container started
+36s         Normal    Created                        pod/locust-worker-66f5dd89c4-4sbp8         Container created
+30s         Normal    Pulled                         pod/locust-worker-66f5dd89c4-zbvcd         Container image "diagnosis-api:llm-orchestrated" already present on machine and can be accessed by the pod
+30s         Normal    Created                        pod/locust-worker-66f5dd89c4-zbvcd         Container created
+30s         Normal    Started                        pod/locust-worker-66f5dd89c4-zbvcd         Container started
